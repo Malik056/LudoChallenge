@@ -5,6 +5,6 @@ package com.example.apple.ludochallenge;
  **/
 public enum PlayerType {
 
-    HUMAN, CPU
+    HUMAN, CPU, ONLINE
 
 }

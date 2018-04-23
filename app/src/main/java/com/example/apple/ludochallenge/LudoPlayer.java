@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.graphics.Point;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -53,13 +54,38 @@ public class LudoPlayer {
             @Override
             public void run() {
 
-                ((Activity) mGame.context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        piece.mBox.removePiece(piece);
-                    }
-                });
+                LudoBox ludoBox = piece.mBox;
 
+                ludoBox.removePiece(piece);
+
+                if(ludoBox.mPieceCount > 1) {
+                    if (!ludoBox.stop) {
+
+                        int opponent = 0;
+                        int mine = 0;
+                        int[] index = {0, 0, 0, 0};
+                        for (LudoPiece l : ludoBox.mPieces) {
+                            if (l.player.player != piece.player.player) {
+                                index[opponent++] = ludoBox.mPieces.indexOf(l);
+                            } else {
+                                mine++;
+                            }
+                        }
+
+                        if(opponent == mine)
+                        {
+
+                            for(int i = 0; i < opponent; i++) {
+
+                                LudoPiece ludoPiece = ludoBox.mPieces.get(index[i]);
+                                killPiece(ludoPiece);
+                            }
+
+                            LudoGame.turnChange = false;
+
+                        }
+                    }
+                }
                 LudoBox fromBox = piece.mBox;
                 Point to = new Point();
                 Point from = new Point();
@@ -92,13 +118,72 @@ public class LudoPlayer {
                     fromBox = finalBox[0];
                 }
 
+                finalBox[0].addPiece(piece);
+                if(finalBox[0].winBox)
+                {
+                    LudoGame.turnChange = false;
+
+                    if(finalBox[0].mPieceCount == 4)
+                    {
+                        player_won();
+                    }
+                }
+                else if(finalBox[0].mPieceCount > 1)
+                {
+                    if(!finalBox[0].stop)
+                    {
+                        int opponent = 0;
+                        int mine = 0;
+                        int[] index = {0,0,0,0};
+                        for(LudoPiece l:finalBox[0].mPieces)
+                        {
+                            if(l.player.player != piece.player.player)
+                            {
+                                index[opponent++] = finalBox[0].mPieces.indexOf(l);
+                            }
+                            else
+                            {
+                                mine++;
+                            }
+                        }
+
+                        if(opponent == mine)
+                        {
+                            LudoPiece ludoPiece = finalBox[0].mPieces.get(index[0]);
+                            ludoBox = finalBox[0];
+                            int toIndex = mGame.boxes.indexOf(ludoPiece.startPosition.nextBox);
+                            int fromIndex = mGame.boxes.indexOf(ludoBox);
+
+                            int n = 52 + (fromIndex - toIndex) % 52;
+                            n += 2;
+
+                            for(int i = 0; i < opponent; i++) {
+
+                                ludoPiece = finalBox[0].mPieces.get(index[i]);
+                                killPiece(ludoPiece);
+                            }
+
+                            LudoGame.turnChange = false;
+
+                            try {
+                                Thread.sleep(n * 103 + (opponent * 10));
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
                 ((Activity) mGame.context).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
-                        mGame.currentPlayer++;
-                        mGame.currentPlayer %=mGame.numberOfPlayers;
-                        finalBox[0].addPiece(piece);
+                        if(LudoGame.turnChange) {
+                            mGame.currentPlayer++;
+                            mGame.currentPlayer %= mGame.numberOfPlayers;
+                        }
+                        else LudoGame.turnChange = true;
+
                         mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
                         mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
                         mGame.getDiceImage().setEnabled(true);
@@ -107,11 +192,13 @@ public class LudoPlayer {
                         mGame.getmArrows()[mGame.currentPlayer].setVisibility(VISIBLE);
                         mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
 
-                        if(mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU)
-                        {
+                        if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
                             mGame.getDiceImage().performClick();
                         }
+                        else if(mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE)
+                        {
 
+                        }
                     }
                 });
 
@@ -119,6 +206,15 @@ public class LudoPlayer {
         });
         thread.start();
 
+    }
+
+    private void player_won() {
+        ((Activity)mGame.context).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mGame.context,"Player Won", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void animatePiece(final LudoPiece piece, final Point from, final Point to) {
@@ -295,8 +391,49 @@ public class LudoPlayer {
                 }
             });
 
+        }
+    }
+
+    private void killPiece(LudoPiece piece)
+    {
+        LudoBox ludoBox  = piece.mBox;
+        ludoBox.removePiece(piece);
+        piece.setLayoutParams(new FrameLayout.LayoutParams(ludoBox.defaultWidth,ludoBox.defaultHeight));
+
+        Point from = new Point();
+        Point to = new Point();
+
+        while(ludoBox.previousBox != null) {
+
+            from.x = ludoBox.firstX;
+            from.y = ludoBox.firstY;
+            to.x = ludoBox.previousBox.firstX;
+            to.y = ludoBox.previousBox.firstY;
+
+            piece.animate().translationX(to.x).setDuration(100).start();
+            piece.animate().translationY(to.y).setDuration(100).start();
+
+            ludoBox = ludoBox.previousBox;
+
+
+            try {
+                Thread.sleep(103);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
         }
+
+        piece.animate().translationX(piece.startPosition.firstX).setDuration(200);
+        piece.animate().translationY(piece.startPosition.firstY).setDuration(200);
+
+        try {
+            Thread.sleep(203);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        piece.startPosition.addPiece(piece);
+
     }
 
 }
