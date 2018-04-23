@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.apple.ludochallenge.Networking.LoginActivity"
+    android:background="@drawable/background">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="1"
+        android:gravity="center_horizontal">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="0.85"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.02"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.3"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:id="@+id/register_logo"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:layout_weight="0.03"
+                android:weightSum="0.4">
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.6"
+                android:orientation="vertical"
+                android:weightSum="1">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.15"
+                    android:weightSum="1"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:text="UserName:"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp"/>
+                    <com.example.apple.ludoking.CustomEditText
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.50"
+                        android:textColor="#ECC239"
+                        android:id="@+id/login_username"
+                        android:inputType="text"
+                        android:textStyle="bold"
+                        android:autoSizeTextType="uniform"
+                        android:lines="1"
+                        android:maxLength="17"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.15"
+                        android:src="@drawable/login_dice"/>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.15"
+                    android:weightSum="1"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:text="Password:"
+                        android:layout_weight="0.4"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        android:textColor="#ffffff"
+                        android:textSize="23sp"/>
+                    <com.example.apple.ludoking.CustomEditText
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.45"
+                        android:textColor="#ECC239"
+                        android:textStyle="bold"
+                        android:id="@+id/login_password"
+                        android:lines="1"
+                        android:autoSizeTextType="uniform"
+                        android:inputType="textPassword"
+                        android:maxLength="17"/>
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.1"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_weight="0.2"
+                    android:weightSum="1">
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/login_button_background"
+                        android:id="@+id/login_login_button"
+                        android:layout_weight="0.5"/>
+                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.05"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.08"
+                    android:weightSum="1"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Don't have an account? "
+                        android:gravity="center"
+                        android:textStyle="italic|bold"
+                        android:textColor="#ECC239"
+                        android:autoSizeTextType="uniform" />
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/createone"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitXY"
+                        android:layout_weight="0.6"
+                        android:id="@+id/login_dont_have_an_account_createOne"/>
+                </LinearLayout>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.05"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:orientation="horizontal"
+                    android:layout_weight="0.2"
+                    android:gravity="center"
+                    android:weightSum="1">
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/loginActivity_playAsGuest"
+                        android:background="@drawable/play_as_guest_background"
+                        android:layout_weight="0.48"
+                        android:scaleType="fitXY"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.04"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/loginActivity_loginWithFacebook"
+                        android:background="@drawable/login_with_facebook_background"
+                        android:layout_weight="0.48"
+                        android:scaleType="fitXY"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>

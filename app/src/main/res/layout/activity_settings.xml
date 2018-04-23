@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1"
+        tools:context=".SettingsActivity">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:layout_weight="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.18"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:weightSum="1"
+                        android:gravity="center"
+                        android:layout_weight="0.16">
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.3"
+                            android:src="@drawable/default_pic"
+                            android:id="@+id/edit_profile_profileImage"/>
+
+                    </LinearLayout>
+            </LinearLayout>
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/edit_profile_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1"
+        tools:context=".SettingsActivity">
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:weightSum="1"
+            android:layout_weight="1">
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.35"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:gravity="center"
+                android:layout_weight="0.1">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.7"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/edit_profile_username"/>
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:gravity="center"
+                android:layout_weight="0.07">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.15"
+                    android:scaleType="fitXY"
+                    android:id="@+id/edit_profile_flagImage"
+                    android:src="@drawable/pakistan"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.04"/>
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:scaleType="fitXY"
+                    android:id="@+id/edit_profile_selectYourCountryBtn"
+                    android:src="@drawable/select_your_country_wriiten"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:layout_weight="0.05"
+                android:visibility="visible">
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.15"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.2"/>
+
+                <Spinner
+                    android:layout_weight="0.6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/edit_profile_spinnerCountries"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="invisible"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:gravity="center"
+                android:layout_weight="0.1">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/edit_profile_signinwithfacebook"
+                    android:layout_weight="0.5"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:gravity="center"
+                android:layout_weight="0.1">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/edit_profile_signin"
+                    android:layout_weight="0.35"/>
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/edit_profile_logout"
+                    android:layout_weight="0.35"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:gravity="center"
+                android:layout_weight="0.1">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:id="@+id/edit_profile_continue"
+                    android:src="@drawable/edit_profile_continue"
+                    android:layout_weight="0.5"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <!--<ImageView-->
+            <!--android:layout_width="50dp"-->
+            <!--android:layout_height="50dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:id="@+id/image"-->
+            <!--android:src="@drawable/play"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="hi"-->
+            <!--android:id="@+id/textView"-->
+            <!--android:gravity="center"-->
+            <!--android:textSize="50sp"/>-->
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="User"-->
+            <!--android:id="@+id/temp_users"/>-->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="0.35"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:weightSum="1"
+            android:gravity="center"
+            android:layout_weight="0.1">
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:maxLines="1"
+                    android:textColor="#440055"
+                    android:background="@null"
+                    android:id="@+id/edit_profileUserName"
+                    android:textStyle="bold"
+                    android:maxLength="19"
+                    android:gravity="center"
+                    android:layout_weight="0.6"/>
+        </LinearLayout>
+    </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

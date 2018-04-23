@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item type="id" name="player1_pic"/>
+    <item type="id" name="player2_pic"/>
+    <item type="id" name="player1_name"/>
+    <item type="id" name="player2_name"/>
+    <item type="id" name="player1_dice"/>
+    <item type="id" name="player2_dice"/>
+    <item type="id" name="player1_arrow"/>
+    <item type="id" name="player2_arrow"/>
+    <item type="id" name="player3_pic"/>
+    <item type="id" name="player4_pic"/>
+    <item type="id" name="player3_name"/>
+    <item type="id" name="player4_name"/>
+    <item type="id" name="player3_dice"/>
+    <item type="id" name="player4_dice"/>
+    <item type="id" name="player3_arrow"/>
+    <item type="id" name="player4_arrow"/>
+    <item name="lower_bar" type="id" />
+    <item name="upper_bar" type="id" />
+    <item name="player2_box" type="id" />
+    <item name="player1_box" type="id" />
+    <item name="player3_box" type="id" />
+    <item name="player4_box" type="id" />
+
+</resources>
