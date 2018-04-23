@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 public class LudoActivity extends AppCompatActivity {
 
-    //first step
+    //first step 1
     ImageView[] arrows;
     Point[] dicePoints;
     LudoGame game;
