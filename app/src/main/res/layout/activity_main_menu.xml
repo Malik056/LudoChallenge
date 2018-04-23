@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.apple.ludochallenge.Networking.MainMenu"
+    tools:context="com.example.apple.ludochallenge.networking.MainMenu"
     android:background="@drawable/background">
 
 
@@ -417,8 +417,8 @@
                     android:layout_height="0dp"
                     android:layout_weight="0.112"
                     android:adjustViewBounds="true"
-                    android:background="@drawable/default_pic"
-                    android:scaleType="center" />
+                    android:src="@drawable/default_pic"
+                    android:scaleType="fitXY" />
             </LinearLayout>
         </LinearLayout>
 

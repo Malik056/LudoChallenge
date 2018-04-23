@@ -1,4 +1,4 @@
-package com.example.apple.ludochallenge.Networking;
+package com.example.apple.ludochallenge.networking;
 
 import android.app.ProgressDialog;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.example.apple.ludochallenge.Networking;
+package com.example.apple.ludochallenge.networking;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -52,6 +52,11 @@ public class MainMenu extends AppCompatActivity {
     private String check_activity;
     String clickedCountryName;
     String getSettingsUsername;
+    String LOGIN_STATUS;
+    String facebook_display_name;
+    String facebook_country_name;
+    byte[] facebook_country_image;
+    byte[] facebook_photo_byte_array;
 
     public static MySQLDatabase mySQLDatabase;
 
@@ -93,26 +98,53 @@ public class MainMenu extends AppCompatActivity {
 
 
 
-
-
-
-
+        //GET LOGIN STATUS FACEBOOK/LUDOCHALLENGE
         mySQLDatabase = MySQLDatabase.getInstance(this);
-        byte[] d_profilePic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.IMAGE_PROFILE_COL);
-        byte[] d_flagPic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.PIC_FLAG);
-        String d_userName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_USER);
-        String d_countryName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_FLAG);
+        LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedIn();
 
-        Bitmap bitmap = BitmapFactory.decodeByteArray(d_profilePic,0,d_profilePic.length);
+        if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)){
+//            Toast.makeText(this, "FACEBOOK LOGGED IN!", Toast.LENGTH_SHORT).show();
+//            facebook_display_name = mCurrentUser.getDisplayName();
+//            facebook_photo_Uri = mCurrentUser.getPhotoUrl();
+            MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+
+            facebook_display_name = (String) mySQLDatabase.getData(null, MySQLDatabase.NAME_USER, MySQLDatabase.FACEBOOK_USER_TABLE);
+            facebook_country_name = (String) mySQLDatabase.getData(null, MySQLDatabase.NAME_FLAG, MySQLDatabase.FACEBOOK_USER_TABLE);
+            facebook_photo_byte_array = (byte[]) mySQLDatabase.getData(null, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.FACEBOOK_USER_TABLE);
+            facebook_country_image = (byte[]) mySQLDatabase.getData(null, MySQLDatabase.PIC_FLAG, MySQLDatabase.FACEBOOK_USER_TABLE);
+
+            userName.setText(facebook_display_name);
+            edit_profile_userName.setText(facebook_display_name);
+            countryName.setText(facebook_country_name);
+            edit_profile_countryName.setText(facebook_country_name);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(facebook_photo_byte_array, 0, facebook_photo_byte_array.length);
+            Bitmap bitmap1 = BitmapFactory.decodeByteArray(facebook_country_image, 0, facebook_country_image.length);
+            editProfile_userImage.setImageBitmap(bitmap);
+            profile_pic.setImageBitmap(bitmap);
+            flagPic.setImageBitmap(bitmap1);
+            edit_profile_flagImage.setImageBitmap(bitmap1);
+        }
+
+
+
+
+    if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE)) {
+        byte[] d_profilePic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+        byte[] d_flagPic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.PIC_FLAG, MySQLDatabase.TABLE_NAME);
+        String d_userName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_USER, MySQLDatabase.TABLE_NAME);
+        String d_countryName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_FLAG, MySQLDatabase.TABLE_NAME);
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(d_profilePic, 0, d_profilePic.length);
         profile_pic.setImageBitmap(bitmap);
         editProfile_userImage.setImageBitmap(bitmap);
-        bitmap = BitmapFactory.decodeByteArray(d_flagPic,0,d_flagPic.length);
+        bitmap = BitmapFactory.decodeByteArray(d_flagPic, 0, d_flagPic.length);
         flagPic.setImageBitmap(bitmap);
         edit_profile_flagImage.setImageBitmap(bitmap);
         userName.setText(d_userName);
         countryName.setText(d_countryName);
         edit_profile_userName.setText(d_userName);
         edit_profile_countryName.setText(d_countryName);
+    }
 
 
         Intent intent = getIntent();

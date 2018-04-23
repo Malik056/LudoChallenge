@@ -1,15 +1,22 @@
- package com.example.apple.ludochallenge.Networking;
+ package com.example.apple.ludochallenge.networking;
 
  import android.app.ProgressDialog;
  import android.content.Intent;
+ import android.content.pm.PackageInfo;
+ import android.content.pm.PackageManager;
+ import android.content.pm.Signature;
  import android.graphics.Bitmap;
- import android.graphics.Color;
+ import android.graphics.BitmapFactory;
+ import android.graphics.drawable.BitmapDrawable;
  import android.net.Uri;
  import android.os.Bundle;
+ import android.os.ParcelFileDescriptor;
+ import android.provider.MediaStore;
  import android.support.annotation.NonNull;
  import android.support.v7.app.AppCompatActivity;
  import android.text.TextUtils;
  import android.util.DisplayMetrics;
+ import android.util.Log;
  import android.view.View;
  import android.widget.AdapterView;
  import android.widget.Button;
@@ -20,10 +27,19 @@
 
  import com.bumptech.glide.Glide;
  import com.example.apple.ludochallenge.R;
+ import com.facebook.AccessToken;
+ import com.facebook.CallbackManager;
+ import com.facebook.FacebookCallback;
+ import com.facebook.FacebookException;
+ import com.facebook.login.LoginManager;
+ import com.facebook.login.LoginResult;
+ import com.facebook.login.widget.LoginButton;
  import com.google.android.gms.tasks.OnCompleteListener;
  import com.google.android.gms.tasks.OnSuccessListener;
  import com.google.android.gms.tasks.Task;
+ import com.google.firebase.auth.AuthCredential;
  import com.google.firebase.auth.AuthResult;
+ import com.google.firebase.auth.FacebookAuthProvider;
  import com.google.firebase.auth.FirebaseAuth;
  import com.google.firebase.auth.FirebaseUser;
  import com.google.firebase.database.DatabaseReference;
@@ -34,15 +50,27 @@
  import com.google.firebase.storage.UploadTask;
  import com.theartofdev.edmodo.cropper.CropImage;
 
+ import java.io.BufferedInputStream;
  import java.io.ByteArrayOutputStream;
  import java.io.File;
+ import java.io.FileDescriptor;
+ import java.io.FileNotFoundException;
+ import java.io.IOException;
+ import java.io.InputStream;
  import java.lang.reflect.Field;
+ import java.net.MalformedURLException;
+ import java.net.URL;
+ import java.net.URLConnection;
+ import java.security.MessageDigest;
  import java.util.ArrayList;
+ import java.util.Arrays;
  import java.util.HashMap;
  import java.util.Map;
 
  public class RegisterActivity extends AppCompatActivity {
 
+
+    private static final String TAG = "FACELOG";
     private ArrayList<CountryItem> mCountryList;
     private  CountryAdapter mAdapter;
     private int screen_Height;
@@ -66,18 +94,30 @@
     private Bitmap thumb_bitmap;
     private DatabaseReference mTokenDatabase;
     boolean checkCountryClick = false;
+    private CallbackManager mCallbackManager;
+    private ImageView facebookLogin;
+    private MySQLDatabase sqlDatabase;
+    FirebaseUser currentUser;
+    String facebook_uid;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+
+
+
         mImageStorage = FirebaseStorage.getInstance().getReference();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+        sqlDatabase = MySQLDatabase.getInstance(getApplicationContext(), MySQLDatabase.LOGINAS);
 //        current_uid = mCurrentUser.getUid();
 //        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
 
         mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
 
         selectYourCountry = (Button) findViewById(R.id.selectYourCountry);
         countryName = (TextView) findViewById(R.id.country_name);
@@ -92,6 +132,57 @@
         loadingBar = new ProgressDialog(this);
         alreadyHaveAnAccount = (ImageView) findViewById(R.id.register_already_have_an_account_login);
         playAsGuest = (ImageView) findViewById(R.id.registerActivity_playAsGuest);
+        facebookLogin = (ImageView) findViewById(R.id.registerActivity_loginWithFacebook);
+
+
+
+
+
+
+
+
+
+        // Initialize Facebook Login button
+        mCallbackManager = CallbackManager.Factory.create();
+//        LoginButton loginButton = (LoginButton) findViewById(R.id.registerActivity_loginWithFacebook);
+
+        facebookLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!checkCountryClick){
+                    Toast.makeText(getApplicationContext(), "Please select your country!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                facebookLogin.setEnabled(false);
+                LoginManager.getInstance().logInWithReadPermissions(RegisterActivity.this, Arrays.asList("email", "public_profile"));
+                LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+
+                        Log.d(TAG, "facebook:onSuccess:" + loginResult);
+                        handleFacebookAccessToken(loginResult.getAccessToken());
+                        sqlDatabase.UpdateLoginAs(MySQLDatabase.LOGIN_STATUS_FACEBOOK);
+                        // Check if user is signed in (non-null) and update UI accordingly.
+
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.d(TAG, "facebook:onCancel");
+                        // ...
+                    }
+
+                    @Override
+                    public void onError(FacebookException error) {
+                        Log.d(TAG, "facebook:onError", error);
+                        // ...
+                    }
+                });
+            }
+        });
+
+
+
 
 
 
@@ -187,6 +278,100 @@
 
     }
 
+
+
+
+     @Override
+     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+         super.onActivityResult(requestCode, resultCode, data);
+
+         // Pass the activity result back to the Facebook SDK
+         mCallbackManager.onActivityResult(requestCode, resultCode, data);
+     }
+
+
+     @Override
+     public void onStart() {
+         super.onStart();
+         // Check if user is signed in (non-null) and update UI accordingly.
+//         if(currentUser != null){
+//             String name = currentUser.getDisplayName();
+//             String email = currentUser.getEmail();
+//             Uri photoUrl= currentUser.getPhotoUrl();
+//             Toast.makeText(this, "Name: "+ name + "email: "+ email, Toast.LENGTH_SHORT).show();
+//             updateUI();
+//         }
+     }
+
+     private void updateUI() {
+         Toast.makeText(this, "Congratualtions you are logged In", Toast.LENGTH_SHORT).show();
+         final Intent intent = new Intent(RegisterActivity.this, MainMenu.class);
+         final String name = currentUser.getDisplayName();
+         final String email = currentUser.getEmail();
+         final Uri photoUrl = currentUser.getPhotoUrl();
+         final Bitmap country_flag_bitmap ;
+         BitmapDrawable bitmapDrawable = (BitmapDrawable) countryFlag.getDrawable();
+         country_flag_bitmap = bitmapDrawable.getBitmap();
+         ByteArrayOutputStream stream1 = new ByteArrayOutputStream();
+         country_flag_bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream1);
+         final byte[] byteArray1 = stream1.toByteArray();
+
+
+         facebook_uid = currentUser.getUid();
+
+         final Bitmap[] bitmap = {BitmapFactory.decodeResource(getResources(), R.drawable.default_pic)};// = get_imageFrom_Uri(photoUrl);
+//         try {
+//             bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),photoUrl);
+//         } catch (IOException e) {
+//             e.printStackTrace();
+//         }
+
+         Thread thread = new Thread(new Runnable() {
+             @Override
+             public void run() {
+                 bitmap[0] = get_imageFrom_Uri(photoUrl);
+                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                 bitmap[0].compress(Bitmap.CompressFormat.PNG, 100, stream);
+                 byte[] byteArray = stream.toByteArray();
+                 MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+                 mySQLDatabase.insertData(name, byteArray, byteArray1, countryName.getText().toString(), email, MySQLDatabase.FACEBOOK_USER_TABLE);
+                 startActivity(intent);
+                 finish();
+
+             }
+         });
+         thread.start();
+     }
+
+     private void handleFacebookAccessToken(AccessToken token) {
+         Log.d(TAG, "handleFacebookAccessToken:" + token);
+
+         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+         mAuth.signInWithCredential(credential)
+                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                     @Override
+                     public void onComplete(@NonNull Task<AuthResult> task) {
+                         if (task.isSuccessful()) {
+                             // Sign in success, update UI with the signed-in user's information
+                             Log.d(TAG, "signInWithCredential:success");
+                             FirebaseUser user = mAuth.getCurrentUser();
+                             updateUI();
+                             facebookLogin.setEnabled(true);
+                         } else {
+                             // If sign in fails, display a message to the user.
+                             Log.w(TAG, "signInWithCredential:failure", task.getException());
+                             Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                                     Toast.LENGTH_SHORT).show();
+                             updateUI();
+                             facebookLogin.setEnabled(true);
+                         }
+
+                         // ...
+                     }
+                 });
+     }
+
+
      @Override
      public void startActivityForResult(Intent intent, int requestCode) {
          super.startActivityForResult(intent, requestCode);
@@ -212,6 +397,7 @@
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
+                        sqlDatabase.UpdateLoginAs(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE);
                         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
                         FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
                         String uid = current_user.getUid();
@@ -470,17 +656,6 @@
 
      }
 
-     @Override
-     protected void onStart() {
-         super.onStart();
-         FirebaseUser currentUser = mAuth.getCurrentUser();
-//         if(currentUser != null){
-//             Intent intent = new Intent(RegisterActivity.this, SettingsActivity.class);
-//             startActivity(intent);
-//         }
-     }
-
-
      void storeFlag_into_Storage() {
 
          Uri imageUri = Uri.parse("android.resource://com.example.apple.ludoking/" + getResources().getIdentifier(countryName.getText().toString().toLowerCase(), "drawable", getApplicationContext().getPackageName()));
@@ -526,4 +701,20 @@
              }
          });
      }
+
+    public Bitmap get_imageFrom_Uri(Uri uri) {
+        Bitmap bm = BitmapFactory.decodeResource(getResources(),R.drawable.default_pic);
+        URL imageURL = null;
+        try {
+            imageURL = new URL(uri.toString());
+            bm = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bm;
+    }
+
  }

@@ -1,4 +1,4 @@
-package com.example.apple.ludochallenge.Networking;
+package com.example.apple.ludochallenge.networking;
 
 /**
  * Created by Apple on 25/03/2018.

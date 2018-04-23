@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.apple.ludochallenge.Networking.RegisterActivity"
+    tools:context="com.example.apple.ludochallenge.networking.RegisterActivity"
     android:background="@drawable/background">
 
 
@@ -126,7 +126,7 @@
                                 android:textStyle="bold"
                                 android:textColor="#ffffff"
                                 android:textSize="35sp"/>
-                            <com.example.apple.ludochallenge.Networking.CustomEditText
+                            <com.example.apple.ludochallenge.networking.CustomEditText
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:textColor="#ECC239"
@@ -159,7 +159,7 @@
                                 android:gravity="center"
                                 android:textColor="#ffffff"
                                 android:textSize="20sp"/>
-                            <com.example.apple.ludochallenge.Networking.CustomEditText
+                            <com.example.apple.ludochallenge.networking.CustomEditText
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:textColor="#ECC239"
@@ -187,7 +187,7 @@
                                 android:textStyle="bold"
                                 android:textColor="#ffffff"
                                 android:textSize="23sp"/>
-                            <com.example.apple.ludochallenge.Networking.CustomEditText
+                            <com.example.apple.ludochallenge.networking.CustomEditText
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:textColor="#ECC239"
@@ -280,6 +280,14 @@
                                 android:background="@drawable/login_with_facebook_background"
                                 android:layout_weight="0.45"
                                 android:scaleType="fitXY"/>
+
+                            <!--<com.facebook.login.widget.LoginButton-->
+                                <!--android:id="@+id/registerActivity_loginWithFacebook"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_gravity="center_horizontal"-->
+                                <!--android:layout_marginTop="30dp"-->
+                                <!--android:layout_marginBottom="30dp" />-->
                         </LinearLayout>
 
                     </LinearLayout>

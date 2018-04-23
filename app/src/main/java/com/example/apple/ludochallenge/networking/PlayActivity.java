@@ -1,4 +1,4 @@
-package com.example.apple.ludochallenge.Networking;
+package com.example.apple.ludochallenge.networking;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -76,6 +76,11 @@ public class PlayActivity extends AppCompatActivity {
     private ImageView play_editProfileDialog_edit_profileBtn;
     LinearLayout playWithFriends_2players;
     public static MySQLDatabase mySQLDatabase;
+    private String LOGIN_STATUS;
+    String facebook_display_name;
+    String facebook_country_name;
+    byte[] facebook_country_image;
+    byte[] facebook_photo_byte_array;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,24 +172,55 @@ public class PlayActivity extends AppCompatActivity {
 
 
 
+
+
+
         mySQLDatabase = MySQLDatabase.getInstance(this);
-        byte[] d_profilePic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.IMAGE_PROFILE_COL);
-        byte[] d_flagPic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.PIC_FLAG);
-        String d_userName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_USER);
-        String d_countryName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_FLAG);
+        LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedIn();
+
+        if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)){
+//            Toast.makeText(this, "FACEBOOK LOGGED IN!", Toast.LENGTH_SHORT).show();
+//            facebook_display_name = mCurrentUser.getDisplayName();
+//            facebook_photo_Uri = mCurrentUser.getPhotoUrl();
+            MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+
+            facebook_display_name = (String) mySQLDatabase.getData(null, MySQLDatabase.NAME_USER, MySQLDatabase.FACEBOOK_USER_TABLE);
+            facebook_country_name = (String) mySQLDatabase.getData(null, MySQLDatabase.NAME_FLAG, MySQLDatabase.FACEBOOK_USER_TABLE);
+            facebook_photo_byte_array = (byte[]) mySQLDatabase.getData(null, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.FACEBOOK_USER_TABLE);
+            facebook_country_image = (byte[]) mySQLDatabase.getData(null, MySQLDatabase.PIC_FLAG, MySQLDatabase.FACEBOOK_USER_TABLE);
+
+            userName.setText(facebook_display_name);
+            edit_profile_dialog_userName.setText(facebook_display_name);
+            countryName.setText(facebook_country_name);
+            edit_profile_dialog_countryName.setText(facebook_country_name);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(facebook_photo_byte_array, 0, facebook_photo_byte_array.length);
+            Bitmap bitmap1 = BitmapFactory.decodeByteArray(facebook_country_image, 0, facebook_country_image.length);
+            editProfile_userImage.setImageBitmap(bitmap);
+            profile_image.setImageBitmap(bitmap);
+            flag_image.setImageBitmap(bitmap1);
+            edit_profile_dialog_flagImage.setImageBitmap(bitmap1);
+        }
 
 
 
-        Bitmap bitmap = BitmapFactory.decodeByteArray(d_profilePic,0,d_profilePic.length);
-        profile_image.setImageBitmap(bitmap);
-        editProfile_userImage.setImageBitmap(bitmap);
-        bitmap = BitmapFactory.decodeByteArray(d_flagPic,0,d_flagPic.length);
-        flag_image.setImageBitmap(bitmap);
-        edit_profile_dialog_flagImage.setImageBitmap(bitmap);
-        userName.setText(d_userName);
-        countryName.setText(d_countryName);
-        edit_profile_dialog_userName.setText(d_userName);
-        edit_profile_dialog_countryName.setText(d_countryName);
+        if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE)) {
+            byte[] d_profilePic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+            byte[] d_flagPic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.PIC_FLAG, MySQLDatabase.TABLE_NAME);
+            String d_userName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_USER, MySQLDatabase.TABLE_NAME);
+            String d_countryName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_FLAG, MySQLDatabase.TABLE_NAME);
+
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(d_profilePic, 0, d_profilePic.length);
+            profile_image.setImageBitmap(bitmap);
+            editProfile_userImage.setImageBitmap(bitmap);
+            bitmap = BitmapFactory.decodeByteArray(d_flagPic, 0, d_flagPic.length);
+            flag_image.setImageBitmap(bitmap);
+            edit_profile_dialog_flagImage.setImageBitmap(bitmap);
+            userName.setText(d_userName);
+            countryName.setText(d_countryName);
+            edit_profile_dialog_userName.setText(d_userName);
+            edit_profile_dialog_countryName.setText(d_countryName);
+        }
 
 
 //        mUserDatabase.addValueEventListener(new ValueEventListener() {

@@ -1,4 +1,4 @@
-package com.example.apple.ludochallenge.Networking;
+package com.example.apple.ludochallenge.networking;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -144,10 +144,10 @@ public class SettingsActivity extends AppCompatActivity {
             edit_profileUserName.setText(userNamefromPreviousActivity);
 
             mySQLDatabase = MySQLDatabase.getInstance(this);
-            byte[] d_profilePic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.IMAGE_PROFILE_COL);
-            byte[] d_flagPic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.PIC_FLAG);
-            String d_userName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_USER);
-            String d_countryName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_FLAG);
+            byte[] d_profilePic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+            byte[] d_flagPic = (byte[]) mySQLDatabase.getData(current_uid, MySQLDatabase.PIC_FLAG, MySQLDatabase.TABLE_NAME);
+            String d_userName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_USER, MySQLDatabase.TABLE_NAME);
+            String d_countryName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_FLAG, MySQLDatabase.TABLE_NAME);
 
 
 
@@ -336,7 +336,7 @@ public class SettingsActivity extends AppCompatActivity {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 Bitmap flag_bitmap = ((BitmapDrawable) edit_profile_flagImage.getDrawable()).getBitmap();
                 flag_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos2);
-                mySQLDatabase.insertData(edit_profileUserName.getText().toString(), baos.toByteArray(), baos2.toByteArray(),countryName_toMain, current_uid);
+                mySQLDatabase.insertData(edit_profileUserName.getText().toString(), baos.toByteArray(), baos2.toByteArray(),countryName_toMain, current_uid, MySQLDatabase.TABLE_NAME);
 
             }
         });

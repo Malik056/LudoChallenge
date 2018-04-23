@@ -14,18 +14,43 @@
         android:supportsRtl="true"
         android:largeHeap="true"
         android:theme="@style/AppTheme"
-        android:name=".Networking.OfflineCapabilities">
+        android:name=".networking.OfflineCapabilities">
 
         <service
-            android:name=".Networking.FirebaseMessaginingService">
+            android:name=".networking.FirebaseMessaginingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
+
+
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
+
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
+
+
+
+
+        <activity android:name="com.facebook.FacebookActivity"
+            android:configChanges=
+                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+
+
 
 
         <activity android:name=".LudoActivity">
@@ -39,16 +64,16 @@
 
         <activity android:name=".SALActivity">
         </activity>
-        <activity android:name=".Networking.LoginActivity">
+        <activity android:name=".networking.LoginActivity">
         </activity>
-        <activity android:name=".Networking.MainMenu">
+        <activity android:name=".networking.MainMenu">
         </activity>
-        <activity android:name=".Networking.PlayActivity">
+        <activity android:name=".networking.PlayActivity">
         </activity>
-        <activity android:name=".Networking.ProfileActivity">
+        <activity android:name=".networking.ProfileActivity">
         </activity>
 
-        <activity android:name=".Networking.RegisterActivity">
+        <activity android:name=".networking.RegisterActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -57,9 +82,9 @@
         </activity>
 
 
-        <activity android:name=".Networking.SettingsActivity">
+        <activity android:name=".networking.SettingsActivity">
         </activity>
-        <activity android:name=".Networking.UsersActivity">
+        <activity android:name=".networking.UsersActivity">
         </activity>
     </application>
 
