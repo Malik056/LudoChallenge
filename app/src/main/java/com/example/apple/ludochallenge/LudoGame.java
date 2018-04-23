@@ -39,6 +39,8 @@ public class LudoGame extends FrameLayout {
     LudoBox[] threeP;
     LudoBox[] fourP;
 
+    static boolean turnChange = true;
+
     Context context;
     int currentPlayer = 0;
     int numberOfPlayers;
@@ -265,6 +267,10 @@ public class LudoGame extends FrameLayout {
             }
 
             players.get(currentPlayer).move(num, piece);
+        }
+        else if(players.get(currentPlayer).type == PlayerType.ONLINE)
+        {
+            //add online Player Code
         }
 
     }
@@ -547,7 +553,6 @@ public class LudoGame extends FrameLayout {
         }
 
         ludoBox.winBox = true;
-
         setStops();
         setStartingBoxes(numberOfPlayers);
 

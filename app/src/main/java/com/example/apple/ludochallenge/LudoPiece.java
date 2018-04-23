@@ -134,4 +134,10 @@ public class LudoPiece extends android.support.v7.widget.AppCompatImageView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
     }
+
+    public void kill()
+    {
+
+    }
+
 }
