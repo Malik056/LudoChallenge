@@ -11,9 +11,11 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.apple.ludochallenge.FacebookFriendAdapter;
 import com.example.apple.ludochallenge.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -21,6 +23,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -31,6 +35,10 @@ public class UsersActivity extends AppCompatActivity {
     private int noOfPlayers;
     private int color;
     private int vsComputer;
+    MySQLDatabase mySQLDatabase;
+    String LOGIN_STATUS;
+    FirebaseRecyclerAdapter<Users, UsersViewHolder> adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,50 +60,66 @@ public class UsersActivity extends AppCompatActivity {
         super.onStart();
         Query query = FirebaseDatabase.getInstance().getReference();
 
+        mySQLDatabase = MySQLDatabase.getInstance(this);
+        LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedInStatus();
 
-        FirebaseRecyclerOptions<Users> options  = new FirebaseRecyclerOptions.Builder<Users>()
-                .setQuery(mUsersDatabase, Users.class)
-                .build();
 
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(options) {
-            @NonNull
-            @Override
-            public UsersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.users_single_layout, parent, false);
-                DisplayMetrics displayMetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                view.setLayoutParams(new ViewGroup.LayoutParams(displayMetrics.widthPixels,displayMetrics.heightPixels/5));
-                return new UsersViewHolder(view);
+        if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE)) {
 
-            }
+            FirebaseRecyclerOptions<Users> options = new FirebaseRecyclerOptions.Builder<Users>()
+                    .setQuery(mUsersDatabase, Users.class)
+                    .build();
 
-            @Override
-            protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull Users model) {
-                holder.setName(model.getName());
-                holder.setUserImage(model.getThumb_image(), getApplicationContext());
-                holder.setUserFlag(model.getFlag_image(), getApplicationContext());
+            adapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(options) {
+                @NonNull
+                @Override
+                public UsersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                    View view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.users_single_layout, parent, false);
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                    view.setLayoutParams(new ViewGroup.LayoutParams(displayMetrics.widthPixels, displayMetrics.heightPixels / 5));
+                    return new UsersViewHolder(view);
 
-                final String user_id = getRef(position).getKey();
+                }
 
-                holder.mView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                @Override
+                protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull Users model) {
+                    holder.setName(model.getName());
+                    holder.setUserImage(model.getThumb_image(), getApplicationContext());
+                    holder.setUserFlag(model.getFlag_image(), getApplicationContext());
 
-                        Intent intent = new Intent(UsersActivity.this, ProfileActivity.class);
-                        intent.putExtra("user_id", user_id);
-                        intent.putExtra("noOfPlayers",noOfPlayers);
-                        intent.putExtra("color",color);
-                        intent.putExtra("vsComputer",vsComputer);
-                        startActivity(intent);
-                    }
-                });
-            }
+                    final String user_id = getRef(position).getKey();
 
-        };
+                    holder.mView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
 
-        mUsersList.setAdapter(adapter);
-        adapter.startListening();
+                            Intent intent = new Intent(UsersActivity.this, ProfileActivity.class);
+                            intent.putExtra("user_id", user_id);
+                            intent.putExtra("noOfPlayers", noOfPlayers);
+                            intent.putExtra("color", color);
+                            intent.putExtra("vsComputer", vsComputer);
+                            startActivity(intent);
+                        }
+                    });
+                }
+
+            };
+            mUsersList.setAdapter(adapter);
+            adapter.startListening();
+        }
+
+        else if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)) {
+
+            ArrayList<FacebookUser> users = mySQLDatabase.getFacebookFriendList();
+
+            FacebookFriendAdapter adapter = new FacebookFriendAdapter(users);
+
+            mUsersList.setAdapter(adapter);
+
+        }
+
     }
 
     public static class UsersViewHolder extends RecyclerView.ViewHolder{

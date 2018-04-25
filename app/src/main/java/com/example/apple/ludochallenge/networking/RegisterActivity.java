@@ -1,17 +1,14 @@
  package com.example.apple.ludochallenge.networking;
 
  import android.app.ProgressDialog;
+ import android.content.ContentResolver;
  import android.content.Intent;
- import android.content.pm.PackageInfo;
- import android.content.pm.PackageManager;
- import android.content.pm.Signature;
  import android.graphics.Bitmap;
  import android.graphics.BitmapFactory;
  import android.graphics.drawable.BitmapDrawable;
+ import android.graphics.drawable.Drawable;
  import android.net.Uri;
  import android.os.Bundle;
- import android.os.ParcelFileDescriptor;
- import android.provider.MediaStore;
  import android.support.annotation.NonNull;
  import android.support.v7.app.AppCompatActivity;
  import android.text.TextUtils;
@@ -31,9 +28,12 @@
  import com.facebook.CallbackManager;
  import com.facebook.FacebookCallback;
  import com.facebook.FacebookException;
+ import com.facebook.GraphRequest;
+ import com.facebook.GraphRequestAsyncTask;
+ import com.facebook.GraphResponse;
+ import com.facebook.HttpMethod;
  import com.facebook.login.LoginManager;
  import com.facebook.login.LoginResult;
- import com.facebook.login.widget.LoginButton;
  import com.google.android.gms.tasks.OnCompleteListener;
  import com.google.android.gms.tasks.OnSuccessListener;
  import com.google.android.gms.tasks.Task;
@@ -48,20 +48,20 @@
  import com.google.firebase.storage.FirebaseStorage;
  import com.google.firebase.storage.StorageReference;
  import com.google.firebase.storage.UploadTask;
+ import com.squareup.picasso.Picasso;
  import com.theartofdev.edmodo.cropper.CropImage;
 
- import java.io.BufferedInputStream;
+ import org.json.JSONArray;
+ import org.json.JSONException;
+
  import java.io.ByteArrayOutputStream;
  import java.io.File;
- import java.io.FileDescriptor;
  import java.io.FileNotFoundException;
  import java.io.IOException;
  import java.io.InputStream;
  import java.lang.reflect.Field;
  import java.net.MalformedURLException;
  import java.net.URL;
- import java.net.URLConnection;
- import java.security.MessageDigest;
  import java.util.ArrayList;
  import java.util.Arrays;
  import java.util.HashMap;
@@ -99,6 +99,10 @@
     private MySQLDatabase sqlDatabase;
     FirebaseUser currentUser;
     String facebook_uid;
+    String finalId;
+    String name;
+    String email;
+    Uri photoUrl;
 
 
 
@@ -112,7 +116,7 @@
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
-        sqlDatabase = MySQLDatabase.getInstance(getApplicationContext(), MySQLDatabase.LOGINAS);
+        sqlDatabase = MySQLDatabase.getInstance(getApplicationContext());
 //        current_uid = mCurrentUser.getUid();
 //        mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
 
@@ -136,12 +140,6 @@
 
 
 
-
-
-
-
-
-
         // Initialize Facebook Login button
         mCallbackManager = CallbackManager.Factory.create();
 //        LoginButton loginButton = (LoginButton) findViewById(R.id.registerActivity_loginWithFacebook);
@@ -153,16 +151,89 @@
                     Toast.makeText(getApplicationContext(), "Please select your country!", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                loadingBar.setTitle("Connecting with Facebook");
+                loadingBar.setMessage("Please wait while we connect Ludo Challenge with Facebook");
+                loadingBar.setCanceledOnTouchOutside(false);
+                loadingBar.show();
+
                 facebookLogin.setEnabled(false);
-                LoginManager.getInstance().logInWithReadPermissions(RegisterActivity.this, Arrays.asList("email", "public_profile"));
+
+                LoginManager.getInstance().logInWithReadPermissions(RegisterActivity.this, Arrays.asList("email", "public_profile", "user_friends"));
                 LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
                     @Override
-                    public void onSuccess(LoginResult loginResult) {
+                    public void onSuccess(final LoginResult loginResult) {
 
-                        Log.d(TAG, "facebook:onSuccess:" + loginResult);
                         handleFacebookAccessToken(loginResult.getAccessToken());
-                        sqlDatabase.UpdateLoginAs(MySQLDatabase.LOGIN_STATUS_FACEBOOK);
-                        // Check if user is signed in (non-null) and update UI accordingly.
+
+                        GraphRequestAsyncTask graphRequestAsyncTask = new GraphRequest(
+                                loginResult.getAccessToken(),
+                                "/me/friends",
+                                null,
+                                HttpMethod.GET,
+                                new GraphRequest.Callback() {
+                                    @Override
+                                    public void onCompleted(GraphResponse response) {
+                                        final MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+                                        final Bitmap[] bitmap = new Bitmap[1];
+                                        final String[] name = new String[1];
+                                        final String[] id = new String[1];
+                                        try{
+                                            final JSONArray rawName = response.getJSONObject().getJSONArray("data");
+                                            Runnable runnable = new Runnable() {
+                                                @Override
+                                                public void run() {
+                                            for(int i = 0; i < rawName.length(); i++) {
+                                                try {
+                                                    name[0] = rawName.getJSONObject(i).getString("name");
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                try {
+                                                    id[0] = rawName.getJSONObject(i).getString("id");
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                final String finalName = name[0];
+                                                finalId = id[0];
+                                                bitmap[0] = getFriendBitmap(finalId);
+                                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                                bitmap[0].compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                                byte[] bytes = baos.toByteArray();
+
+                                                mySQLDatabase.insertData(finalName, bytes, finalId, MySQLDatabase.FACEBOKK_FRIENDS_DATA_TABLE);
+//                                                bitmap[0] = ((BitmapDrawable)countryFlag.getDrawable()).getBitmap();
+//                                                bitmap[0].compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//                                                byte[] flaginBytes = baos.toByteArray();
+//                                                mySQLDatabase.insertData(name[0], bytes, flaginBytes, countryName.getText().toString(), finalId, MySQLDatabase.FACEBOOK_USER_TABLE);
+                                            }
+
+                                                    synchronized (this)
+                                                    {
+                                                        this.notify();
+                                                    }
+                                                }
+                                            };
+                                                synchronized (runnable) {
+                                                    Thread thread = new Thread(runnable);
+                                                    thread.start();
+                                                    try {
+                                                        runnable.wait();
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                Log.d(TAG, "facebook:onSuccess:" + loginResult);
+
+
+                                        }catch (JSONException e){
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                        ).executeAsync();
+
 
                     }
 
@@ -279,8 +350,6 @@
     }
 
 
-
-
      @Override
      protected void onActivityResult(int requestCode, int resultCode, Intent data) {
          super.onActivityResult(requestCode, resultCode, data);
@@ -304,11 +373,11 @@
      }
 
      private void updateUI() {
-         Toast.makeText(this, "Congratualtions you are logged In", Toast.LENGTH_SHORT).show();
+//         Toast.makeText(this, "Congratualtions you are logged In", Toast.LENGTH_SHORT).show();
          final Intent intent = new Intent(RegisterActivity.this, MainMenu.class);
-         final String name = currentUser.getDisplayName();
-         final String email = currentUser.getEmail();
-         final Uri photoUrl = currentUser.getPhotoUrl();
+//         final String name = currentUser.getDisplayName();
+//         final String email = currentUser.getEmail();
+//         final Uri photoUrl = currentUser.getPhotoUrl();
          final Bitmap country_flag_bitmap ;
          BitmapDrawable bitmapDrawable = (BitmapDrawable) countryFlag.getDrawable();
          country_flag_bitmap = bitmapDrawable.getBitmap();
@@ -317,14 +386,9 @@
          final byte[] byteArray1 = stream1.toByteArray();
 
 
-         facebook_uid = currentUser.getUid();
+//         facebook_uid = currentUser.getUid();
 
-         final Bitmap[] bitmap = {BitmapFactory.decodeResource(getResources(), R.drawable.default_pic)};// = get_imageFrom_Uri(photoUrl);
-//         try {
-//             bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),photoUrl);
-//         } catch (IOException e) {
-//             e.printStackTrace();
-//         }
+         final Bitmap[] bitmap = {BitmapFactory.decodeResource(getResources(), R.drawable.default_pic)};
 
          Thread thread = new Thread(new Runnable() {
              @Override
@@ -335,7 +399,13 @@
                  byte[] byteArray = stream.toByteArray();
                  MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                  mySQLDatabase.insertData(name, byteArray, byteArray1, countryName.getText().toString(), email, MySQLDatabase.FACEBOOK_USER_TABLE);
+
+                 mySQLDatabase.insertGameProgressData(email,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_COMPUTER, "0","0", "500");
+                 mySQLDatabase.insertGameProgressData(email,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
+                 mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_COMPUTER, "0","0", "500");
+                 mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
                  startActivity(intent);
+                 loadingBar.dismiss();
                  finish();
 
              }
@@ -353,17 +423,17 @@
                      public void onComplete(@NonNull Task<AuthResult> task) {
                          if (task.isSuccessful()) {
                              // Sign in success, update UI with the signed-in user's information
+                              name = task.getResult().getUser().getDisplayName();
+                              email =task.getResult().getUser().getEmail();
+                              photoUrl = task.getResult().getUser().getPhotoUrl();
+                              MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+                             mySQLDatabase.setCurrentSession(email, MySQLDatabase.LOGIN_STATUS_FACEBOOK);
                              Log.d(TAG, "signInWithCredential:success");
-                             FirebaseUser user = mAuth.getCurrentUser();
                              updateUI();
                              facebookLogin.setEnabled(true);
                          } else {
-                             // If sign in fails, display a message to the user.
-                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                             Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                                     Toast.LENGTH_SHORT).show();
-                             updateUI();
-                             facebookLogin.setEnabled(true);
+                             Toast.makeText(RegisterActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                             loadingBar.dismiss();
                          }
 
                          // ...
@@ -397,7 +467,8 @@
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
-                        sqlDatabase.UpdateLoginAs(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE);
+                        currentUser = mAuth.getCurrentUser();
+                        sqlDatabase.setCurrentSession(currentUser.getUid(), MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE);
                         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
                         FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
                         String uid = current_user.getUid();
@@ -416,7 +487,7 @@
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()){
                                     mTokenDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
-                                    String current_userId = mAuth.getCurrentUser().getUid();
+                                    final String current_userId = mAuth.getCurrentUser().getUid();
                                     String deviceToken = FirebaseInstanceId.getInstance().getToken();
                                     mTokenDatabase.child(current_userId).child("device_token").setValue(deviceToken).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -428,19 +499,26 @@
                                             intent.putExtra("check",1);
                                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
+                                            MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+                                            mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_COMPUTER, "0","0", "500");
+                                            mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
+                                            mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_COMPUTER, "0","0", "500");
+                                            mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
+
+
                                             startActivity(intent);
                                             finish();
-                                            loadingBar.dismiss();
                                         }
                                     });
+                                    loadingBar.dismiss();
                                 }
                             }
                         });
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "Error Occured, Try Again!", Toast.LENGTH_SHORT).show();
+                        loadingBar.dismiss();
                     }
-                    loadingBar.dismiss();
                 }
             });
         }
@@ -706,15 +784,41 @@
         Bitmap bm = BitmapFactory.decodeResource(getResources(),R.drawable.default_pic);
         URL imageURL = null;
         try {
-            imageURL = new URL(uri.toString());
+            imageURL = new URL(uri.toString() + "?type=large");
             bm = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return bm;
     }
+
+
+     public Bitmap getFriendBitmap(String userID)
+     {
+
+         String imageURL;
+
+         Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.default_pic);
+         imageURL = "http://graph.facebook.com/"+userID+"/picture?type=large";
+//         Uri myUri = Uri.parse(imageURL);
+//         URL imageURL1 = null;
+//         try {
+//             imageURL1 = new URL(myUri.toString());
+//             bitmap = BitmapFactory.decodeStream(imageURL1.openConnection().getInputStream());
+//         } catch (IOException e) {
+//             e.printStackTrace();
+//         }
+         try {
+             bitmap = Picasso.get().load(imageURL).get();
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+
+
+         return bitmap;
+
+     }
+
 
  }

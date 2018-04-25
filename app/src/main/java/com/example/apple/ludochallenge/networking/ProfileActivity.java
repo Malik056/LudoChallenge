@@ -46,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
     private int vsComputer;
     private DatabaseReference gameStartedDatabase;
     private DatabaseReference gameStarted;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);

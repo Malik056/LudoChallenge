@@ -88,15 +88,10 @@
                 android:weightSum="1"
                 android:gravity="center"
                 android:layout_weight="0.08">
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.15"
-                    android:background="@drawable/back"/>
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.5"/>
+                    android:layout_weight="0.6"/>
                 <ImageView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -145,22 +140,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="0.20"
-                    android:weightSum="1"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-                    <Button
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/achievments"
-                        android:layout_weight="0.8"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.20"
+                    android:layout_weight="0.22"
                     android:weightSum="1"
                     android:orientation="horizontal"
                     android:gravity="center">
@@ -168,7 +148,22 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:background="@drawable/settings"
-                        android:layout_weight="0.7"/>
+                        android:layout_weight="0.8"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.18"
+                    android:weightSum="1"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/exit"
+                        android:layout_weight="0.5"/>
 
                 </LinearLayout>
 
@@ -339,6 +334,7 @@
                     android:textColor="#481676"
                     android:textSize="12sp"
                     android:textStyle="bold"
+                    android:id="@+id/mainMenu_coins"
                     android:text="1,000,000,000,000"/>
             </LinearLayout>
 
@@ -532,7 +528,7 @@
                     android:layout_weight="0.333" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_level"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -566,7 +562,7 @@
                     android:layout_weight="0.502" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_LudoChallenge_vsComputer_win"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -600,7 +596,7 @@
                     android:layout_weight="0.497" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_LudoChallenge_vsComputer_lose"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -634,7 +630,7 @@
                     android:layout_weight="0.49" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_LudoChallenge_vsMultiplayer_win"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -669,7 +665,7 @@
                     android:layout_weight="0.49" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_LudoChallenge_vsMultiplayer_lose"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -703,7 +699,7 @@
                     android:layout_weight="0.683" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_SAL_vsMultiplayer_lose"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -737,7 +733,7 @@
                     android:layout_weight="0.686" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_SAL_vsMultiplayer_win"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -771,7 +767,7 @@
                     android:layout_weight="0.692" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_SAL_vsComputer_lose"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -805,7 +801,7 @@
                     android:layout_weight="0.694" />
 
                 <TextView
-                    android:id="@+id/select_no_of_players_back"
+                    android:id="@+id/mainMenu_dialog_SAL_vsComputer_win"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.029"
@@ -926,7 +922,436 @@
                             android:layout_height="match_parent"
                             android:layout_weight="0.68"
                             android:text="1,000,000,000,00"
-                            android:id="@+id/edit_profile_dialog_coinText"
+                            android:id="@+id/mainMenu_dialog_coins"
+                            android:textSize="10sp"
+                            android:gravity=""
+                            android:textColor="#000000"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/mainMenu_edit_profile_dialogBox"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.8"
+            android:background="#000000" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.7"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:adjustViewBounds="true"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.8"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/settings_dialog" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.16"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.15" />
+
+                <ImageView
+                    android:id="@+id/mainMenu_edit_profile_backBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.1"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/settings_backbtn"
+                    android:scaleType="center" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.27"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.13"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.502" />
+
+                <ImageView
+                    android:id="@+id/mainMenu_edit_profile_backBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.1"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/settings_music_on"
+                    android:scaleType="center" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.36"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.13"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.497" />
+
+
+                <ImageView
+                    android:id="@+id/mainMenu_edit_profile_backBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.1"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/settings_sound_on"
+                    android:scaleType="center" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.55"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.13"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.49" />
+
+
+                <ImageView
+                    android:id="@+id/mainMenu_edit_profile_backBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.1"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/settings_like"
+                    android:scaleType="center" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.63"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.09"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.683" />
+
+                <TextView
+                    android:id="@+id/mainMenu_dialog_SAL_vsMultiplayer_lose"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.029"
+                    android:autoSizeTextType="uniform"
+                    android:textAlignment="center"
+                    android:rotation="-5"
+                    android:textColor="#000000"
+                    android:text="4"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.536"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.09"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.686" />
+
+                <TextView
+                    android:id="@+id/mainMenu_dialog_SAL_vsMultiplayer_win"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.029"
+                    android:autoSizeTextType="uniform"
+                    android:textAlignment="center"
+                    android:rotation="-7"
+                    android:textColor="#000000"
+                    android:text="4"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.385"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.09"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.692" />
+
+                <TextView
+                    android:id="@+id/mainMenu_dialog_SAL_vsComputer_lose"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.029"
+                    android:autoSizeTextType="uniform"
+                    android:textAlignment="center"
+                    android:rotation="-7"
+                    android:textColor="#000000"
+                    android:text="9"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.29"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.09"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.694" />
+
+                <TextView
+                    android:id="@+id/mainMenu_dialog_SAL_vsComputer_win"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.029"
+                    android:autoSizeTextType="uniform"
+                    android:textAlignment="center"
+                    android:rotation="-15"
+                    android:textColor="#000000"
+                    android:text="7"/>
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.42"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.32"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.24" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:orientation="vertical"
+                    android:weightSum="1"
+                    android:layout_weight="0.1">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.25"
+                        android:text="Awais Harron Bhatti"
+                        android:textColor="#000000"
+                        android:lines="1"
+                        android:id="@+id/mainMen_edit_profile_userName"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:textSize="11sp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.1"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:weightSum="1"
+                        android:gravity="center_vertical"
+                        android:layout_weight="0.25">
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/pakistan"
+                            android:layout_weight="0.25"
+                            android:id="@+id/mainMenu_edit_profile_flagImage"
+                            android:adjustViewBounds="true" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.05"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.68"
+                            android:id="@+id/mainMenu_edit_profile_countryName"
+                            android:text="Paksitan"
+                            android:textSize="11sp"
+                            android:gravity=""
+                            android:textColor="#000000"/>
+                    </LinearLayout>
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.1"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:weightSum="1"
+                        android:gravity="center_vertical"
+                        android:layout_weight="0.25">
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/coin"
+                            android:layout_weight="0.25"
+                            android:id="@+id/edit_profile_dialog_coin"
+                            android:adjustViewBounds="true"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.05"/>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.68"
+                            android:text="1,000,000,000,00"
+                            android:id="@+id/mainMenu_dialog_coins"
                             android:textSize="10sp"
                             android:gravity=""
                             android:textColor="#000000"/>
