@@ -61,7 +61,7 @@
                         android:gravity="center"
                         android:textColor="#ffffff"
                         android:textSize="20sp"/>
-                    <com.example.apple.ludoking.CustomEditText
+                    <com.example.apple.ludochallenge.networking.CustomEditText
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0.50"
@@ -94,7 +94,7 @@
                         android:textStyle="bold"
                         android:textColor="#ffffff"
                         android:textSize="23sp"/>
-                    <com.example.apple.ludoking.CustomEditText
+                    <com.example.apple.ludochallenge.networking.CustomEditText
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0.45"

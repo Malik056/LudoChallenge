@@ -19,6 +19,9 @@ import com.bumptech.glide.Glide;
 import com.example.apple.ludochallenge.LudoActivity;
 import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.UserProgressData;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -95,6 +98,10 @@ public class PlayActivity extends AppCompatActivity {
     private TextView play_dialog_SAL_vsComputer_lose;
     private TextView play_dialog_SAL_vsComputer_win;
     private TextView play_dialog_level;
+    private InterstitialAd interstitialAd;
+    private String current_uid;
+    private ImageView play_backBtn;
+    private ImageView play_coinIcon;
 
 
 
@@ -120,9 +127,10 @@ public class PlayActivity extends AppCompatActivity {
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String current_uid = mCurrentUser.getUid();
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
 
+
+        mySQLDatabase = MySQLDatabase.getInstance(this);
+        LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedInStatus();
         flag_image = (ImageView) findViewById(R.id.play_flag_pic);
         profile_image = (ImageView) findViewById(R.id.play_profile_pic);
         userName = (TextView) findViewById(R.id.play_username);
@@ -207,66 +215,96 @@ public class PlayActivity extends AppCompatActivity {
         play_dialog_SAL_vsComputer_lose = (TextView) findViewById(R.id.play_dialog_SAL_vsComputer_lose);
         play_dialog_SAL_vsComputer_win = (TextView) findViewById(R.id.play_dialog_SAL_vsComputer_win);
         play_dialog_level = (TextView) findViewById(R.id.play_dialog_level);
+        play_backBtn = (ImageView) findViewById(R.id.play_backBtn);
+        play_coinIcon = (ImageView) findViewById(R.id.play_coinIcon);
 
 
 
 
 
 
-
-        mySQLDatabase = MySQLDatabase.getInstance(this);
-        LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedInStatus();
-
-
-
-        String ID = mySQLDatabase.fetchCurrentLoggedInID();
-
-
-        ArrayList<UserProgressData> userProgressData = mySQLDatabase.getUserProgressData(ID);
-        coins = userProgressData.get(0).getCoins();
-
-        for(UserProgressData user: userProgressData)
-        {
-            if(user.getUserGameType().getVersus().getVersus().equals(MySQLDatabase.VS_COMPUTER))
-            {
-                if(user.getUserGameType().getGameType().equals(MySQLDatabase.LUDO_CHALLENGE))
-                {
-                    LudoChallenge_vsComputer_WIN = user.getUserGameType().getVersus().getWinAndLoses().getWins();
-                    LudoChallenge_vsComputer_LOSE = user.getUserGameType().getVersus().getWinAndLoses().getLoses();
-                }
-                else if(user.getUserGameType().getGameType().equals(MySQLDatabase.SNAKES_AND_LADDERS))
-                {
-                    SAL_vsComputer_WIN = user.getUserGameType().getVersus().getWinAndLoses().getWins();
-                    SAL_vsComputer_LOSE = user.getUserGameType().getVersus().getWinAndLoses().getLoses();
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        interstitialAd.loadAd(new AdRequest.Builder().build());
+        interstitialAd.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed() {
+                interstitialAd.loadAd(new AdRequest.Builder().build());
+                if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)){
+                    Intent intent = new Intent(PlayActivity.this, UsersActivity.class);
+                    intent.putExtra("noOfPlayers",noOfPlayers);
+                    intent.putExtra("color",color);
+                    intent.putExtra("vsComputer",vsComputer);
+                    startActivity(intent);
+                    finish();
+                }else {
+                    playWithFriends_dialogBox.setVisibility(View.VISIBLE);
                 }
             }
-            else if(user.getUserGameType().getVersus().getVersus().equals(MySQLDatabase.VS_MULTIPLAYTER))
+        });
+
+
+
+        if(!LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST)) {
+            current_uid = mCurrentUser.getUid();
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
+
+
+
+
+
+
+
+
+            String ID = mySQLDatabase.fetchCurrentLoggedInID();
+
+
+            ArrayList<UserProgressData> userProgressData = mySQLDatabase.getUserProgressData(ID);
+            coins = userProgressData.get(0).getCoins();
+
+            for(UserProgressData user: userProgressData)
             {
-                if(user.getUserGameType().getGameType().equals(MySQLDatabase.LUDO_CHALLENGE))
+                if(user.getUserGameType().getVersus().getVersus().equals(MySQLDatabase.VS_COMPUTER))
                 {
-                    LudoChallenge_vsMultiplayer_WIN = user.getUserGameType().getVersus().getWinAndLoses().getWins();
-                    LudoChallenge_vsMultiplayer_LOSE = user.getUserGameType().getVersus().getWinAndLoses().getLoses();
+                    if(user.getUserGameType().getGameType().equals(MySQLDatabase.LUDO_CHALLENGE))
+                    {
+                        LudoChallenge_vsComputer_WIN = user.getUserGameType().getVersus().getWinAndLoses().getWins();
+                        LudoChallenge_vsComputer_LOSE = user.getUserGameType().getVersus().getWinAndLoses().getLoses();
+                    }
+                    else if(user.getUserGameType().getGameType().equals(MySQLDatabase.SNAKES_AND_LADDERS))
+                    {
+                        SAL_vsComputer_WIN = user.getUserGameType().getVersus().getWinAndLoses().getWins();
+                        SAL_vsComputer_LOSE = user.getUserGameType().getVersus().getWinAndLoses().getLoses();
+                    }
                 }
-                else if(user.getUserGameType().getGameType().equals(MySQLDatabase.SNAKES_AND_LADDERS))
+                else if(user.getUserGameType().getVersus().getVersus().equals(MySQLDatabase.VS_MULTIPLAYTER))
                 {
-                    SAL_vsMultiplayer_WIN = user.getUserGameType().getVersus().getWinAndLoses().getWins();
-                    SAL_vsMultiplayer_LOSE = user.getUserGameType().getVersus().getWinAndLoses().getLoses();
+                    if(user.getUserGameType().getGameType().equals(MySQLDatabase.LUDO_CHALLENGE))
+                    {
+                        LudoChallenge_vsMultiplayer_WIN = user.getUserGameType().getVersus().getWinAndLoses().getWins();
+                        LudoChallenge_vsMultiplayer_LOSE = user.getUserGameType().getVersus().getWinAndLoses().getLoses();
+                    }
+                    else if(user.getUserGameType().getGameType().equals(MySQLDatabase.SNAKES_AND_LADDERS))
+                    {
+                        SAL_vsMultiplayer_WIN = user.getUserGameType().getVersus().getWinAndLoses().getWins();
+                        SAL_vsMultiplayer_LOSE = user.getUserGameType().getVersus().getWinAndLoses().getLoses();
+                    }
                 }
+
             }
 
+
+            play_coins.setText(coins);
+            play_dialog_coins.setText(coins);
+            play_dialog_LudoChallenge_vsComputer_win.setText(LudoChallenge_vsComputer_WIN);
+            play_dialog_LudoChallenge_vsComputer_lose.setText(LudoChallenge_vsComputer_LOSE);
+            play_dialog_LudoChallenge_vsMultiplayer_win.setText(LudoChallenge_vsMultiplayer_WIN);
+            play_dialog_LudoChallenge_vsMultiplayer_lose.setText(LudoChallenge_vsMultiplayer_LOSE);
+            play_dialog_SAL_vsComputer_win.setText(SAL_vsComputer_WIN);
+            play_dialog_SAL_vsComputer_lose.setText(SAL_vsComputer_LOSE);
+            play_dialog_SAL_vsMultiplayer_win.setText(SAL_vsMultiplayer_WIN);
+            play_dialog_SAL_vsMultiplayer_lose.setText(SAL_vsMultiplayer_LOSE);
         }
-
-
-        play_coins.setText(coins);
-        play_dialog_coins.setText(coins);
-        play_dialog_LudoChallenge_vsComputer_win.setText(LudoChallenge_vsComputer_WIN);
-        play_dialog_LudoChallenge_vsComputer_lose.setText(LudoChallenge_vsComputer_LOSE);
-        play_dialog_LudoChallenge_vsMultiplayer_win.setText(LudoChallenge_vsMultiplayer_WIN);
-        play_dialog_LudoChallenge_vsMultiplayer_lose.setText(LudoChallenge_vsMultiplayer_LOSE);
-        play_dialog_SAL_vsComputer_win.setText(SAL_vsComputer_WIN);
-        play_dialog_SAL_vsComputer_lose.setText(SAL_vsComputer_LOSE);
-        play_dialog_SAL_vsMultiplayer_win.setText(SAL_vsMultiplayer_WIN);
-        play_dialog_SAL_vsMultiplayer_lose.setText(SAL_vsMultiplayer_LOSE);
 
 
 
@@ -314,32 +352,27 @@ public class PlayActivity extends AppCompatActivity {
             edit_profile_dialog_countryName.setText(d_countryName);
         }
 
+        if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST)) {
 
-//        mUserDatabase.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.hasChild("flag_image")) {
-//                    String username = dataSnapshot.child("name").getValue().toString();
-//                    String country_name = dataSnapshot.child("country").getValue().toString();
-//                    String flagImage = dataSnapshot.child("flag_image").getValue().toString();
-//                    String profile_pic = dataSnapshot.child("thumb_image").getValue().toString();
-//                    userName.setText(username);
-//                    countryName.setText(country_name);
-//                    Picasso.get().load(flagImage).placeholder(R.drawable.pakistan).into(flag_image);
-//                    if (!profile_pic.equals("default")) {
-//                        Picasso.get().load(profile_pic).placeholder(R.drawable.default_pic).into(profile_image);
-//                    }
-//                    editProfile_userImage.setImageDrawable(profile_image.getDrawable());
-//                    edit_profile_dialog_flagImage.setImageDrawable(flag_image.getDrawable());
-//                    edit_profile_dialog_userName.setText(username);
-//                    edit_profile_dialog_countryName.setText(country_name);
-//                }
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
+            flag_image.setVisibility(View.GONE);
+            edit_profile_dialog_flagImage.setVisibility(View.GONE);
+            userName.setText("Guest");
+            countryName.setVisibility(View.GONE);
+            edit_profile_dialog_userName.setText("Guest");
+            edit_profile_dialog_countryName.setVisibility(View.GONE);
+            play_coins.setVisibility(View.GONE);
+            play_coinIcon.setVisibility(View.GONE);
 
+        }
+
+        play_backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PlayActivity.this, MainMenu.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         playWithFriends_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -351,14 +384,27 @@ public class PlayActivity extends AppCompatActivity {
         playWithFriends.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)){
-                    Intent intent = new Intent(PlayActivity.this, UsersActivity.class);
-                    intent.putExtra("noOfPlayers",noOfPlayers);
-                    intent.putExtra("color",color);
-                    intent.putExtra("vsComputer",vsComputer);
-                    startActivity(intent);
-                }else {
-                    playWithFriends_dialogBox.setVisibility(View.VISIBLE);
+
+
+                if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK) || LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE)) {
+                    if(interstitialAd.isLoaded()){
+                        interstitialAd.show();
+                    }
+                    else{
+                        if (LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)) {
+                            Intent intent = new Intent(PlayActivity.this, UsersActivity.class);
+                            intent.putExtra("noOfPlayers", noOfPlayers);
+                            intent.putExtra("color", color);
+                            intent.putExtra("vsComputer", vsComputer);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            playWithFriends_dialogBox.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+                else{
+                    Toast.makeText(PlayActivity.this, "Sign In to Play with your Friends!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -375,6 +421,7 @@ public class PlayActivity extends AppCompatActivity {
                 intent.putExtra("color",color);
                 intent.putExtra("vsComputer",vsComputer);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -384,6 +431,7 @@ public class PlayActivity extends AppCompatActivity {
                 play_editProfileDialog_edit_profileBtn.setVisibility(View.GONE);
                 Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -396,9 +444,11 @@ public class PlayActivity extends AppCompatActivity {
         profile_picBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                edit_profile_dialogBox.setVisibility(View.VISIBLE);
-                local_multiplayer.setClickable(false);
-                vsComputer_btn.setClickable(false);
+                if(!LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST)) {
+                    edit_profile_dialogBox.setVisibility(View.VISIBLE);
+                    local_multiplayer.setClickable(false);
+                    vsComputer_btn.setClickable(false);
+                }
             }
         });
         edit_profile_dilaogBox_backBtn.setOnClickListener(new View.OnClickListener() {
@@ -496,6 +546,7 @@ public class PlayActivity extends AppCompatActivity {
                     intent.putExtra("color",color);
                     intent.putExtra("vsComputer",vsComputer);
                     startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -521,6 +572,7 @@ public class PlayActivity extends AppCompatActivity {
                     three_players_player1_name.setText("");
                     three_players_player2_name.setText("");
                     three_players_player3_name.setText("");
+                    finish();
                 }
             }
         });
@@ -545,6 +597,7 @@ public class PlayActivity extends AppCompatActivity {
                     startActivity(intent);
                     two_players_player1_name.setText("");
                     two_players_player2_name.setText("");
+                    finish();
                 }
             }
         });
@@ -559,6 +612,7 @@ public class PlayActivity extends AppCompatActivity {
                     intent.putExtra("color",vsComputer_color);
                     intent.putExtra("vsComputer",vsComputer);
                     startActivity(intent);
+                    finish();
                 }
         });
 

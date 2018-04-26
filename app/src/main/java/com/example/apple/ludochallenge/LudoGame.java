@@ -299,22 +299,15 @@ public class LudoGame extends FrameLayout {
 
             }
         }
-        else if(players.get(currentPlayer).type == PlayerType.CPU)
-        {
-            Random random = new Random();
-            int rand = random.nextInt()%4;
-            LudoPiece piece = ludoPieces[rand < 0 ? rand*-1:rand];
-
-            while (!piece.isValid(num))
-            {
-                rand = random.nextInt()%4;
-                piece = ludoPieces[rand < 0 ? rand*-1: rand];
-            }
-
-            players.get(currentPlayer).move(num, piece);
-        }
-        else if(players.get(currentPlayer).type == PlayerType.ONLINE)
-        {
+//        else if(players.get(currentPlayer).type == PlayerType.CPU){
+//            Random random = new Random();
+//            int rand = random.nextInt()%4;
+//
+//            ludoPieces[0].isValid(5);
+//
+//            players.get(currentPlayer).move(num, piece);
+//        }
+        else if(players.get(currentPlayer).type == PlayerType.ONLINE){
             //add online Player Code
         }
 

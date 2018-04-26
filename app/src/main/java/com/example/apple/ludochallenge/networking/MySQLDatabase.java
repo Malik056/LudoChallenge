@@ -50,6 +50,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
     public static String LOSES_COL = "LOSES";
     public static String COINS_COL = "COINS";
     public static String USER_ID = "USER_ID";
+    public static String LOGIN_STATUS_PLAY_AS_GUEST = "LOGIN_STATUS_PLAY_AS_GUEST";
 
     public static MySQLDatabase getInstance(Context context)
     {

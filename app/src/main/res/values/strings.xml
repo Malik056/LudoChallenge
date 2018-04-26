@@ -2,6 +2,7 @@
     <string name="app_name">LudoChallenge</string>
     <string name="facebook_app_id">142901193223884</string>
     <string name="fb_login_protocol_scheme">fb142901193223884</string>
+    <string name="addUnit">ca-app-pub-3940256099942544/6300978111</string>
 
 
 </resources>

@@ -146,6 +146,7 @@
                     android:gravity="center">
                     <Button
                         android:layout_width="0dp"
+                        android:id="@+id/mainMenu_settingsBtn"
                         android:layout_height="match_parent"
                         android:background="@drawable/settings"
                         android:layout_weight="0.8"/>
@@ -161,6 +162,7 @@
                     android:gravity="center">
                     <Button
                         android:layout_width="0dp"
+                        android:id="@+id/mainMenu_exit"
                         android:layout_height="match_parent"
                         android:background="@drawable/exit"
                         android:layout_weight="0.5"/>
@@ -182,21 +184,21 @@
                     <ImageView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:id="@+id/loginActivity_playAsGuest"
+                        android:id="@+id/mainMenu_rate"
                         android:background="@drawable/rate"
                         android:layout_weight="0.15"
                         android:scaleType="fitXY"/>
                     <ImageView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:id="@+id/loginActivity_loginWithFacebook"
+                        android:id="@+id/mainMenu_share"
                         android:background="@drawable/share"
                         android:layout_weight="0.15"
                         android:scaleType="fitXY"/>
                     <ImageView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:id="@+id/loginActivity_loginWithFacebook"
+                        android:id="@+id/mainMenu_like"
                         android:background="@drawable/like"
                         android:layout_weight="0.15"
                         android:scaleType="fitXY"/>
@@ -324,6 +326,7 @@
                     android:adjustViewBounds="true"
                     android:layout_weight="0.1"
                     android:scaleType="fitXY"
+                    android:id="@+id/mainMenu_coinIcon"
                     android:src="@drawable/coin"
                     />
                 <TextView
@@ -935,7 +938,7 @@
     </FrameLayout>
 
     <FrameLayout
-    android:id="@+id/mainMenu_edit_profile_dialogBox"
+    android:id="@+id/mainMenu_settings_dialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:visibility="gone">
@@ -997,6 +1000,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.2"
                 android:scaleType="fitXY"
+                android:id="@+id/mainMenu_settings_dialog_back"
                 android:src="@drawable/back"/>
         </LinearLayout>
 
@@ -1012,12 +1016,14 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.35"
                 android:scaleType="fitXY"
+                android:id="@+id/mainMenu_settings_dialog_signIn"
                 android:src="@drawable/settings_signin"/>
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.35"
                 android:scaleType="fitXY"
+                android:id="@+id/mainMenu_settings_dialog_logOut"
                 android:src="@drawable/settings_logout"/>
         </LinearLayout>
 
@@ -1033,6 +1039,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
                 android:scaleType="fitXY"
+                android:id="@+id/mainMenu_settings_dialog_registerYourAccount"
                 android:src="@drawable/settings_register_your_account"/>
         </LinearLayout>
 
@@ -1098,6 +1105,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
                 android:scaleType="fitXY"
+                android:id="@+id/mainMenu_settings_dialog_moreGames"
                 android:src="@drawable/settings_more_games"/>
         </LinearLayout>
 
@@ -1110,7 +1118,7 @@
 </FrameLayout>
 
     <FrameLayout
-        android:id="@+id/mainMenu_edit_profile_dialogBox"
+        android:id="@+id/mainMenu_exit_dialog"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
@@ -1167,12 +1175,14 @@
                 android:orientation="horizontal">
                 <ImageView
                     android:layout_width="0dp"
+                    android:id="@+id/mainMenu_exit_dialog_yes"
                     android:layout_height="match_parent"
                     android:layout_weight="0.35"
                     android:scaleType="fitXY"
                     android:src="@drawable/exit_yes"/>
                 <ImageView
                     android:layout_width="0dp"
+                    android:id="@+id/mainMenu_exit_dialog_no"
                     android:layout_height="match_parent"
                     android:layout_weight="0.35"
                     android:scaleType="fitXY"
@@ -1186,4 +1196,8 @@
 
 
     </FrameLayout>
+
+
+
+
 </FrameLayout>

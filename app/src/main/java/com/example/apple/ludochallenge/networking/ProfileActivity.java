@@ -61,6 +61,9 @@ public class ProfileActivity extends AppCompatActivity {
         mCurrent_state = "not_challenged";
 
 
+
+
+
         final String user_id = getIntent().getStringExtra("user_id");
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
         mChallenge_database = FirebaseDatabase.getInstance().getReference().child("challenge");

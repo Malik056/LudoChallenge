@@ -26,6 +26,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
 
@@ -41,11 +44,20 @@ public class LudoActivity extends AppCompatActivity {
     public static final String PLAYERS_KEY = "PLAYERS";
     public static final String COLORS_KEY = "COLORS";
     public static final String PLAYERS_TYPE_KEY = "PLAYERS_TYPE";
+    private AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ludo);
+
+
+
+        //initializing addUnit
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+        adView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
 
 //        FrameLayout frameLayout = findViewById(R.id.ludoContainer);
 

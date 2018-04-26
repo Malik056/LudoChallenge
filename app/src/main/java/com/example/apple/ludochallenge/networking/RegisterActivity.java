@@ -340,6 +340,8 @@
         playAsGuest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+                mySQLDatabase.setCurrentSession("PLAY_AS_GUEST", MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST);
                 Intent intent = new Intent(RegisterActivity.this, MainMenu.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
