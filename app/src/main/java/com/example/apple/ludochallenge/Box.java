@@ -10,6 +10,8 @@ import java.util.ArrayList;
  **/
 public class Box {
 
+    //hh
+
     Point mCenterPoint;
     Point firstPiece;
     private SALGame mGame;
