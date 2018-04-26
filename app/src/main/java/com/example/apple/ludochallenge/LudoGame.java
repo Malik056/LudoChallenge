@@ -17,11 +17,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import static com.example.apple.ludochallenge.SALGame.translateAnimation;
 
 /**
  * Created by Taha Malik on 4/18/2018.
@@ -56,7 +59,6 @@ public class LudoGame extends FrameLayout {
     int boardStart;
     public static TranslateAnimation translateAnimation;
     public static AlphaAnimation alphaAnimation;
-    public static RotateAnimation rotateAnimation;
 
     public LudoGame(@NonNull Context context, int width, int y, Color[] colors, int numberOfPlayers, Point[] dicePoints, ImageView[] arrows, PlayerType[] playerTypes) {
 
@@ -76,19 +78,24 @@ public class LudoGame extends FrameLayout {
         initializePieces(numberOfPlayers,colors,playerTypes);
 
         diceImage = new ImageView(context);
-        diceImage.setLayoutParams(new LinearLayout.LayoutParams(mBoxWidth, mBoxWidth));
+        diceImage.setLayoutParams(new LinearLayout.LayoutParams(width/10, width/10));
         diceImage.setX(dicePoints[currentPlayer].x);
         diceImage.setY(dicePoints[currentPlayer].y);
         setVisibility(VISIBLE);
         setLayoutParams(new LayoutParams(width,width));
         diceImage.setImageDrawable(getResources().getDrawable(R.drawable.dice_2));
         diceImage.setOnClickListener(getDiceClickListener());
-
+        diceImage.setScaleType(ImageView.ScaleType.FIT_XY);
     }
 
     private OnClickListener pieceClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
+
+            if(!((LudoPiece) v).open) {
+                ((LudoPiece) v).open = true;
+                num-=5;
+            }
             for(LudoPiece l: players.get(currentPlayer).getmPiece())
             {
                 l.setEnabled(false);
@@ -96,7 +103,8 @@ public class LudoGame extends FrameLayout {
                 ((ImageView)l.getTag()).setVisibility(INVISIBLE);
                 ((ImageView)l.getTag()).clearAnimation();
             }
-            players.get(currentPlayer).move(num + 1, (LudoPiece) v);
+            players.get(currentPlayer).move1(num + 1, (LudoPiece) v);
+
         }
     };
 
@@ -126,7 +134,7 @@ public class LudoGame extends FrameLayout {
                         animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                             @Override
                             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                if ((diceImage.getLayoutParams().width - value >= mBoxWidth))
+                                if ((diceImage.getLayoutParams().width - value >= width/10))
                                     diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width - value), (diceImage.getLayoutParams().height - value)));
                             }
                         });
@@ -156,7 +164,7 @@ public class LudoGame extends FrameLayout {
                 final View v1 = v;
                 final int num = Integer.parseInt(textView.getText().toString()) == 0 ? random.nextInt(6) : Integer.parseInt(textView.getText().toString()) - 1;
                 game.num = num;
-                Glide.with(context)
+                Glide.with(context).asGif()
                         .load(R.raw.dice_gif)
                         .into((ImageView) v);
                 valueAnimator.start();
@@ -165,11 +173,15 @@ public class LudoGame extends FrameLayout {
                     @Override
                     public void run() {
 
-                        ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (num + 1), "drawable", getContext().getPackageName())));
-
-                        ((Activity) game.context).runOnUiThread(new Runnable() {
+                        if(num < 6)
+                            ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (num + 1), "drawable", getContext().getPackageName())));
+                        else {
+                            ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
+                            Toast.makeText(context, "dice Value is" + (num + 1), Toast.LENGTH_SHORT).show();
+                        }((Activity) game.context).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                if(num == 5) turnChange = false;
                                 makeMove(num + 1);
 //                                diceImage.setX(dicePoints[currentPlayer].x);
 //                                diceImage.setY(dicePoints[currentPlayer].y);
@@ -194,7 +206,7 @@ public class LudoGame extends FrameLayout {
 
         LudoBox.TransitionPlayer[] transitionPlayers = {LudoBox.TransitionPlayer.ONE, LudoBox.TransitionPlayer.TWO, LudoBox.TransitionPlayer.THREE, LudoBox.TransitionPlayer.FOUR};
 
-        LudoBox[][] ludoBoxes = {oneP,twoP,threeP,fourP};
+        final LudoBox[][] ludoBoxes = {oneP,twoP,threeP,fourP};
 
         for(int i = 0;  i< numberOfPlayers; i++)
         {
@@ -203,7 +215,7 @@ public class LudoGame extends FrameLayout {
 
             for(int j = 0; j < 4; j++)
             {
-                LudoPiece ludoPiece = new LudoPiece(context, player, game, colors[i], pieceSize, ludoBoxes[i][j], ludoBoxes[i][j]);
+                final LudoPiece ludoPiece = new LudoPiece(context, player, game, colors[i], pieceSize, ludoBoxes[i][j], ludoBoxes[i][j]);
                 ImageView circle = new ImageView(context);
                 circle.setImageResource(R.drawable.circle);
                 circle.setWillNotDraw(false);
@@ -212,7 +224,15 @@ public class LudoGame extends FrameLayout {
                 ludoPiece.setTag(circle);
                 pieces.add(ludoPiece);
                 ludoPiece.setOnClickListener(pieceClickListener);
-                ludoBoxes[i][j].addPiece(ludoPiece);
+                final int finalJ = j;
+                final int finalI = i;
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ludoBoxes[finalI][finalJ].addPiece(ludoPiece);
+                    }
+                });
+                thread.start();
                 ludoPieces[j] = ludoPiece;
                 ludoPiece.setEnabled(false);
             }
@@ -252,6 +272,31 @@ public class LudoGame extends FrameLayout {
             if(foundNum == 1 || (sameCordinates && temp != null))
             {
                 temp.performClick();
+            }
+            else if(foundNum == 0)
+            {
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        currentPlayer++;
+                        currentPlayer %= numberOfPlayers;
+                        getDiceImage().setX(dicePoints[currentPlayer].x);
+                        getDiceImage().setY(dicePoints[currentPlayer].y);
+                        getDiceImage().setEnabled(true);
+                        getmArrows()[currentPlayer].setVisibility(VISIBLE);
+                        getmArrows()[currentPlayer].setAnimation(translateAnimation);
+
+                        if (players.get(currentPlayer).type == PlayerType.CPU) {
+                            getDiceImage().performClick();
+                        }
+                        else if(players.get(currentPlayer).type == PlayerType.ONLINE)
+                        {
+
+                        }
+
+                    }
+                }, 1000);
+
             }
         }
         else if(players.get(currentPlayer).type == PlayerType.CPU)
@@ -293,6 +338,7 @@ public class LudoGame extends FrameLayout {
         firstPoint.x += 6*mBoxWidth;
         LudoBox previousBox = null;
         LudoBox firstBox = null;
+
         for(int i = 0; i < 6; i++)
         {
             LudoBox ludoBox = new LudoBox(firstPoint, mBoxWidth, this, LudoBox.TransitionPlayer.NULL, null, null, previousBox);
@@ -452,6 +498,7 @@ public class LudoGame extends FrameLayout {
         LudoBox ludoBox = new LudoBox(firstPoint, mBoxWidth, this, LudoBox.TransitionPlayer.NULL, null, null, previousBox);
         previousBox.nextBox = ludoBox;
         ludoBox.nextBox = firstBox;
+        firstBox.previousBox = ludoBox;
         boxes.add(ludoBox);
 
         previousBox = boxes.get(51);
@@ -622,6 +669,12 @@ public class LudoGame extends FrameLayout {
 
     private enum Direction{
         UP, DOWN, LEFT, RIGHT
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        ((Activity)context).findViewById(R.id.boardContainer).invalidate();
     }
 
     private void startRotation(View view)

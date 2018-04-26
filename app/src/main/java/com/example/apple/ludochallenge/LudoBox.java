@@ -25,8 +25,8 @@ public class LudoBox {
     LudoBox nextBox;
     LudoBox transitionBox;
     LudoBox previousBox;
-    boolean stop;
-    boolean winBox;
+    boolean stop = false;
+    boolean winBox = false;
     TransitionPlayer transitionPlayer;
 
 
@@ -52,80 +52,109 @@ public class LudoBox {
 //        oldCoordinate.y = (int) piece.y;
 
         piece.mBox = this;
-        ((Activity)mGame.context).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mPieces.add(piece);
-                mPieceCount++;
-                int pieceHeight = mSize;
-                int pieceWidth = pieceHeight / 2;
+        mPieces.add(piece);
+        mPieceCount++;
 
-                for (int i = 1; i < mPieceCount; i++) {
-                    pieceHeight = pieceHeight - pieceHeight / 6;
-                    pieceWidth = pieceHeight / 2;
+        int pieceHeight = mSize;
+        int pieceWidth = pieceHeight / 2;
+
+        for (int i = 1; i < mPieceCount; i++) {
+            pieceHeight = pieceHeight - pieceHeight / 6;
+            pieceWidth = pieceHeight / 2;
+        }
+
+        int x = mCenterPoint.x;
+        int y = mCenterPoint.y + pieceHeight / 8;
+        x -= pieceWidth / 2;
+        y -= pieceHeight;
+
+        x += (mPieceCount - 1) * (pieceWidth / 2);
+        int startingPointX = x;
+
+        for (int i = 0; i < mPieceCount; i++) {
+            final LudoPiece piece1 = mPieces.get(i);
+            piece1.setX(startingPointX);
+            piece1.setY(y);
+            ((ImageView) piece1.getTag()).setX(startingPointX);
+            ((ImageView) piece1.getTag()).setY(mCenterPoint.y - pieceWidth / 2);
+
+            final int finalPieceHeight = pieceHeight;
+            final int finalPieceWidth = pieceWidth;
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+
+                    piece1.setSize(finalPieceWidth, finalPieceHeight);
+                    ((ImageView) piece1.getTag()).setLayoutParams(new FrameLayout.LayoutParams(finalPieceWidth, finalPieceWidth));
+                    mGame.invalidate();
+                    synchronized (this)
+                    {
+                        this.notify();
+                    }
                 }
-
-                int x = mCenterPoint.x;
-                int y = mCenterPoint.y + pieceHeight / 8;
-                x -= pieceWidth / 2;
-                y -= pieceHeight;
-
-                x += (mPieceCount - 1) * (pieceWidth / 2);
-                int startingPointX = x;
-
-                for (int i = 0; i < mPieceCount; i++) {
-                    LudoPiece piece1 = mPieces.get(i);
-                    piece1.setX(startingPointX);
-                    piece1.setSize(pieceWidth, pieceHeight);
-                    piece1.setY(y);
-                    ((ImageView) piece1.getTag()).setX(startingPointX);
-                    ((ImageView) piece1.getTag()).setY(mCenterPoint.y - pieceWidth / 2);
-                    ((ImageView) piece1.getTag()).setLayoutParams(new FrameLayout.LayoutParams(pieceWidth, pieceWidth));
-                    startingPointX -= pieceWidth;
+            };
+            synchronized (runnable) {
+                ((Activity) mGame.context).runOnUiThread(runnable);
+                startingPointX -= pieceWidth;
+                try {
+                    runnable.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-        });
-
+        }
     }
 
-    void removePiece(LudoPiece piece)
-    {
+    void removePiece(LudoPiece piece) {
         mPieces.remove(piece);
-        ((Activity)mGame.context).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        mPieceCount--;
 
-                mPieceCount--;
-                int pieceHeight = mSize;
-                int pieceWidth = pieceHeight / 2;
+        int pieceHeight = mSize;
+        int pieceWidth = pieceHeight / 2;
 
-                for (int i = 1; i < mPieceCount; i++) {
-                    pieceHeight = pieceHeight - pieceHeight / 6;
-                    pieceWidth = pieceHeight / 2;
+        for (int i = 1; i < mPieceCount; i++) {
+            pieceHeight = pieceHeight - pieceHeight / 6;
+            pieceWidth = pieceHeight / 2;
+        }
+
+        int x = mCenterPoint.x;
+        int y = mCenterPoint.y + pieceHeight / 8;
+        x -= pieceWidth / 2;
+        y -= pieceHeight;
+
+        x += (mPieceCount - 1) * (pieceWidth / 2);
+
+        int startingPointX = x;
+
+        for (int i = 0; i < mPieceCount; i++) {
+            final LudoPiece piece1 = mPieces.get(i);
+            piece1.setX(startingPointX);
+            ((ImageView) piece1.getTag()).setX(startingPointX);
+            ((ImageView) piece1.getTag()).setY(mCenterPoint.y - pieceWidth / 2);
+            final int finalPieceWidth = pieceWidth;
+            final int finalPieceHeight = pieceHeight;
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    piece1.setSize(finalPieceWidth, finalPieceHeight);
+                    ((ImageView) piece1.getTag()).setLayoutParams(new FrameLayout.LayoutParams(finalPieceWidth, finalPieceWidth));
+                    synchronized (this)
+                    {
+                        this.notify();
+                    }
                 }
-
-                int x = mCenterPoint.x;
-                int y = mCenterPoint.y + pieceHeight / 8;
-                x -= pieceWidth / 2;
-                y -= pieceHeight;
-
-                x += (mPieceCount - 1) * (pieceWidth / 2);
-
-                int startingPointX = x;
-
-                for (int i = 0; i < mPieceCount; i++) {
-                    LudoPiece piece1 = mPieces.get(i);
-                    piece1.setX(startingPointX);
-                    piece1.setSize(pieceWidth, pieceHeight);
-                    ((ImageView)piece1.getTag()).setX(startingPointX);
-                    ((ImageView)piece1.getTag()).setY(mCenterPoint.y - pieceWidth/2);
-                    ((ImageView)piece1.getTag()).setLayoutParams(new FrameLayout.LayoutParams(pieceWidth,pieceWidth));
-                    piece1.setY(y);
-                    startingPointX -= pieceWidth;
+            };
+            synchronized (runnable) {
+                ((Activity) mGame.context).runOnUiThread(runnable);
+                try {
+                    runnable.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-        });
-
+            piece1.setY(y);
+            startingPointX -= pieceWidth;
+        }
     }
 
     public int getPieceHeight() {

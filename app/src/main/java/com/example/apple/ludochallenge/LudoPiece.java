@@ -97,6 +97,11 @@ public class LudoPiece extends android.support.v7.widget.AppCompatImageView {
     {
         LudoBox box = mBox;
 
+        if(num != 6 && !open)
+        {
+            return false;
+        }
+
         for(int i = 0; i < num; i++)
         {
             if(this.player.player == box.transitionPlayer)
@@ -133,11 +138,6 @@ public class LudoPiece extends android.support.v7.widget.AppCompatImageView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-    }
-
-    public void kill()
-    {
-
     }
 
 }

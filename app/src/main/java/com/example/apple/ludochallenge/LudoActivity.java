@@ -2,6 +2,7 @@ package com.example.apple.ludochallenge;
 
 import android.animation.ObjectAnimator;
 import android.app.Service;
+import android.content.Intent;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.support.v4.app.Fragment;
@@ -36,6 +37,10 @@ public class LudoActivity extends AppCompatActivity {
     LudoGame game;
     TextView[] pNames = new TextView[4];
     float p1TextSize;
+    public static final String NAMES_KEY = "NAMES";
+    public static final String PLAYERS_KEY = "PLAYERS";
+    public static final String COLORS_KEY = "COLORS";
+    public static final String PLAYERS_TYPE_KEY = "PLAYERS_TYPE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +48,6 @@ public class LudoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ludo);
 
 //        FrameLayout frameLayout = findViewById(R.id.ludoContainer);
-
 
         if (game == null) {
 
@@ -58,10 +62,24 @@ public class LudoActivity extends AppCompatActivity {
             int height = ds.heightPixels > ds.widthPixels ? ds.heightPixels : ds.widthPixels;
             final int width = ds.heightPixels < ds.widthPixels ? ds.heightPixels : ds.widthPixels;
 
-            PlayerType[] playerTypes = {PlayerType.HUMAN, PlayerType.CPU, PlayerType.CPU, PlayerType.CPU};
+            Intent intent = getIntent();
+            String[] names = intent.getStringArrayExtra(NAMES_KEY);
+            int[] colorsInt = intent.getIntArrayExtra(COLORS_KEY);
+            int[] playerTypesInt = intent.getIntArrayExtra(PLAYERS_TYPE_KEY);
+            int players = intent.getIntExtra(PLAYERS_KEY,3);
+
+            Color[] selectedColors = new Color[4];
+            PlayerType[] selectedPlayerTypes = new PlayerType[4];
+
+            for (int i = 0; i < players; i++)
+            {
+                    selectedColors[i] = Color.getColor(colorsInt[i]);
+                    selectedPlayerTypes[i] = PlayerType.getPlayerType(playerTypesInt[i]);
+            }
+
+            PlayerType[] playerTypes = {PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.CPU};
 
             final int boardStartY = (height - width) / 2;
-            int players = 3;
             Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
             String[] p_names = new String[]{"Player 1", "Player 2", "Player 3", "Player 4"};
 
@@ -82,24 +100,12 @@ public class LudoActivity extends AppCompatActivity {
             dicePoints = new Point[players];
             dicePoints[0] = first;
 
-
             AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0.2f);
             alphaAnimation.setRepeatMode(AlphaAnimation.REVERSE);
             alphaAnimation.setRepeatCount(AlphaAnimation.INFINITE);
             alphaAnimation.setDuration(200);
             alphaAnimation.setInterpolator(new LinearInterpolator());
             LudoGame.alphaAnimation = alphaAnimation;
-
-//
-//            RotateAnimation rotateAnimation = new RotateAnimation(0, 10,
-//                    Animation.RELATIVE_TO_SELF, 0.5f,
-//                    Animation.ABSOLUTE, 0.5f);
-//
-//            rotateAnimation.setInterpolator(new LinearInterpolator());
-//            rotateAnimation.setDuration(500);
-//            rotateAnimation.setRepeatCount(Animation.INFINITE);
-//
-//            LudoGame.rotateAnimation = rotateAnimation;
 
             TranslateAnimation translateAnimation = new TranslateAnimation(
                     TranslateAnimation.RELATIVE_TO_SELF, 0.1f,
@@ -192,20 +198,54 @@ public class LudoActivity extends AppCompatActivity {
 //            findViewById(R.id.boardContainer).setBackgroundColor(android.graphics.Color.RED);
 
             final TextView textView = new TextView(getApplicationContext());
-            textView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             textView.setText("0");
-            textView.setTextSize(20);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            textView.setLayoutParams(params);
+            textView.setTextSize(30);
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int value = Integer.parseInt(textView.getText().toString());
                     value++;
-                    value %= 7;
                     textView.setText("" + value);
                 }
             });
 
+            final TextView textView1 = new TextView(getApplicationContext());
+            FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params1.gravity = Gravity.RIGHT;
+            textView1.setLayoutParams(params1);
+            textView1.setText("decrement");
+            textView1.setTextSize(30);
+            textView1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int value = Integer.parseInt(textView.getText().toString());
+                    value--;
+                    textView.setText("" + value);
+                }
+            });
+
+            final TextView textView2 = new TextView(getApplicationContext());
+            FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params2.gravity = Gravity.CENTER;
+            textView2.setLayoutParams(params2);
+
+            textView2.setText("ToZero");
+            textView2.setGravity(Gravity.CENTER);
+            textView2.setTextSize(30);
+            textView2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    textView.setText("0");
+                }
+            });
+
+
+
             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView);
+            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView1);
+            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView2);
             LudoGame.textView = textView;
         }
     }

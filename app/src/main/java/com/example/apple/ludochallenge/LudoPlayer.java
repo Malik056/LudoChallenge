@@ -1,6 +1,7 @@
 package com.example.apple.ludochallenge;
 
 import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Point;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import static android.view.View.VISIBLE;
+import static android.view.View.combineMeasuredStates;
 import static com.example.apple.ludochallenge.SALGame.translateAnimation;
 
 /**
@@ -55,37 +57,44 @@ public class LudoPlayer {
             public void run() {
 
                 LudoBox ludoBox = piece.mBox;
+                if (ludoBox.mPieceCount > 2) {
 
-                ludoBox.removePiece(piece);
-
-                if(ludoBox.mPieceCount > 1) {
                     if (!ludoBox.stop) {
 
                         int opponent = 0;
-                        int mine = 0;
-                        int[] index = {0, 0, 0, 0};
+                        int mine = -1;
+                        final LudoPiece[] ludoPieces = new LudoPiece[4];
                         for (LudoPiece l : ludoBox.mPieces) {
                             if (l.player.player != piece.player.player) {
-                                index[opponent++] = ludoBox.mPieces.indexOf(l);
+                                opponent++;
                             } else {
-                                mine++;
+                                if (l != piece)
+                                    ludoPieces[++mine] = l;
                             }
                         }
 
-                        if(opponent == mine)
-                        {
+                        if (opponent == mine) {
+                            for (int i = 0; i < mine; i++) {
 
-                            for(int i = 0; i < opponent; i++) {
+                                final int finalI = i;
 
-                                LudoPiece ludoPiece = ludoBox.mPieces.get(index[i]);
-                                killPiece(ludoPiece);
+                                Thread thread1 = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        LudoPiece ludoPiece = ludoPieces[finalI];
+                                        killPiece(ludoPiece);
+                                    }
+                                });
+                                thread1.start();
+
                             }
-
                             LudoGame.turnChange = false;
-
                         }
                     }
                 }
+
+                ludoBox.removePiece(piece);
+
                 LudoBox fromBox = piece.mBox;
                 Point to = new Point();
                 Point from = new Point();
@@ -96,21 +105,21 @@ public class LudoPlayer {
                     from.x = fromBox.firstX;
                     from.y = fromBox.firstY;
 
-                    if(player == fromBox.transitionPlayer)
-                    {
+                    if (player == fromBox.transitionPlayer) {
                         to.y = fromBox.transitionBox.firstY;
                         to.x = fromBox.transitionBox.firstX;
                         finalBox[0] = fromBox.transitionBox;
 
-                    }
-                    else {
+                    } else {
                         to.y = fromBox.nextBox.firstY;
                         to.x = fromBox.nextBox.firstX;
                         finalBox[0] = fromBox.nextBox;
                     }
+
                     animatePiece(piece, from, to);
+
                     try {
-                        Thread.sleep(300);
+                        Thread.sleep(350);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -118,51 +127,50 @@ public class LudoPlayer {
                     fromBox = finalBox[0];
                 }
 
-                finalBox[0].addPiece(piece);
-                if(finalBox[0].winBox)
-                {
+                if (finalBox[0].winBox) {
                     LudoGame.turnChange = false;
 
-                    if(finalBox[0].mPieceCount == 4)
-                    {
+                    if (finalBox[0].mPieceCount == 4) {
                         player_won();
                     }
-                }
-                else if(finalBox[0].mPieceCount > 1)
-                {
-                    if(!finalBox[0].stop)
-                    {
+                } else if (finalBox[0].mPieceCount > 0) {
+                    if (!finalBox[0].stop) {
                         int opponent = 0;
-                        int mine = 0;
-                        int[] index = {0,0,0,0};
-                        for(LudoPiece l:finalBox[0].mPieces)
-                        {
-                            if(l.player.player != piece.player.player)
-                            {
-                                index[opponent++] = finalBox[0].mPieces.indexOf(l);
-                            }
-                            else
-                            {
+                        int mine = 1;
+                        final LudoPiece[] ludoPieces = {null, null, null, null};
+                        for (LudoPiece l : finalBox[0].mPieces) {
+                            if (l.player.player != piece.player.player) {
+                                ludoPieces[opponent++] = l;
+                            } else {
                                 mine++;
                             }
                         }
 
-                        if(opponent == mine)
-                        {
-                            LudoPiece ludoPiece = finalBox[0].mPieces.get(index[0]);
+                        if (opponent == mine) {
+
+                            final LudoPiece[] ludoPiece = {ludoPieces[0]};
+
                             ludoBox = finalBox[0];
-                            int toIndex = mGame.boxes.indexOf(ludoPiece.startPosition.nextBox);
+
+                            int toIndex = mGame.boxes.indexOf(ludoPiece[0].startPosition.nextBox);
                             int fromIndex = mGame.boxes.indexOf(ludoBox);
 
-                            int n = 52 + (fromIndex - toIndex) % 52;
+                            int n = (52 + (fromIndex - toIndex)) % 52;
                             n += 2;
 
-                            for(int i = 0; i < opponent; i++) {
+                            for (int i = 0; i < opponent; i++) {
 
-                                ludoPiece = finalBox[0].mPieces.get(index[i]);
-                                killPiece(ludoPiece);
+                                ludoPiece[0] = ludoPieces[i];
+                                finalBox[0].removePiece(ludoPiece[0]);
+
+                                Thread thread1 = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        killPiece(ludoPiece[0]);
+                                    }
+                                });
+                                thread1.start();
                             }
-
                             LudoGame.turnChange = false;
 
                             try {
@@ -170,19 +178,32 @@ public class LudoPlayer {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
+                            finalBox[0].addPiece(piece);
+
+                            ((Activity) mGame.context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mGame.invalidate();
+                                }
+                            });
+                        } else {
+                            finalBox[0].addPiece(piece);
                         }
+                    } else {
+                        finalBox[0].addPiece(piece);
                     }
+                } else {
+                    finalBox[0].addPiece(piece);
                 }
 
                 ((Activity) mGame.context).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
-                        if(LudoGame.turnChange) {
+                        if (LudoGame.turnChange) {
                             mGame.currentPlayer++;
                             mGame.currentPlayer %= mGame.numberOfPlayers;
-                        }
-                        else LudoGame.turnChange = true;
+                        } else LudoGame.turnChange = true;
 
                         mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
                         mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
@@ -194,10 +215,7 @@ public class LudoPlayer {
 
                         if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
                             mGame.getDiceImage().performClick();
-                        }
-                        else if(mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE)
-                        {
-
+                        } else if (mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE) {
                         }
                     }
                 });
@@ -205,14 +223,91 @@ public class LudoPlayer {
             }
         });
         thread.start();
+    }
 
+    public void move1(final int num, final LudoPiece piece) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                LudoBox currentBox = piece.mBox;
+                currentBox.removePiece(piece);
+                Point from = new Point(currentBox.firstX, currentBox.firstY);
+                Point to = new Point(currentBox.nextBox.firstX, currentBox.nextBox.firstY);
+                for (int i = 0; i < num; i++) {
+
+                    LudoBox nextBox;
+
+                    if (player == currentBox.transitionPlayer) {
+                        to.y = currentBox.transitionBox.firstY;
+                        to.x = currentBox.transitionBox.firstX;
+                        nextBox = currentBox.transitionBox;
+                    } else {
+                        to.y = currentBox.nextBox.firstY;
+                        to.x = currentBox.nextBox.firstX;
+                        nextBox = currentBox.nextBox;
+                    }
+
+                    animatePiece(piece, from, to);
+
+                    currentBox = nextBox;
+                    from.x = to.x;
+                    from.y = to.y;
+
+                }
+
+                currentBox.addPiece(piece);
+
+                if (currentBox.mPieceCount > 0) {
+                    if (!currentBox.stop) {
+                        int opponent = 0;
+                        int mine = 0;
+                        final LudoPiece[] ludoPieces = {null, null, null, null};
+                        for (LudoPiece l : currentBox.mPieces) {
+                            if (l.player.player != piece.player.player) {
+                                ludoPieces[opponent++] = l;
+                            } else {
+                                mine++;
+                            }
+                        }
+                        if (mine == opponent) {
+                            for (int i = 0; i < opponent; i++) {
+                                killPieces(ludoPieces);
+                            }
+                        }
+                    }
+                }
+
+                ((Activity) mGame.context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Toast.makeText(mGame.context, "animated", Toast.LENGTH_SHORT).show();
+                        if (LudoGame.turnChange) {
+                            mGame.currentPlayer++;
+                            mGame.currentPlayer %= mGame.numberOfPlayers;
+                        } else LudoGame.turnChange = true;
+
+                        mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
+                        mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
+                        mGame.getDiceImage().setEnabled(true);
+                        //                                arrows[(currentPlayer+numberOfPlayers-1)%numberOfPlayers].setAnimation(null);
+                        //                                arrows[(currentPlayer+numberOfPlayers-1)%numberOfPlayers].setVisibility(INVISIBLE);
+                        mGame.getmArrows()[mGame.currentPlayer].setVisibility(VISIBLE);
+                        mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
+                    }
+                });
+            }
+
+        });
+        thread.start();
     }
 
     private void player_won() {
-        ((Activity)mGame.context).runOnUiThread(new Runnable() {
+        ((Activity) mGame.context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(mGame.context,"Player Won", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mGame.context, "Player Won", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -225,16 +320,48 @@ public class LudoPlayer {
         final int pieceWidth = piece.mBox.getPieceWidth();
         final int pieceHeight = piece.mBox.getPieceHeight();
 
-        if(from.x != to.x && from.y != to.y) {
-            ((Activity) mGame.context).runOnUiThread(new Runnable() {
+        if (from.x != to.x && from.y != to.y) {
+
+            final Runnable runnable = new Runnable() {
+                final Runnable runnable1 = this;
+
                 @Override
                 public void run() {
                     piece.animate().translationX(to.x).setDuration(160);
-                    piece.animate().translationY(to.y).setDuration(160);
+                    piece.animate().translationY(to.y).setDuration(160).setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            synchronized (runnable1) {
+                                runnable1.notify();
+                            }
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    });
                 }
-            });
-        }
-        else if (from.x != to.x) {
+            };
+            synchronized (runnable) {
+                ((Activity) mGame.context).runOnUiThread(runnable);
+                try {
+                    runnable.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (from.x != to.x) {
             animator = ValueAnimator.ofFloat(from.x, to.x);
 
             animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -380,60 +507,325 @@ public class LudoPlayer {
             final ValueAnimator finalAnimator = animator1;
             final ValueAnimator finalAnimator1 = animator;
 
-            ((Activity) mGame.context).runOnUiThread(new Runnable() {
+            final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
+                    AnimatorSet animatorSet = new AnimatorSet();
                     finalAnimator1.setDuration(160);
                     finalAnimator.setDuration(75);
-                    finalAnimator1.start();
-                    finalAnimator.start();
+                    final Runnable runnable1 = this;
+                    animatorSet.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+
+                            synchronized (runnable1) {
+                                runnable1.notify();
+                            }
+
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                            synchronized (runnable1) {
+                                runnable1.notify();
+                            }
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    });
+                    animatorSet.playTogether(finalAnimator, finalAnimator1);
+                    animatorSet.start();
 
                 }
-            });
-
+            };
+            synchronized (runnable) {
+                ((Activity) mGame.context).runOnUiThread(runnable);
+                try {
+                    runnable.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    private void killPiece(LudoPiece piece)
-    {
-        LudoBox ludoBox  = piece.mBox;
+    private void killPiece(final LudoPiece piece) {
+        LudoBox ludoBox = piece.mBox;
         ludoBox.removePiece(piece);
-        piece.setLayoutParams(new FrameLayout.LayoutParams(ludoBox.defaultWidth,ludoBox.defaultHeight));
+        final LudoBox finalLudoBox = ludoBox;
+
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+
+                piece.setLayoutParams(new FrameLayout.LayoutParams(finalLudoBox.defaultWidth, finalLudoBox.defaultHeight));
+                piece.open = false;
+                synchronized (this) {
+                    this.notify();
+                }
+            }
+        };
+
+        synchronized (runnable) {
+            ((Activity) mGame.context).runOnUiThread(runnable);
+            try {
+                runnable.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         Point from = new Point();
-        Point to = new Point();
+        final Point to = new Point();
 
-        while(ludoBox.previousBox != null) {
+        while (ludoBox != piece.startPosition.nextBox) {
 
             from.x = ludoBox.firstX;
             from.y = ludoBox.firstY;
             to.x = ludoBox.previousBox.firstX;
             to.y = ludoBox.previousBox.firstY;
 
-            piece.animate().translationX(to.x).setDuration(100).start();
-            piece.animate().translationY(to.y).setDuration(100).start();
+            Runnable runnable1 = new Runnable() {
+                @Override
+                public void run() {
 
+                    final Runnable runnable2 = this;
+                    piece.animate().translationY(to.y).setDuration(100).start();
+                    piece.animate().translationX(to.x).setDuration(100).setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            synchronized (runnable2) {
+                                runnable2.notify();
+                            }
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    }).start();
+                }
+            };
+            synchronized (runnable1) {
+                ((Activity) mGame.context).runOnUiThread(runnable1);
+                try {
+                    runnable1.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             ludoBox = ludoBox.previousBox;
 
+        }
 
+        Runnable runnable1 = new Runnable() {
+            @Override
+            public void run() {
+                final Runnable runnable2 = this;
+                piece.animate().translationX(piece.startPosition.firstX).setDuration(200).start();
+                piece.animate().translationY(piece.startPosition.firstY).setDuration(200).setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        synchronized (runnable2) {
+                            runnable2.notify();
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).start();
+            }
+        };
+        synchronized (runnable1) {
+            ((Activity) mGame.context).runOnUiThread(runnable1);
             try {
-                Thread.sleep(103);
+                runnable1.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
         }
 
-        piece.animate().translationX(piece.startPosition.firstX).setDuration(200);
-        piece.animate().translationY(piece.startPosition.firstY).setDuration(200);
-
-        try {
-            Thread.sleep(203);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         piece.startPosition.addPiece(piece);
-
     }
 
+    private void killPieces(final LudoPiece[] pieces) {
+        final LudoPiece piece = pieces[0];
+
+        LudoBox ludoBox = piece.mBox;
+
+        for(LudoPiece p:pieces)
+            if(p!=null)
+                ludoBox.removePiece(p);
+
+        final LudoBox finalLudoBox = ludoBox;
+
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+
+                for (LudoPiece piece1 : pieces) {
+                    if (piece1 != null) {
+                        piece1.setLayoutParams(new FrameLayout.LayoutParams(finalLudoBox.defaultWidth, finalLudoBox.defaultHeight));
+                        piece1.open = false;
+                    }
+                }
+                synchronized (this) {
+                    this.notify();
+                }
+            }
+        };
+
+        synchronized (runnable) {
+            ((Activity) mGame.context).runOnUiThread(runnable);
+            try {
+                runnable.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Point from = new Point();
+        final Point to = new Point();
+
+        while (ludoBox != piece.startPosition.nextBox) {
+            if (ludoBox.previousBox != null) {
+                from.x = ludoBox.firstX;
+                from.y = ludoBox.firstY;
+                to.x = ludoBox.previousBox.firstX;
+                to.y = ludoBox.previousBox.firstY;
+                Runnable runnable1 = new Runnable() {
+                    @Override
+                    public void run() {
+
+                        final Runnable runnable2 = this;
+                        for (int i = 1; i < pieces.length; i++) {
+                            if (pieces[i] != null) {
+                                pieces[i].animate().translationY(to.y).setDuration(100).start();
+                                pieces[i].animate().translationX(to.x).setDuration(100).start();
+                            }
+                        }
+                        pieces[0].animate().translationY(to.y).setDuration(100).start();
+                        pieces[0].animate().translationX(to.x).setDuration(100).setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                synchronized (runnable2) {
+                                    runnable2.notify();
+                                }
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        }).start();
+                    }
+                };
+                synchronized (runnable1) {
+                    ((Activity) mGame.context).runOnUiThread(runnable1);
+                    try {
+                        runnable1.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                ludoBox = ludoBox.previousBox;
+            }
+        }
+
+        Runnable runnable1 = new Runnable() {
+            @Override
+            public void run() {
+                final Runnable runnable2 = this;
+
+                for (int i = 1; i < pieces.length; i++) {
+                    if (pieces[i] != null) {
+                        pieces[i].animate().translationX(pieces[i].startPosition.firstX).setDuration(200).start();
+                        pieces[i].animate().translationY(pieces[i].startPosition.firstY).setDuration(200).start();
+                    }
+                }
+
+                pieces[0].animate().translationX(pieces[0].startPosition.firstX).setDuration(200).start();
+                pieces[0].animate().translationY(pieces[0].startPosition.firstY).setDuration(200).setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        synchronized (runnable2) {
+                            runnable2.notify();
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                }).start();
+
+            }
+        };
+        synchronized (runnable1) {
+            ((Activity) mGame.context).runOnUiThread(runnable1);
+            try {
+                runnable1.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        for (LudoPiece piece1 : pieces)
+            if (piece1 != null) {
+                piece1.startPosition.addPiece(piece1);
+            }
+    }
 }
