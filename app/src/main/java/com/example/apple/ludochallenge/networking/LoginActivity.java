@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.apple.ludochallenge.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.sdsmdg.tastytoast.TastyToast;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -41,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mAUth = FirebaseAuth.getInstance();
         logo = (ImageView) findViewById(R.id.register_logo);
-        Glide.with(getApplicationContext()).load(R.raw.logo).into(logo);
+        Glide.with(getApplicationContext()).load(R.raw.logo).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(logo);
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
         login_username = (CustomEditText) findViewById(R.id.login_username);
@@ -65,9 +68,10 @@ public class LoginActivity extends AppCompatActivity {
         createOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
             }
         });
@@ -76,9 +80,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                 mySQLDatabase.setCurrentSession("PLAY_AS_GUEST", MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST);
-                Intent intent = new Intent(LoginActivity.this, MainMenu.class);
+                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
             }
         });
@@ -86,10 +91,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private void LoginUserAccount(String email, String password) {
         if(TextUtils.isEmpty(email)){
-            Toast.makeText(getApplicationContext(), "Please write your username!", Toast.LENGTH_SHORT).show();
+            TastyToast.makeText(getApplicationContext(),"Please enter your username!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
         }
         else if(TextUtils.isEmpty(password)){
-            Toast.makeText(getApplicationContext(), "Please write your password!", Toast.LENGTH_SHORT).show();
+            TastyToast.makeText(getApplicationContext(),"Please enter your password!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
         }
         else{
             loadingBar.setTitle("Logging In");
@@ -106,19 +111,26 @@ public class LoginActivity extends AppCompatActivity {
                         mUserDatabase.child(current_userId).child("device_token").setValue(deviceToken).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Intent intent = new Intent(LoginActivity.this, MainMenu.class);
+                                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
+                                overridePendingTransition(R.anim.goup, R.anim.godown);
                                 finish();
                             }
                         });
 
                     }else{
-                        Toast.makeText(getApplicationContext(), "Error Occured, Try Again", Toast.LENGTH_SHORT).show();
+                        TastyToast.makeText(getApplicationContext(),"Error occurred, Try Again!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                     }
                     loadingBar.dismiss();
                 }
             });
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Runtime.getRuntime().gc();
     }
 }

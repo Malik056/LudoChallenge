@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -16,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.apple.ludochallenge.LudoActivity;
 import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.UserProgressData;
@@ -28,6 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
 
@@ -122,7 +127,6 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-
 //        FirebaseAuth.getInstance().signOut();
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
@@ -139,10 +143,10 @@ public class PlayActivity extends AppCompatActivity {
         diceGif0 = (ImageView) findViewById(R.id.play_selectNoOfPlayers_dilaog_gif0);
         diceGif1 = (ImageView) findViewById(R.id.play_selectNoOfPlayers_dilaog_gif1);
         diceGif2 = (ImageView) findViewById(R.id.play_selectNoOfPlayers_dilaog_gif2);
-        Glide.with(getApplicationContext()).load(R.raw.logo).into(logo);
-        Glide.with(getApplicationContext()).load(R.raw.dice_gif0).into(diceGif0);
-        Glide.with(getApplicationContext()).load(R.raw.dice_gif1).into(diceGif1);
-        Glide.with(getApplicationContext()).load(R.raw.dice_gif0).into(diceGif2);
+        Glide.with(getApplicationContext()).load(R.raw.logo).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(logo);
+        Glide.with(getApplicationContext()).load(R.raw.dice_gif0).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(diceGif0);
+        Glide.with(getApplicationContext()).load(R.raw.dice_gif1).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(diceGif1);
+        Glide.with(getApplicationContext()).load(R.raw.dice_gif0).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(diceGif2);
         two_players = (LinearLayout) findViewById(R.id.two_players);
         three_players = (LinearLayout) findViewById(R.id.three_players);
         two_players_backBtn = (ImageView) findViewById(R.id.play_two_players_back);
@@ -231,10 +235,11 @@ public class PlayActivity extends AppCompatActivity {
             public void onAdClosed() {
                 interstitialAd.loadAd(new AdRequest.Builder().build());
                 if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)){
-                    Intent intent = new Intent(PlayActivity.this, UsersActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), UsersActivity.class);
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color);
                     intent.putExtra("vsComputer",vsComputer);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                 }else {
@@ -329,6 +334,9 @@ public class PlayActivity extends AppCompatActivity {
             profile_image.setImageBitmap(bitmap);
             flag_image.setImageBitmap(bitmap1);
             edit_profile_dialog_flagImage.setImageBitmap(bitmap1);
+            play_editProfileDialog_edit_profileBtn.setVisibility(View.GONE);
+            bitmap = null;
+            bitmap1 = null;
         }
 
 
@@ -350,6 +358,7 @@ public class PlayActivity extends AppCompatActivity {
             countryName.setText(d_countryName);
             edit_profile_dialog_userName.setText(d_userName);
             edit_profile_dialog_countryName.setText(d_countryName);
+            bitmap = null;
         }
 
         if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST)) {
@@ -362,14 +371,17 @@ public class PlayActivity extends AppCompatActivity {
             edit_profile_dialog_countryName.setVisibility(View.GONE);
             play_coins.setVisibility(View.GONE);
             play_coinIcon.setVisibility(View.GONE);
+            play_editProfileDialog_edit_profileBtn.setVisibility(View.GONE);
 
         }
 
         play_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PlayActivity.this, MainMenu.class);
+                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
             }
         });
@@ -377,6 +389,7 @@ public class PlayActivity extends AppCompatActivity {
         playWithFriends_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                enableButtons();
                 playWithFriends_dialogBox.setVisibility(View.GONE);
             }
         });
@@ -387,24 +400,26 @@ public class PlayActivity extends AppCompatActivity {
 
 
                 if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK) || LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE)) {
+                    disableButtons();
                     if(interstitialAd.isLoaded()){
                         interstitialAd.show();
                     }
                     else{
                         if (LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)) {
-                            Intent intent = new Intent(PlayActivity.this, UsersActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), UsersActivity.class);
                             intent.putExtra("noOfPlayers", noOfPlayers);
                             intent.putExtra("color", color);
                             intent.putExtra("vsComputer", vsComputer);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
-                            finish();
+                            overridePendingTransition(R.anim.goup, R.anim.godown);
                         } else {
                             playWithFriends_dialogBox.setVisibility(View.VISIBLE);
                         }
                     }
                 }
                 else{
-                    Toast.makeText(PlayActivity.this, "Sign In to Play with your Friends!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Sign in to play with your friends!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                 }
             }
         });
@@ -416,21 +431,24 @@ public class PlayActivity extends AppCompatActivity {
                 color = 3;
                 vsComputer = 0;
                 playWithFriends_dialogBox.setVisibility(View.GONE);
-                Intent intent = new Intent(PlayActivity.this, UsersActivity.class);
+                Intent intent = new Intent(getApplicationContext(), UsersActivity.class);
                 intent.putExtra("noOfPlayers",noOfPlayers);
                 intent.putExtra("color",color);
                 intent.putExtra("vsComputer",vsComputer);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
-                finish();
+                overridePendingTransition(R.anim.goup, R.anim.godown);
             }
         });
 
         play_editProfileDialog_edit_profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                play_editProfileDialog_edit_profileBtn.setVisibility(View.GONE);
+                edit_profile_dialogBox.setVisibility(View.GONE);
                 Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
             }
         });
@@ -445,9 +463,8 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(!LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST)) {
+                    disableButtons();
                     edit_profile_dialogBox.setVisibility(View.VISIBLE);
-                    local_multiplayer.setClickable(false);
-                    vsComputer_btn.setClickable(false);
                 }
             }
         });
@@ -455,12 +472,14 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 edit_profile_dialogBox.setVisibility(View.GONE);
+                enableButtons();
             }
         });
 
         local_multiplayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                disableButtons();
                 frameLayout.setVisibility(View.VISIBLE);
             }
         });
@@ -468,6 +487,7 @@ public class PlayActivity extends AppCompatActivity {
         vsComputer_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                disableButtons();
                 vsComputer_frameLayout.setVisibility(View.VISIBLE);
             }
         });
@@ -475,12 +495,14 @@ public class PlayActivity extends AppCompatActivity {
         vsComputer_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                enableButtons();
                 vsComputer_frameLayout.setVisibility(View.GONE);
             }
         });
         selectNoOfPlayers_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                enableButtons();
                 frameLayout.setVisibility(View.GONE);
             }
         });
@@ -510,11 +532,13 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 four_player_frameLayout.setVisibility(View.GONE);
+                enableButtons();
             }
         });
         three_players_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                enableButtons();
                 three_player_frameLayout.setVisibility(View.GONE);
             }
         });
@@ -522,6 +546,7 @@ public class PlayActivity extends AppCompatActivity {
         two_players_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                enableButtons();
                 two_player_frameLayout.setVisibility(View.GONE);
             }
         });
@@ -537,15 +562,17 @@ public class PlayActivity extends AppCompatActivity {
                 String player4_name = four_players_player4_name.getText().toString();
 
                 if(TextUtils.isEmpty(player1_name) || TextUtils.isEmpty(player2_name) || TextUtils.isEmpty(player3_name) || TextUtils.isEmpty(player4_name)){
-                    Toast.makeText(getApplicationContext(), "Please enter name!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Please enter name!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                 }
                 else{
                     four_player_frameLayout.setVisibility(View.GONE);
-                    Intent intent = new Intent(PlayActivity.this, LudoActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color);
                     intent.putExtra("vsComputer",vsComputer);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
                     finish();
                 }
             }
@@ -560,15 +587,17 @@ public class PlayActivity extends AppCompatActivity {
                 String player3_name = three_players_player3_name.getText().toString();
 
                 if(TextUtils.isEmpty(player1_name) || TextUtils.isEmpty(player2_name) || TextUtils.isEmpty(player3_name)){
-                    Toast.makeText(getApplicationContext(), "Please enter name!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Please enter name!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                 }
                 else{
                     three_player_frameLayout.setVisibility(View.GONE);
-                    Intent intent = new Intent(PlayActivity.this, LudoActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color_3players);
                     intent.putExtra("vsComputer",vsComputer);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
                     three_players_player1_name.setText("");
                     three_players_player2_name.setText("");
                     three_players_player3_name.setText("");
@@ -586,15 +615,17 @@ public class PlayActivity extends AppCompatActivity {
 
 
                 if(TextUtils.isEmpty(player1_name) || TextUtils.isEmpty(player2_name)){
-                    Toast.makeText(getApplicationContext(), "Please enter name!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Please enter name!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                 }
                 else{
                     two_player_frameLayout.setVisibility(View.GONE);
-                    Intent intent = new Intent(PlayActivity.this, LudoActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color);
                     intent.putExtra("vsComputer",vsComputer);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
                     two_players_player1_name.setText("");
                     two_players_player2_name.setText("");
                     finish();
@@ -607,11 +638,13 @@ public class PlayActivity extends AppCompatActivity {
                     noOfPlayers = 2;
                     vsComputer = 1;
                     vsComputer_frameLayout.setVisibility(View.GONE);
-                    Intent intent = new Intent(PlayActivity.this, LudoActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",vsComputer_color);
                     intent.putExtra("vsComputer",vsComputer);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
                     finish();
                 }
         });
@@ -853,4 +886,53 @@ public class PlayActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    private void disableButtons(){
+        profile_picBox.setEnabled(false);
+        local_multiplayer.setEnabled(false);
+        vsComputer_btn.setEnabled(false);
+        playWithFriends.setEnabled(false);
+    }
+    private void enableButtons(){
+        profile_picBox.setEnabled(true);
+        local_multiplayer.setEnabled(true);
+        vsComputer_btn.setEnabled(true);
+        playWithFriends.setEnabled(true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        overridePendingTransition(R.anim.goup, R.anim.godown);
+        finish();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unbindDrawables(findViewById(R.id.playActivityRoot));
+        Runtime.getRuntime().gc();
+        System.gc();
+    }
+
+    private void unbindDrawables(View view) {
+        if (view.getBackground() != null)
+            view.getBackground().setCallback(null);
+
+        if (view instanceof ImageView) {
+            ImageView imageView = (ImageView) view;
+            imageView.setImageBitmap(null);
+        } else if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++)
+                unbindDrawables(viewGroup.getChildAt(i));
+
+            if (!(view instanceof AdapterView))
+                viewGroup.removeAllViews();
+        }
+    }
+
 }

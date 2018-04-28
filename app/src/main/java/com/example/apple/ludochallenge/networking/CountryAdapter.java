@@ -2,18 +2,21 @@ package com.example.apple.ludochallenge.networking;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.apple.ludochallenge.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -44,14 +47,13 @@ public class CountryAdapter extends ArrayAdapter<CountryItem> {
                     R.layout.country_spinner_row, parent, false
             );
             FrameLayout frameLayout = (FrameLayout) convertView.findViewById(R.id.drop_down_framLayout);
-//            frameLayout.setLayoutParams(new FrameLayout.LayoutParams(screen_Width/3,));
-//            frameLayout.setBackground(getContext().getResources().getDrawable(R.drawable.drop_down_menu_background));
         }
-        ImageView imageViewFlag = convertView.findViewById(R.id.image_view_flag);
+        final ImageView imageViewFlag = convertView.findViewById(R.id.image_view_flag);
         TextView textViewName = convertView.findViewById(R.id.text_view_name);
 
-        CountryItem currentItem = getItem(position);
+        final CountryItem currentItem = getItem(position);
         if(currentItem != null) {
+//            Picasso.get().load(Uri.parse("android.resource://" + R.class.getPackage().getName() + "/" + currentItem.getFlagImage()).toString()).resize(imageViewFlag.getMeasuredWidth(), imageViewFlag.getMeasuredHeight()).into(imageViewFlag);
             imageViewFlag.setImageResource(currentItem.getFlagImage());
             textViewName.setText(currentItem.getCountryName());
         }

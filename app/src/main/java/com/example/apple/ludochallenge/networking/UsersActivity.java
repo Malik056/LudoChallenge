@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -95,11 +96,12 @@ public class UsersActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View view) {
 
-                            Intent intent = new Intent(UsersActivity.this, ProfileActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
                             intent.putExtra("user_id", user_id);
                             intent.putExtra("noOfPlayers", noOfPlayers);
                             intent.putExtra("color", color);
                             intent.putExtra("vsComputer", vsComputer);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         }
                     });
@@ -150,5 +152,39 @@ public class UsersActivity extends AppCompatActivity {
         noOfPlayers = intent.getIntExtra("noOfPlayers", 0);
         color = intent.getIntExtra("color", 0);
         vsComputer = intent.getIntExtra("vsComputer",0);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unbindDrawables(findViewById(R.id.usersActivityRoot));
+        Runtime.getRuntime().gc();
+        System.gc();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+        Runtime.getRuntime().gc();
+    }
+
+    private void unbindDrawables(View view) {
+        if (view.getBackground() != null)
+            view.getBackground().setCallback(null);
+
+        if (view instanceof ImageView) {
+            ImageView imageView = (ImageView) view;
+            imageView.setImageBitmap(null);
+        } else if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++)
+                unbindDrawables(viewGroup.getChildAt(i));
+
+            if (!(view instanceof AdapterView))
+                viewGroup.removeAllViews();
+        }
     }
 }

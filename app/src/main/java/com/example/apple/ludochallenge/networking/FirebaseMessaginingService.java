@@ -20,6 +20,7 @@ public class FirebaseMessaginingService extends FirebaseMessagingService {
 
         String click_action = remoteMessage.getNotification().getClickAction();
 
+
         String from_user_id = remoteMessage.getData().get("from_user_id");
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher_background)

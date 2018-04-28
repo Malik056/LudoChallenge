@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.apple.ludochallenge.networking.MainMenu"
-    android:background="@drawable/background">
+    android:background="@drawable/background"
+    android:id="@+id/mainMenuActivityRoot">
 
 
 
@@ -205,7 +206,7 @@
                     <ImageView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:id="@+id/loginActivity_loginWithFacebook"
+                        android:id="@+id/mainMenu_SAL"
                         android:background="@drawable/snl"
                         android:layout_weight="0.15"
                         android:scaleType="fitXY"/>

@@ -258,7 +258,7 @@ public class LudoActivity extends AppCompatActivity {
             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView);
             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView1);
             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView2);
-            LudoGame.textView = textView;
+            game.textView = textView;
         }
     }
 

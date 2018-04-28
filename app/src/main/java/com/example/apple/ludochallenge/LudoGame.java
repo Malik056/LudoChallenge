@@ -52,7 +52,7 @@ public class LudoGame extends FrameLayout {
     ImageView[] mArrows;
     ArrayList<LudoPlayer> players = new ArrayList<>();
     ArrayList<LudoPiece> pieces = new ArrayList<>();
-    static TextView textView;
+    TextView textView;
     ImageView diceImage;
     int width;
     LudoGame game = this;

@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.apple.ludochallenge.networking.RegisterActivity"
-    android:background="@drawable/background">
+    android:background="@drawable/background"
+    android:id="@+id/playActivityRoot">
 
 
 

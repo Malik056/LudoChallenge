@@ -262,6 +262,7 @@ public class ProfileActivity extends AppCompatActivity {
                                             intent.putExtra("playWithFriends", 1);
                                             startActivity(intent);
 
+
                                         }
                                     });
                                 }
@@ -280,5 +281,11 @@ public class ProfileActivity extends AppCompatActivity {
         noOfPlayers = intent.getIntExtra("noOfPlayers", 0);
         color = intent.getIntExtra("color", 0);
         vsComputer = intent.getIntExtra("vsComputer",0);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Runtime.getRuntime().gc();
     }
 }

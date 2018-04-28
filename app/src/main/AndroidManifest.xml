@@ -10,6 +10,7 @@
     <application
         android:name=".networking.OfflineCapabilities"
         android:allowBackup="true"
+        android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
@@ -55,21 +56,30 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".SALActivity"></activity>
-        <activity android:name=".networking.LoginActivity"></activity>
-        <activity android:name=".networking.MainMenu"></activity>
-        <activity android:name=".networking.PlayActivity"></activity>
-        <activity android:name=".networking.ProfileActivity"></activity>
+        <activity android:name=".SALActivity" />
+        <activity android:name=".networking.LoginActivity" />
+        <activity android:name=".networking.MainMenu" />
+        <activity android:name=".networking.PlayActivity" />
+        <activity android:name=".networking.ProfileActivity" />
         <activity android:name=".networking.RegisterActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
-        <activity android:name=".networking.SettingsActivity"></activity>
-        <activity android:name=".networking.UsersActivity"></activity>
-        <activity android:name=".FriendsList"></activity>
+        <activity android:name=".networking.SettingsActivity" />
+        <activity android:name=".networking.UsersActivity" />
+        <activity android:name=".FriendsList" />
+        <activity android:name=".SpinWheelActivity">
+             <intent-filter>
+             <action android:name="android.intent.action.MAIN" />
+
+
+             <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

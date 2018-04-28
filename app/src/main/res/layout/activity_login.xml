@@ -178,17 +178,7 @@
                         android:layout_weight="0.48"
                         android:scaleType="fitXY"/>
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.04"/>
-                    <ImageView
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:id="@+id/loginActivity_loginWithFacebook"
-                        android:background="@drawable/login_with_facebook_background"
-                        android:layout_weight="0.48"
-                        android:scaleType="fitXY"/>
+
                 </LinearLayout>
 
             </LinearLayout>

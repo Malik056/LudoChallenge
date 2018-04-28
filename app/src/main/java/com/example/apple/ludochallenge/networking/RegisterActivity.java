@@ -1,5 +1,6 @@
  package com.example.apple.ludochallenge.networking;
 
+ import android.app.Activity;
  import android.app.ProgressDialog;
  import android.content.ContentResolver;
  import android.content.Intent;
@@ -15,6 +16,7 @@
  import android.util.DisplayMetrics;
  import android.util.Log;
  import android.view.View;
+ import android.view.ViewGroup;
  import android.widget.AdapterView;
  import android.widget.Button;
  import android.widget.ImageView;
@@ -23,6 +25,8 @@
  import android.widget.Toast;
 
  import com.bumptech.glide.Glide;
+ import com.bumptech.glide.load.engine.DiskCacheStrategy;
+ import com.bumptech.glide.request.RequestOptions;
  import com.example.apple.ludochallenge.R;
  import com.facebook.AccessToken;
  import com.facebook.CallbackManager;
@@ -48,6 +52,7 @@
  import com.google.firebase.storage.FirebaseStorage;
  import com.google.firebase.storage.StorageReference;
  import com.google.firebase.storage.UploadTask;
+ import com.sdsmdg.tastytoast.TastyToast;
  import com.squareup.picasso.Picasso;
  import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -104,6 +109,7 @@
     String email;
     Uri photoUrl;
 
+    ArrayList<Bitmap> bitmapArrayList;
 
 
     @Override
@@ -113,6 +119,7 @@
 
 
 
+        bitmapArrayList = new ArrayList<>();
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -127,7 +134,7 @@
         countryName = (TextView) findViewById(R.id.country_name);
         countryFlag = (ImageView) findViewById(R.id.country_flag);
         logo = (ImageView) findViewById(R.id.register_logo);
-        Glide.with(getApplicationContext()).load(R.raw.logo).into(logo);
+        Glide.with(getApplicationContext()).load(R.raw.logo).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(logo);
 
         register_name = (CustomEditText) findViewById(R.id.register_name);
         register_email = (CustomEditText) findViewById(R.id.register_email);
@@ -148,7 +155,7 @@
             @Override
             public void onClick(View v) {
                 if(!checkCountryClick){
-                    Toast.makeText(getApplicationContext(), "Please select your country!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Please select your country!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                     return;
                 }
 
@@ -198,14 +205,11 @@
                                                 finalId = id[0];
                                                 bitmap[0] = getFriendBitmap(finalId);
                                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                                bitmap[0].compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                                                bitmap[0].compress(Bitmap.CompressFormat.JPEG, 50, baos);
                                                 byte[] bytes = baos.toByteArray();
 
                                                 mySQLDatabase.insertData(finalName, bytes, finalId, MySQLDatabase.FACEBOKK_FRIENDS_DATA_TABLE);
-//                                                bitmap[0] = ((BitmapDrawable)countryFlag.getDrawable()).getBitmap();
-//                                                bitmap[0].compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//                                                byte[] flaginBytes = baos.toByteArray();
-//                                                mySQLDatabase.insertData(name[0], bytes, flaginBytes, countryName.getText().toString(), finalId, MySQLDatabase.FACEBOOK_USER_TABLE);
+                                                bitmapArrayList.add(bitmap[0]);
                                             }
 
                                                     synchronized (this)
@@ -276,7 +280,7 @@
             // silently fail...
         }
 
-        mAdapter = new CountryAdapter(this, mCountryList);
+        mAdapter = new CountryAdapter(getApplicationContext(), mCountryList);
         spinnerCountries.setAdapter(mAdapter);
 //        countryFlag.setImageResource(R.drawable.afghnistan);
         spinnerCountries.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -286,9 +290,6 @@
                 String clickedCountryName = clickedItem.getCountryName();
                 countryName.setText(clickedCountryName);
                 countryFlag.setImageDrawable(getResources().getDrawable(clickedItem.getFlagImage()));
-//                Drawable d = countryFlag.getDrawable();
-//                Bitmap bitmap= ((BitmapDrawable)d).getBitmap();
-//                Bitmap new_bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.america);
 
 
 
@@ -316,7 +317,7 @@
             @Override
             public void onClick(View view) {
                 if(!checkCountryClick){
-                    Toast.makeText(getApplicationContext(), "Please select your country!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Please select your country!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                     return;
                 }
                 String name = register_name.getText().toString();
@@ -331,9 +332,10 @@
         alreadyHaveAnAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
             }
         });
@@ -342,9 +344,10 @@
             public void onClick(View view) {
                 MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                 mySQLDatabase.setCurrentSession("PLAY_AS_GUEST", MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST);
-                Intent intent = new Intent(RegisterActivity.this, MainMenu.class);
+                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
             }
         });
@@ -375,29 +378,27 @@
      }
 
      private void updateUI() {
-//         Toast.makeText(this, "Congratualtions you are logged In", Toast.LENGTH_SHORT).show();
-         final Intent intent = new Intent(RegisterActivity.this, MainMenu.class);
-//         final String name = currentUser.getDisplayName();
-//         final String email = currentUser.getEmail();
-//         final Uri photoUrl = currentUser.getPhotoUrl();
+         final Intent intent = new Intent(getApplicationContext(), MainMenu.class);
          final Bitmap country_flag_bitmap ;
          BitmapDrawable bitmapDrawable = (BitmapDrawable) countryFlag.getDrawable();
          country_flag_bitmap = bitmapDrawable.getBitmap();
          ByteArrayOutputStream stream1 = new ByteArrayOutputStream();
-         country_flag_bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream1);
+         country_flag_bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream1);
          final byte[] byteArray1 = stream1.toByteArray();
+         bitmapArrayList.add(country_flag_bitmap);
 
 
 //         facebook_uid = currentUser.getUid();
 
          final Bitmap[] bitmap = {BitmapFactory.decodeResource(getResources(), R.drawable.default_pic)};
+         bitmapArrayList.add(bitmap[0]);
 
          Thread thread = new Thread(new Runnable() {
              @Override
              public void run() {
                  bitmap[0] = get_imageFrom_Uri(photoUrl);
                  ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                 bitmap[0].compress(Bitmap.CompressFormat.PNG, 100, stream);
+                 bitmap[0].compress(Bitmap.CompressFormat.PNG, 50, stream);
                  byte[] byteArray = stream.toByteArray();
                  MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                  mySQLDatabase.insertData(name, byteArray, byteArray1, countryName.getText().toString(), email, MySQLDatabase.FACEBOOK_USER_TABLE);
@@ -406,7 +407,9 @@
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_COMPUTER, "0","0", "500");
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
+                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                  startActivity(intent);
+                 overridePendingTransition(R.anim.goup, R.anim.godown);
                  loadingBar.dismiss();
                  finish();
 
@@ -429,12 +432,12 @@
                               email =task.getResult().getUser().getEmail();
                               photoUrl = task.getResult().getUser().getPhotoUrl();
                               MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
-                             mySQLDatabase.setCurrentSession(email, MySQLDatabase.LOGIN_STATUS_FACEBOOK);
-                             Log.d(TAG, "signInWithCredential:success");
+                              mySQLDatabase.setCurrentSession(email, MySQLDatabase.LOGIN_STATUS_FACEBOOK);
+                              Log.d(TAG, "signInWithCredential:success");
                              updateUI();
                              facebookLogin.setEnabled(true);
                          } else {
-                             Toast.makeText(RegisterActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                             TastyToast.makeText(getApplicationContext(),"Authentication Failed!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                              loadingBar.dismiss();
                          }
 
@@ -452,13 +455,13 @@
      private void RegisterAccount(final String name, String email, String password) {
 
        if(TextUtils.isEmpty(name)){
-            Toast.makeText(getApplicationContext(), "Please write your name!", Toast.LENGTH_SHORT).show();
+           TastyToast.makeText(getApplicationContext(),"Please enter your name!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
         }
         else if(TextUtils.isEmpty(email)){
-            Toast.makeText(getApplicationContext(), "Please write your username!", Toast.LENGTH_SHORT).show();
+           TastyToast.makeText(getApplicationContext(),"Please enter your username!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
         }
         else if(TextUtils.isEmpty(password)){
-            Toast.makeText(getApplicationContext(), "Please write your password!", Toast.LENGTH_SHORT).show();
+           TastyToast.makeText(getApplicationContext(),"Please enter your password!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
         }
         else{
             loadingBar.setTitle("Creating New Account");
@@ -495,7 +498,7 @@
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             storeFlag_into_Storage();
-                                            Intent intent = new Intent(RegisterActivity.this,SettingsActivity.class);
+                                            Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
                                             intent.putExtra("country_name", countryName.getText().toString());
                                             intent.putExtra("userName_register",name.toString());
                                             intent.putExtra("check",1);
@@ -509,6 +512,7 @@
 
 
                                             startActivity(intent);
+                                            overridePendingTransition(R.anim.goup, R.anim.godown);
                                             finish();
                                         }
                                     });
@@ -518,7 +522,7 @@
                         });
                     }
                     else{
-                        Toast.makeText(getApplicationContext(), "Error Occured, Try Again!", Toast.LENGTH_SHORT).show();
+                        TastyToast.makeText(getApplicationContext(),"Error Occured Try Again!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                         loadingBar.dismiss();
                     }
                 }
@@ -766,17 +770,20 @@
                                      @Override
                                      public void onComplete(@NonNull Task<Void> task) {
                                          if (task.isSuccessful()) {
-                                             Toast.makeText(RegisterActivity.this, "Image uploaded successful!", Toast.LENGTH_SHORT).show();
+                                             TastyToast.makeText(getApplicationContext(),"country uploaded successfully!", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+                                         }
+                                         else{
+                                             TastyToast.makeText(getApplicationContext(),"error uploading your country!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                                          }
                                      }
                                  });
                              } else {
-                                 Toast.makeText(RegisterActivity.this, "Error uploading Image!", Toast.LENGTH_SHORT).show();
+                                 TastyToast.makeText(getApplicationContext(),"Error uploading profile pic!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                              }
                          }
                      });
                  } else {
-                     Toast.makeText(RegisterActivity.this, "Error uploading Image!", Toast.LENGTH_SHORT).show();
+                     TastyToast.makeText(getApplicationContext(),"Error uploading profile pic!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                  }
              }
          });
@@ -784,14 +791,16 @@
 
     public Bitmap get_imageFrom_Uri(Uri uri) {
         Bitmap bm = BitmapFactory.decodeResource(getResources(),R.drawable.default_pic);
-        URL imageURL = null;
+        bitmapArrayList.add(bm);
+        String imageURL = null;
         try {
-            imageURL = new URL(uri.toString() + "?type=large");
-            bm = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+//            imageURL = new URL(uri.toString() + "?type=large");
+            imageURL = uri.toString() + "?type=large";
+            bm = Picasso.get().load(imageURL).get();
+//            bm = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return bm;
     }
 
@@ -800,17 +809,9 @@
      {
 
          String imageURL;
-
          Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.default_pic);
+         bitmapArrayList.add(bitmap);
          imageURL = "http://graph.facebook.com/"+userID+"/picture?type=large";
-//         Uri myUri = Uri.parse(imageURL);
-//         URL imageURL1 = null;
-//         try {
-//             imageURL1 = new URL(myUri.toString());
-//             bitmap = BitmapFactory.decodeStream(imageURL1.openConnection().getInputStream());
-//         } catch (IOException e) {
-//             e.printStackTrace();
-//         }
          try {
              bitmap = Picasso.get().load(imageURL).get();
          } catch (IOException e) {
@@ -820,6 +821,31 @@
 
          return bitmap;
 
+     }
+
+     @Override
+     public void onDestroy() {
+         super.onDestroy();
+         unbindDrawables(findViewById(R.id.registerActivityRoot));
+         Runtime.getRuntime().gc();
+         System.gc();
+     }
+
+     private void unbindDrawables(View view) {
+         if (view.getBackground() != null)
+             view.getBackground().setCallback(null);
+
+         if (view instanceof ImageView) {
+             ImageView imageView = (ImageView) view;
+             imageView.setImageBitmap(null);
+         } else if (view instanceof ViewGroup) {
+             ViewGroup viewGroup = (ViewGroup) view;
+             for (int i = 0; i < viewGroup.getChildCount(); i++)
+                 unbindDrawables(viewGroup.getChildAt(i));
+
+             if (!(view instanceof AdapterView))
+                 viewGroup.removeAllViews();
+         }
      }
 
 

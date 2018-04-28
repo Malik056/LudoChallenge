@@ -1,6 +1,7 @@
 package com.example.apple.ludochallenge.networking;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +35,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sdsmdg.tastytoast.TastyToast;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.ByteArrayOutputStream;
@@ -94,9 +97,8 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
 
-
         ActivityCompat.requestPermissions(
-                SettingsActivity.this,
+               SettingsActivity.this,
                 new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
                 REQUEST_CODE_GALLERY
 
@@ -150,7 +152,6 @@ public class SettingsActivity extends AppCompatActivity {
             String d_countryName = (String) mySQLDatabase.getData(current_uid, MySQLDatabase.NAME_FLAG, MySQLDatabase.TABLE_NAME);
 
 
-
             Bitmap bitmap = BitmapFactory.decodeByteArray(d_profilePic,0,d_profilePic.length);
             edit_profile_profileImage.setImageBitmap(bitmap);
             bitmap = BitmapFactory.decodeByteArray(d_flagPic,0,d_flagPic.length);
@@ -175,52 +176,6 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
             }
         });
-//        temp_users.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(SettingsActivity.this, MainMenu.class);
-//                startActivity(intent);
-//            }
-//        });
-//        mUserDatabase.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String name = dataSnapshot.child("name").getValue().toString();
-//                final String image = dataSnapshot.child("image").getValue().toString();
-//                if(dataSnapshot.hasChild("flag_image")) {
-//                  flagImage = dataSnapshot.child("flag_image").getValue().toString();
-//                    Picasso.get().load(flagImage).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.pakistan).into(edit_profile_flagImage, new Callback() {
-//                        @Override
-//                        public void onSuccess() {
-//                            Toast.makeText(getApplicationContext(),"Successfully uploaded Image", Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                        @Override
-//                        public void onError(Exception e) {
-//                            Picasso.get().load(flagImage).placeholder(R.drawable.pakistan).into(edit_profile_flagImage);
-//                        }
-//                    });
-//                }
-//                thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
-////                if(!image.equals("default")) {
-//                    Picasso.get().load(thumb_image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.default_pic).into(edit_profile_profileImage, new Callback() {
-//                        @Override
-//                        public void onSuccess() {
-//
-//                        }
-//
-//                        @Override
-//                        public void onError(Exception e) {
-//                            Picasso.get().load(thumb_image).placeholder(R.drawable.default_pic).into(edit_profile_profileImage);
-//                        }
-//                    });
-////                }
-//
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
 
         selectYourCountry.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,7 +203,7 @@ public class SettingsActivity extends AppCompatActivity {
             // silently fail...
         }
 
-        mAdapter = new CountryAdapter(this, mCountryList);
+        mAdapter = new CountryAdapter(getApplicationContext(), mCountryList);
         spinnerCountries.setAdapter(mAdapter);
 
 
@@ -278,7 +233,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(check_performClick != 1) {
-                    Toast.makeText(SettingsActivity.this, "Please Select your Country!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Please select your country!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                     return;
                 }
                 loadingBar.setTitle("Creating New Account");
@@ -308,21 +263,16 @@ public class SettingsActivity extends AppCompatActivity {
 
                             Bitmap bmp = ((BitmapDrawable) edit_profile_profileImage.getDrawable()).getBitmap();
                             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                            bmp.compress(Bitmap.CompressFormat.PNG, 50, stream);
                             byte[] byteArray = stream.toByteArray();
 
                             intent.putExtra("profileImage_toMain", byteArray);
-
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             finish();
+                            bmp = null;
                         } else {
-                            Intent intent = new Intent(getApplicationContext(), MainMenu.class);
-                            intent.putExtra("settings_activity_to_main", "0");
-                            intent.putExtra("country_name_toMain", countryName_toMain);
-                            intent.putExtra("userName_toMain",    userNamefromPreviousActivity_register);
-                            startActivity(intent);
-                            Toast.makeText(getApplicationContext(), "Error Occured, Try Again!", Toast.LENGTH_SHORT).show();
-                            finish();
+                            TastyToast.makeText(getApplicationContext(),"Error updating your profile!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                         }
                         loadingBar.dismiss();
                     }
@@ -331,11 +281,10 @@ public class SettingsActivity extends AppCompatActivity {
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-
                 Bitmap bitmap = ((BitmapDrawable) edit_profile_profileImage.getDrawable()).getBitmap();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
                 Bitmap flag_bitmap = ((BitmapDrawable) edit_profile_flagImage.getDrawable()).getBitmap();
-                flag_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos2);
+                flag_bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos2);
                 mySQLDatabase.insertData(edit_profileUserName.getText().toString(), baos.toByteArray(), baos2.toByteArray(),countryName_toMain, current_uid, MySQLDatabase.TABLE_NAME);
 
             }
@@ -374,13 +323,13 @@ public class SettingsActivity extends AppCompatActivity {
                    thumb_bitmap = new Compressor(this)
                             .setMaxHeight(200)
                             .setMaxWidth(200)
-                            .setQuality(75)
+                            .setQuality(60)
                             .compressToBitmap(thumb_filePath);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                thumb_bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+                thumb_bitmap.compress(Bitmap.CompressFormat.JPEG,50,baos);
                 final byte[] thumb_byte = baos.toByteArray();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(thumb_byte, 0, thumb_byte.length);
                 edit_profile_profileImage.setImageBitmap(bitmap);
@@ -405,20 +354,20 @@ public class SettingsActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
                                                     mLoadingBar.dismiss();
-                                                    Toast.makeText(SettingsActivity.this, "Image uploaded successful!", Toast.LENGTH_SHORT).show();
+                                                    TastyToast.makeText(getApplicationContext(),"Profile pic uploaded successfully!", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
                                                  }
                                             }
                                         });
                                     }
                                     else{
-                                        Toast.makeText(SettingsActivity.this, "Error uploading Image!", Toast.LENGTH_SHORT).show();
+                                        TastyToast.makeText(getApplicationContext(),"Error uploading profile pic!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                                         mLoadingBar.dismiss();
                                     }
                                 }
                             });
                         }
                         else{
-                            Toast.makeText(SettingsActivity.this, "Error uploading Image!", Toast.LENGTH_SHORT).show();
+                            TastyToast.makeText(getApplicationContext(),"Error uploading profile pic!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                             mLoadingBar.dismiss();
                         }
                     }
@@ -670,17 +619,17 @@ public class SettingsActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            Toast.makeText(getApplicationContext(), "Image uploaded successful!", Toast.LENGTH_SHORT).show();
+                                            TastyToast.makeText(getApplicationContext(),"Country uploaded successfully!", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
                                         }
                                     }
                                 });
                             } else {
-                                Toast.makeText(getApplicationContext(), "Error uploading Image!", Toast.LENGTH_SHORT).show();
+                                TastyToast.makeText(getApplicationContext(),"Error uploading your country!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                             }
                         }
                     });
                 } else {
-                    Toast.makeText(getApplicationContext(), "Error uploading Image!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Error uploading your country!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                 }
             }
         });
@@ -696,7 +645,7 @@ public class SettingsActivity extends AppCompatActivity {
 //                startActivityForResult(intent, REQUEST_CODE_GALLERY);
             }
             else {
-                Toast.makeText(this, "You don't have permission to ccess files", Toast.LENGTH_SHORT).show();
+                TastyToast.makeText(getApplicationContext(),"You don't have permission to access files", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
             }
             return;
         }
@@ -707,4 +656,30 @@ public class SettingsActivity extends AppCompatActivity {
         mySQLDatabase = mySQLDatabase.getInstance(this);
 
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unbindDrawables(findViewById(R.id.settingsActivityRoot));
+        Runtime.getRuntime().gc();
+        System.gc();
+    }
+
+    private void unbindDrawables(View view) {
+        if (view.getBackground() != null)
+            view.getBackground().setCallback(null);
+
+        if (view instanceof ImageView) {
+            ImageView imageView = (ImageView) view;
+            imageView.setImageBitmap(null);
+        } else if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++)
+                unbindDrawables(viewGroup.getChildAt(i));
+
+            if (!(view instanceof AdapterView))
+                viewGroup.removeAllViews();
+        }
+    }
+
 }

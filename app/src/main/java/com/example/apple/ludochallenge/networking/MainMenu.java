@@ -1,15 +1,22 @@
 package com.example.apple.ludochallenge.networking;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -18,6 +25,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.UserProgressData;
 import com.facebook.login.LoginManager;
@@ -32,6 +41,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -96,6 +106,9 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
     private ImageView mainMenu_settings_dialog_back;
     private  String current_uid;
     private ImageView mainMenu_coinIcon;
+    private ImageView mainMenu_SAL;
+    private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
+    private static final String APP_ID = "ca-app-pub-3940256099942544~3347511713";
 
 
     final int REQUEST_CODE_GALLERY = 999;
@@ -116,17 +129,23 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
+
+
         watchAd = (ImageView) findViewById(R.id.ad);
+//
+
+        MobileAds.initialize(this, APP_ID);
 
         rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
         rewardedVideoAd.setRewardedVideoAdListener(this);
+        rewardedVideoAd.loadAd(APP_ID, new AdRequest.Builder().build());
         loadRewardedVideoAd();
 
         logo = (ImageView) findViewById(R.id.register_logo);
         spin = (ImageView) findViewById(R.id.spin);
-        Glide.with(getApplicationContext()).load(R.raw.logo).into(logo);
-        Glide.with(getApplicationContext()).load(R.raw.spin).into(spin);
-        Glide.with(getApplicationContext()).load(R.raw.add).into(watchAd);
+        Glide.with(getApplicationContext()).load(R.raw.logo).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(logo);
+        Glide.with(getApplicationContext()).load(R.raw.spin).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(spin);
+        Glide.with(getApplicationContext()).load(R.raw.add).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(watchAd);
         mAuth = FirebaseAuth.getInstance();
 
         play = (Button) findViewById(R.id.mainMenu_playBtn);
@@ -168,6 +187,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         mainMenu_share = (ImageView) findViewById(R.id.mainMenu_share);
         mainMenu_like = (ImageView) findViewById(R.id.mainMenu_like);
         mainMenu_coinIcon = (ImageView) findViewById(R.id.mainMenu_coinIcon);
+        mainMenu_SAL = (ImageView) findViewById(R.id.mainMenu_SAL);
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -254,6 +274,9 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
             profile_pic.setImageBitmap(bitmap);
             flagPic.setImageBitmap(bitmap1);
             edit_profile_flagImage.setImageBitmap(bitmap1);
+            edit_profile.setVisibility(View.GONE);
+            bitmap = null;
+            bitmap1 = null;
 
         }
 
@@ -273,6 +296,8 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         countryName.setText(d_countryName);
         edit_profile_userName.setText(d_userName);
         edit_profile_countryName.setText(d_countryName);
+        bitmap = null;
+
 
     }
 
@@ -286,6 +311,9 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         edit_profile_countryName.setVisibility(View.GONE);
         mainMenu_coins.setVisibility(View.GONE);
         mainMenu_coinIcon.setVisibility(View.GONE);
+        watchAd.setVisibility(View.GONE);
+        spin.setVisibility(View.GONE);
+
 
     }
 
@@ -310,7 +338,10 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
                 if(rewardedVideoAd.isLoaded()){
                     rewardedVideoAd.show();
                 }
-                Toast.makeText(getApplicationContext(),"Ad not available right now!",Toast.LENGTH_LONG).show();
+                else {
+                    TastyToast.makeText(getApplicationContext(),"Ad not available right now!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
+//                    Toast.makeText(getApplicationContext(), "Ad not available right now!", Toast.LENGTH_LONG).show();
+                }
 
             }
         });
@@ -343,7 +374,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
                 try {
                     startActivity(new Intent(intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.Unity3d.XIMetodi0")));
                 }catch (ActivityNotFoundException e){
-                    Toast.makeText(MainMenu.this, "Error rating Ludo Challenge!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Error rating Ludo Challenge!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                 }
             }
         });
@@ -352,6 +383,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         mainMenu_settings_dialog_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                enableButtons();
                 mainMenu_settings_dialog.setVisibility(View.GONE);
             }
         });
@@ -360,6 +392,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         mainMenu_settingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                disableButtons();
                 mainMenu_settings_dialog.setVisibility(View.VISIBLE);
             }
         });
@@ -370,19 +403,23 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
                 if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE)) {
                     FirebaseAuth.getInstance().signOut();
                     mainMenu_settings_dialog.setVisibility(View.GONE);
-                    Intent intent = new Intent(MainMenu.this, LoginActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
-                    Toast.makeText(MainMenu.this, "Logged out successfully!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Logged out successfully!", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+                    enableButtons();
                 }
                 if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)) {
                     LoginManager.getInstance().logOut();
                     FirebaseAuth.getInstance().signOut();
                     mainMenu_settings_dialog.setVisibility(View.GONE);
-                    Intent intent = new Intent(MainMenu.this, LoginActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
-                    Toast.makeText(MainMenu.this, "Logged out successfully!", Toast.LENGTH_SHORT).show();
+                    TastyToast.makeText(getApplicationContext(),"Logged out successfully!", TastyToast.LENGTH_SHORT, TastyToast.SUCCESS).show();
+                    enableButtons();
                 }
             }
         });
@@ -392,11 +429,13 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
             public void onClick(View v) {
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 if(currentUser != null){
-                    Toast.makeText(getApplicationContext(),"You are already signed In!", Toast.LENGTH_LONG).show();
+                    TastyToast.makeText(getApplicationContext(),"You are already signed in!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                 }
                 else{
+                    enableButtons();
                     mainMenu_settings_dialog.setVisibility(View.GONE);
-                    Intent intent = new Intent(MainMenu.this, LoginActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                 }
@@ -408,7 +447,8 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
             @Override
             public void onClick(View v) {
                 mainMenu_settings_dialog.setVisibility(View.GONE);
-                Intent intent = new Intent(MainMenu.this, RegisterActivity.class);
+                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
             }
@@ -417,7 +457,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         mainMenu_settings_dialog_moreGames.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainMenu.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+                TastyToast.makeText(getApplicationContext(),"Coming Soon!", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
             }
         });
 
@@ -425,6 +465,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         mainMenu_exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                disableButtons();
                 mainMenu_exit_dialog.setVisibility(View.VISIBLE);
             }
         });
@@ -440,6 +481,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         mainMenu_exit_dialog_no.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                enableButtons();
                 mainMenu_exit_dialog.setVisibility(View.GONE);
             }
         });
@@ -449,7 +491,10 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
             public void onClick(View view) {
                 editProfile_dialog_box.setVisibility(View.GONE);
                 Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                 startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
             }
         });
@@ -457,6 +502,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         editProfile_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                enableButtons();
                 editProfile_dialog_box.setVisibility(View.GONE);
                 play.setClickable(true);
             }
@@ -467,17 +513,20 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainMenu.this, PlayActivity.class);
+                Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
-                finish();
+                overridePendingTransition(R.anim.goup, R.anim.godown);
             }
         });
 
 
         profile_pic_box.setOnClickListener(new View.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
                 if(!LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST)) {
+                    disableButtons();
                     editProfile_dialog_box.setVisibility(View.VISIBLE);
                     play.setClickable(false);
                 }
@@ -489,8 +538,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
 
     private void loadRewardedVideoAd() {
         if(!rewardedVideoAd.isLoaded()) {
-            rewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
-                    new AdRequest.Builder().build());
+            rewardedVideoAd.loadAd(AD_UNIT_ID, new AdRequest.Builder().build());
         }
     }
 
@@ -505,7 +553,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
                 startActivityForResult(intent, REQUEST_CODE_GALLERY);
             }
             else {
-                Toast.makeText(this, "You don't have permission to ccess files", Toast.LENGTH_SHORT).show();
+                TastyToast.makeText(getApplicationContext(),"You don't have permission to access files!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
             }
             return;
         }
@@ -590,5 +638,58 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
     protected void onDestroy() {
         rewardedVideoAd.destroy(this);
         super.onDestroy();
+        unbindDrawables(findViewById(R.id.mainMenuActivityRoot));
+        Runtime.getRuntime().gc();
+        System.gc();
     }
+
+
+    private void disableButtons(){
+        profile_pic_box.setEnabled(false);
+        watchAd.setEnabled(false);
+        mainMenu_like.setEnabled(false);
+        mainMenu_rate.setEnabled(false);
+        mainMenu_share.setEnabled(false);
+        play.setEnabled(false);
+        mainMenu_settingsBtn.setEnabled(false);
+        mainMenu_exit.setEnabled(false);
+        spin.setEnabled(false);
+        mainMenu_SAL.setEnabled(false);
+    }
+    private void enableButtons(){
+        profile_pic_box.setEnabled(true);
+        watchAd.setEnabled(true);
+        mainMenu_like.setEnabled(true);
+        mainMenu_rate.setEnabled(true);
+        mainMenu_share.setEnabled(true);
+        play.setEnabled(true);
+        mainMenu_settingsBtn.setEnabled(true);
+        mainMenu_exit.setEnabled(true);
+        spin.setEnabled(true);
+        mainMenu_SAL.setEnabled(true);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+
+    private void unbindDrawables(View view) {
+        if (view.getBackground() != null)
+            view.getBackground().setCallback(null);
+
+        if (view instanceof ImageView) {
+            ImageView imageView = (ImageView) view;
+            imageView.setImageBitmap(null);
+        } else if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++)
+                unbindDrawables(viewGroup.getChildAt(i));
+
+            if (!(view instanceof AdapterView))
+                viewGroup.removeAllViews();
+        }
+    }
+
 }
