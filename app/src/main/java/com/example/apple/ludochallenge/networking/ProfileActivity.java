@@ -181,7 +181,6 @@ public class ProfileActivity extends AppCompatActivity {
 
                 challenge.setEnabled(false);
 
-
                 //----------------NOT CHALLENGED STATE-------------//
                 if (mCurrent_state.equals("not_challenged")) {
                     mChallenge_database.child(mCurrent_user.getUid()).child(user_id).child("challenge_type").setValue("sent").addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -195,7 +194,6 @@ public class ProfileActivity extends AppCompatActivity {
                                         HashMap<String, String> notificationData = new HashMap<>();
                                         notificationData.put("from", mCurrent_user.getUid());
                                         notificationData.put("type","challenged");
-
 
                                         mNotification_database.child(user_id).push().setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
@@ -237,7 +235,7 @@ public class ProfileActivity extends AppCompatActivity {
                 //----------------Challenge Received State-------------//
                 if (mCurrent_state.equals("challenge_received")) {
                     final HashMap<String, Integer> gameData = new HashMap<>();
-                    gameData.put("color", color);
+                    gameData.put("colors", color);
                     gameData.put("noOfPlayers", noOfPlayers);
                     gameData.put("isPlaying", 0);
                     final String currentDate = DateFormat.getDateTimeInstance().format(new Date());

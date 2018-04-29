@@ -115,6 +115,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
+                    android:id="@+id/challenge_btn"
+                    android:tag="challenge"
                     android:src="@drawable/recycler_view_challenge"
                     android:layout_weight="0.3"/>
             </LinearLayout>

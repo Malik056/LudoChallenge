@@ -27,6 +27,7 @@
  import com.bumptech.glide.Glide;
  import com.bumptech.glide.load.engine.DiskCacheStrategy;
  import com.bumptech.glide.request.RequestOptions;
+ import com.example.apple.ludochallenge.BaseActivity;
  import com.example.apple.ludochallenge.R;
  import com.facebook.AccessToken;
  import com.facebook.CallbackManager;
@@ -332,8 +333,9 @@
         alreadyHaveAnAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("activity", LoginActivity.class.getName());
                 startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
@@ -344,8 +346,9 @@
             public void onClick(View view) {
                 MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                 mySQLDatabase.setCurrentSession("PLAY_AS_GUEST", MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST);
-                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("activity", MainMenu.class.getName());
                 startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
@@ -378,7 +381,7 @@
      }
 
      private void updateUI() {
-         final Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+         final Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
          final Bitmap country_flag_bitmap ;
          BitmapDrawable bitmapDrawable = (BitmapDrawable) countryFlag.getDrawable();
          country_flag_bitmap = bitmapDrawable.getBitmap();
@@ -408,6 +411,7 @@
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_COMPUTER, "0","0", "500");
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
                  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                 intent.putExtra("activity", MainMenu.class.getName());
                  startActivity(intent);
                  overridePendingTransition(R.anim.goup, R.anim.godown);
                  loadingBar.dismiss();
@@ -498,11 +502,12 @@
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             storeFlag_into_Storage();
-                                            Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+                                            Intent intent = new Intent(getApplicationContext(),BaseActivity.class);
                                             intent.putExtra("country_name", countryName.getText().toString());
                                             intent.putExtra("userName_register",name.toString());
                                             intent.putExtra("check",1);
                                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            intent.putExtra("activity", SettingsActivity.class.getName());
 
                                             MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                                             mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_COMPUTER, "0","0", "500");

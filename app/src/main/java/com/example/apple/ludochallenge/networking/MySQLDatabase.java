@@ -51,6 +51,8 @@ public class MySQLDatabase extends SQLiteOpenHelper {
     public static String COINS_COL = "COINS";
     public static String USER_ID = "USER_ID";
     public static String LOGIN_STATUS_PLAY_AS_GUEST = "LOGIN_STATUS_PLAY_AS_GUEST";
+    public static String DATE_TABLE = "DATE";
+    public static String SPIN_DATE_COL = "SPIN_DATE";
 
     public static MySQLDatabase getInstance(Context context)
     {
@@ -92,6 +94,9 @@ public class MySQLDatabase extends SQLiteOpenHelper {
                 LOSES_COL + " VARCHAR, " +
                 COINS_COL + " VARCHAR "+
                 ")");
+        queuryData("CREATE TABLE IF NOT EXISTS " + USER_PROGRESS_TABLE + "(" +
+                USER_ID + " VARCHAR PRIMARY KEY, " +
+                SPIN_DATE_COL + " VARCHAR )" );
 
     }
 
@@ -159,6 +164,61 @@ public class MySQLDatabase extends SQLiteOpenHelper {
     private void queuryData(String sql){
         SQLiteDatabase database = getWritableDatabase();
         database.execSQL(sql);
+    }
+
+    public void setSpinDate(String ID, String spinDate)
+    {
+        SQLiteDatabase database = getReadableDatabase();
+
+        Cursor cursor;
+
+        cursor = database.query
+                (
+                        DATE_TABLE,
+                        new String[] { USER_ID, SPIN_DATE_COL},
+                        USER_ID + " =?",
+                        new String[]{ID}, null, null, null, null
+                );
+
+        SQLiteDatabase database1 = getWritableDatabase();
+        if(cursor.moveToFirst()) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(SPIN_DATE_COL, spinDate);
+            database1.update(DATE_TABLE, contentValues, ID + "=?", new String[]{ID});
+        }
+        else {
+
+            String sql = "INSERT INTO " + TABLE_NAME + " VALUES (?, ?)";
+            SQLiteStatement statement = database1.compileStatement(sql);
+
+            statement.clearBindings();
+            statement.bindString(1, ID);
+            statement.bindString(2, spinDate);
+            statement.executeInsert();
+        }
+        cursor.close();
+    }
+
+    public String getSpinDate(String ID)
+    {
+        SQLiteDatabase database = getReadableDatabase();
+
+        Cursor cursor;
+
+        cursor = database.query
+                (
+                        DATE_TABLE,
+                        new String[] { USER_ID, SPIN_DATE_COL},
+                        USER_ID + " =?",
+                        new String[]{ID}, null, null, null, null
+                );
+
+        if(cursor.moveToFirst())
+        {
+            return cursor.getString(1);
+        }
+
+        return null;
     }
 
     public void insertData(String name, byte[] image, byte[] flag_image, String country_name, String idOrEmail, String TABLE_NAME){
@@ -300,6 +360,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
             contentValues.put(COINS_COL, coins);
 
             database1.update(USER_PROGRESS_TABLE, contentValues, USER_ID + "=? AND " + VS_COMPUTER_OR_MULTIPLAYER_COL + "=? AND " + GAME_TYPE_COL + " =?" , new String[]{idOrEmail, vs_computer_or_multiplayer, gameType});
+
         }
         else {
 
@@ -313,15 +374,16 @@ public class MySQLDatabase extends SQLiteOpenHelper {
             statement.bindString(5, wins);
             statement.bindString(6, loses);
             statement.bindString(7, coins);
+
             statement.executeInsert();
         }
         cursor.close();
+
     }
 
     public ArrayList<UserProgressData> getUserProgressData(String ID)
     {
         ArrayList<UserProgressData> userProgressData = new ArrayList<>();
-
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
 
         Cursor cursor = sqLiteDatabase.query(USER_PROGRESS_TABLE,
@@ -342,6 +404,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
             UserProgressData tempUserProgressData = new UserProgressData(gameType1, cursor.getString(0), cursor.getString(5));
             userProgressData.add(tempUserProgressData);
         }
+
         cursor.close();
         return userProgressData;
 

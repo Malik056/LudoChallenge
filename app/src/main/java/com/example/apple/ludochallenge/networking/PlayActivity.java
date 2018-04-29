@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.apple.ludochallenge.BaseActivity;
 import com.example.apple.ludochallenge.LudoActivity;
 import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.UserProgressData;
@@ -35,6 +36,7 @@ import com.google.firebase.storage.StorageReference;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -235,7 +237,8 @@ public class PlayActivity extends AppCompatActivity {
             public void onAdClosed() {
                 interstitialAd.loadAd(new AdRequest.Builder().build());
                 if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)){
-                    Intent intent = new Intent(getApplicationContext(), UsersActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                    intent.putExtra("activity", UsersActivity.class.getName());
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color);
                     intent.putExtra("vsComputer",vsComputer);
@@ -378,7 +381,8 @@ public class PlayActivity extends AppCompatActivity {
         play_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                intent.putExtra("activity", MainMenu.class.getName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
@@ -406,7 +410,8 @@ public class PlayActivity extends AppCompatActivity {
                     }
                     else{
                         if (LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)) {
-                            Intent intent = new Intent(getApplicationContext(), UsersActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                            intent.putExtra("activity", UsersActivity.class.getName());
                             intent.putExtra("noOfPlayers", noOfPlayers);
                             intent.putExtra("color", color);
                             intent.putExtra("vsComputer", vsComputer);
@@ -431,7 +436,8 @@ public class PlayActivity extends AppCompatActivity {
                 color = 3;
                 vsComputer = 0;
                 playWithFriends_dialogBox.setVisibility(View.GONE);
-                Intent intent = new Intent(getApplicationContext(), UsersActivity.class);
+                Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                intent.putExtra("activity", UsersActivity.class.getName());
                 intent.putExtra("noOfPlayers",noOfPlayers);
                 intent.putExtra("color",color);
                 intent.putExtra("vsComputer",vsComputer);
@@ -445,7 +451,8 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 edit_profile_dialogBox.setVisibility(View.GONE);
-                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                intent.putExtra("activity", SettingsActivity.class.getName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
@@ -566,7 +573,8 @@ public class PlayActivity extends AppCompatActivity {
                 }
                 else{
                     four_player_frameLayout.setVisibility(View.GONE);
-                    Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                    intent.putExtra("activity", LudoActivity.class.getName());
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color);
                     intent.putExtra("vsComputer",vsComputer);
@@ -591,7 +599,8 @@ public class PlayActivity extends AppCompatActivity {
                 }
                 else{
                     three_player_frameLayout.setVisibility(View.GONE);
-                    Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                    intent.putExtra("activity", LudoActivity.class.getName());
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color_3players);
                     intent.putExtra("vsComputer",vsComputer);
@@ -619,7 +628,8 @@ public class PlayActivity extends AppCompatActivity {
                 }
                 else{
                     two_player_frameLayout.setVisibility(View.GONE);
-                    Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                    intent.putExtra("activity", LudoActivity.class.getName());
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color);
                     intent.putExtra("vsComputer",vsComputer);
@@ -638,7 +648,8 @@ public class PlayActivity extends AppCompatActivity {
                     noOfPlayers = 2;
                     vsComputer = 1;
                     vsComputer_frameLayout.setVisibility(View.GONE);
-                    Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                intent.putExtra("activity", LudoActivity.class.getName());
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",vsComputer_color);
                     intent.putExtra("vsComputer",vsComputer);
@@ -903,7 +914,8 @@ public class PlayActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+        Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+        intent.putExtra("activity", MainMenu.class.getName());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         overridePendingTransition(R.anim.goup, R.anim.godown);

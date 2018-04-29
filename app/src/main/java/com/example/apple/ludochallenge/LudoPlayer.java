@@ -5,11 +5,17 @@ import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Point;
+import android.support.annotation.NonNull;
+import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static android.view.View.VISIBLE;
 import static android.view.View.combineMeasuredStates;
@@ -51,7 +57,7 @@ public class LudoPlayer {
         this.mPiece = mPiece;
     }
 
-    public void move(final int num, final LudoPiece piece) {
+    public void move2(final int num, final LudoPiece piece) {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -225,7 +231,7 @@ public class LudoPlayer {
         thread.start();
     }
 
-    public void move1(final int num, final LudoPiece piece) {
+    public void move(final int num, final LudoPiece piece) {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -283,18 +289,37 @@ public class LudoPlayer {
                     public void run() {
 
                         Toast.makeText(mGame.context, "animated", Toast.LENGTH_SHORT).show();
+
+                        mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
+                        mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
+                        mGame.getDiceImage().setEnabled(true);
+
+                        mGame.getmArrows()[mGame.currentPlayer].setVisibility(View.INVISIBLE);
+                        mGame.getmArrows()[mGame.currentPlayer].setAnimation(null);
+
                         if (LudoGame.turnChange) {
                             mGame.currentPlayer++;
                             mGame.currentPlayer %= mGame.numberOfPlayers;
                         } else LudoGame.turnChange = true;
 
-                        mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
-                        mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
-                        mGame.getDiceImage().setEnabled(true);
-                        //                                arrows[(currentPlayer+numberOfPlayers-1)%numberOfPlayers].setAnimation(null);
-                        //                                arrows[(currentPlayer+numberOfPlayers-1)%numberOfPlayers].setVisibility(INVISIBLE);
                         mGame.getmArrows()[mGame.currentPlayer].setVisibility(VISIBLE);
                         mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
+
+                        if(mGame.gameRef!=null) {
+
+                            mGame.gameRef.child("turn").setValue(mGame.uids.get(mGame.currentPlayer)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                }
+                            });
+                        }
+                        if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
+                            mGame.getDiceImage().performClick();
+                        } else if (mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE) {
+
+                        }
+
+
                     }
                 });
             }

@@ -3,8 +3,15 @@ package com.example.apple.ludochallenge;
 import android.animation.ObjectAnimator;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RotateDrawable;
 import android.hardware.display.DisplayManager;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,11 +33,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+
+import static com.example.apple.ludochallenge.Color.BLUE;
+import static com.example.apple.ludochallenge.Color.GREEN;
+import static com.example.apple.ludochallenge.Color.RED;
+import static com.example.apple.ludochallenge.Color.YELLOW;
 
 public class LudoActivity extends AppCompatActivity {
 
@@ -44,22 +60,22 @@ public class LudoActivity extends AppCompatActivity {
     public static final String PLAYERS_KEY = "PLAYERS";
     public static final String COLORS_KEY = "COLORS";
     public static final String PLAYERS_TYPE_KEY = "PLAYERS_TYPE";
-    private AdView adView;
+    public static final String UPDATING_USER = "UPDATING_USER";
+    public static final String TURN = "TURN";
+    public static final String REFERENCE = "REFERENCE";
+    public static final String UIDS = "UIDS";
+    private FirebaseAuth auth;
+    private FirebaseUser mCurrentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ludo);
 
-
-
-        //initializing addUnit
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
-        adView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-
 //        FrameLayout frameLayout = findViewById(R.id.ludoContainer);
+
+        auth = FirebaseAuth.getInstance();
+        mCurrentUser = auth.getCurrentUser();
 
         if (game == null) {
 
@@ -79,6 +95,7 @@ public class LudoActivity extends AppCompatActivity {
             int[] colorsInt = intent.getIntArrayExtra(COLORS_KEY);
             int[] playerTypesInt = intent.getIntArrayExtra(PLAYERS_TYPE_KEY);
             int players = intent.getIntExtra(PLAYERS_KEY,3);
+            final int[] currentPlayer = {intent.getIntExtra(TURN, 0)};
 
             Color[] selectedColors = new Color[4];
             PlayerType[] selectedPlayerTypes = new PlayerType[4];
@@ -92,11 +109,13 @@ public class LudoActivity extends AppCompatActivity {
             PlayerType[] playerTypes = {PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.CPU};
 
             final int boardStartY = (height - width) / 2;
-            Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
+            Color[] colors = new Color[]{RED, BLUE, GREEN, Color.YELLOW};
             String[] p_names = new String[]{"Player 1", "Player 2", "Player 3", "Player 4"};
 
             int oneBox = width/10;
             int viewMargin = width/40;
+
+
 
             final View view =
                     fourPlayer(width, ds.heightPixels > ds.widthPixels ?
@@ -139,15 +158,16 @@ public class LudoActivity extends AppCompatActivity {
                 view.findViewById(R.id.upper_bar).setVisibility(View.INVISIBLE);
                 pNames[0] = view.findViewById(R.id.player1_name);
                 pNames[1] = view.findViewById(R.id.player4_name);
+
             } else if (players == 3 && twoSelected) {
-                dicePoints[1] = three;
+                dicePoints[1] = two;
                 dicePoints[2] = four;
                 arrows[0] = view.findViewById(R.id.player1_arrow);
-                arrows[1] = view.findViewById(R.id.player3_arrow);
+                arrows[1] = view.findViewById(R.id.player2_arrow);
                 arrows[2] = view.findViewById(R.id.player4_arrow);
                 view.findViewById(R.id.player2_box).setVisibility(View.INVISIBLE);
                 pNames[0] = view.findViewById(R.id.player1_name);
-                pNames[1] = view.findViewById(R.id.player3_name);
+                pNames[1] = view.findViewById(R.id.player2_name);
                 pNames[2] = view.findViewById(R.id.player4_name);
 
             } else if(players == 3 && !twoSelected)
@@ -178,7 +198,7 @@ public class LudoActivity extends AppCompatActivity {
 
             for(int i = 0; i < players; i++)
             {
-                pNames[i].setText(p_names[i]);
+                pNames[i].setText(names[i]);
             }
 
             view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -190,10 +210,136 @@ public class LudoActivity extends AppCompatActivity {
             });
 
 
-            arrows[0].setAnimation(translateAnimation);
-            arrows[0].setVisibility(View.VISIBLE);
-            game = new LudoGame(LudoActivity.this,width,boardStartY,colors,players,dicePoints,arrows,playerTypes);
-            game.setBackground(getResources().getDrawable(R.drawable.ludo_board_4x4));
+//            arrows[0].setAnimation(translateAnimation);
+//            arrows[0].setVisibility(View.VISIBLE);
+
+
+            Color p1 = colors[0];
+
+            Color[] colors1 = new Color[]{RED, BLUE, GREEN, YELLOW};
+
+            while(colors1[0] != p1)
+            {
+                for(int i = 3; i > 0; i--)
+                {
+                    Color temp = colors1[i];
+                    colors1[i] = colors1[i - 1];
+                    colors1[i - 1] = temp;
+                }
+            }
+
+            ImageView[] imageViews = new ImageView[]{((ImageView)view.findViewById(R.id.player1_pic)),((ImageView)view.findViewById(R.id.player2_pic)),((ImageView)view.findViewById(R.id.player3_pic)),((ImageView)view.findViewById(R.id.player4_pic))};
+
+            for(int i = 0; i < 4; i++)
+            {
+                if(colors1[i] == BLUE)
+                {
+                    imageViews[i].setImageResource(R.drawable.marker_blue);
+                }
+                else if(colors1[i] == RED)
+                {
+                    imageViews[i].setImageResource(R.drawable.marker_red);
+                }
+                else if(colors1[i] == YELLOW)
+                {
+                    imageViews[i].setImageResource(R.drawable.marker_yellow);
+                }
+                else if(colors1[i] == GREEN)
+                {
+                    imageViews[i].setImageResource(R.drawable.marker_green);
+                }
+            }
+
+            int rotation = 0;
+
+            if(p1 == BLUE)
+            {
+                rotation = 3;
+            } else if (p1 == YELLOW) {
+                rotation = 2;
+            }
+            else if(p1 == GREEN)
+            {
+                rotation = 1;
+            }
+
+
+
+            game = new LudoGame(LudoActivity.this,width,boardStartY,selectedColors,players,dicePoints,arrows,selectedPlayerTypes);
+
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ludo_board_4x4);
+            Matrix matrix = new Matrix();
+            matrix.preRotate(rotation*90);
+
+            Bitmap backgroundDrawable = Bitmap.createBitmap(bitmap, 0, 0, width, width, matrix, true);
+            Drawable drawable = new BitmapDrawable(getResources(), backgroundDrawable);
+            game.setBackground(drawable);
+
+            bitmap.recycle();
+            bitmap = null;
+            backgroundDrawable.recycle();
+            backgroundDrawable = null;
+
+            if(currentPlayer[0] == 1 && selectedPlayerTypes[1] == PlayerType.ONLINE) {
+
+                final DatabaseReference reference = FirebaseDatabase.getInstance().getReference(intent.getStringExtra(REFERENCE));
+                final String[] uids = new String[4];
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        int players = (int) dataSnapshot.child("players").getValue();
+                        for(int i = 0; i < players; i++) {
+                            if (i == 0)
+                            {
+                                uids[i] = String.valueOf(dataSnapshot.child("firstUID"));
+                            }
+                            else if (i == 1)
+                            {
+                                uids[i] = String.valueOf(dataSnapshot.child("secondUID"));
+                            }
+                            else if (i == 2)
+                            {
+                                uids[i] = String.valueOf(dataSnapshot.child("thirdUID"));
+                            }
+                            else if (i == 3)
+                            {
+                                uids[i] = String.valueOf(dataSnapshot.child("fourthUID"));
+                            }
+                        }
+
+                        while(!uids[0].equals(mCurrentUser.getUid()))
+                        {
+                            for(int i = players - 1; i > 0; i--) {
+                                String temp;
+                                temp = uids[i];
+                                uids[i] = uids[i-1];
+                                uids[i-1] = temp;
+                            }
+                        }
+
+                        game.gameRef = reference;
+                        String turn = (String) dataSnapshot.child("turn").getValue();
+
+                        for(int i = 0; i < players; i++)
+                        {
+                            if(uids[i].equals(turn))
+                            {
+                                currentPlayer[0] = i;
+                            }
+                        }
+
+                        game.currentPlayer = currentPlayer[0];
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+
+
 
             ArrayList<LudoPiece> pieces = game.getPieces();
 
@@ -222,6 +368,8 @@ public class LudoActivity extends AppCompatActivity {
                     textView.setText("" + value);
                 }
             });
+
+
 
             final TextView textView1 = new TextView(getApplicationContext());
             FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -253,15 +401,12 @@ public class LudoActivity extends AppCompatActivity {
                 }
             });
 
-
-
             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView);
             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView1);
             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView2);
-            game.textView = textView;
+            LudoGame.textView = textView;
         }
     }
-
     View fourPlayer(final int width, float xdpi, float ydpi, final int y) {
         final LinearLayout linearLayout = new LinearLayout(this);
 

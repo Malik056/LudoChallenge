@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.apple.ludochallenge.BaseActivity;
 import com.example.apple.ludochallenge.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -256,7 +257,8 @@ public class SettingsActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             storeFlag_into_Storage();
-                            Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                            Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                            intent.putExtra("activity", MainMenu.class.getName());
                             intent.putExtra("settings_activity_to_main", "0");
                             intent.putExtra("country_name_toMain", countryName_toMain);
                             intent.putExtra("userName_toMain",    userNamefromPreviousActivity_register);
@@ -654,8 +656,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void local_databse(){
-        mySQLDatabase = mySQLDatabase.getInstance(this);
-
+        mySQLDatabase = MySQLDatabase.getInstance(this);
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * Created by Taha Malik on 4/18/2018.
@@ -18,9 +19,10 @@ public class LudoBox {
     LudoGame mGame;
     Point mCenterPoint;
     int firstX;
+    boolean home = false;
     int firstY;
     int mSize;
-    ArrayList<LudoPiece> mPieces = new ArrayList<>();
+    Vector<LudoPiece> mPieces = new Vector<>();
     int mPieceCount = 0;
     LudoBox nextBox;
     LudoBox transitionBox;
