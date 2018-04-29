@@ -62,24 +62,35 @@
         <activity android:name=".networking.PlayActivity" />
         <activity android:name=".networking.ProfileActivity" />
         <activity android:name=".networking.RegisterActivity">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".networking.SettingsActivity" />
         <activity android:name=".networking.UsersActivity" />
         <activity android:name=".FriendsList" />
         <activity android:name=".SpinWheelActivity">
-             <intent-filter>
-             <action android:name="android.intent.action.MAIN" />
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
 
 
-             <category android:name="android.intent.category.LAUNCHER" />
-             </intent-filter>
-
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
+        <activity android:name=".WaitingForOpponent4Players">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".WaitingForOpponent3Players" />
+        <activity android:name=".WaitingForOpponent2Players"></activity>
     </application>
 
 </manifest>

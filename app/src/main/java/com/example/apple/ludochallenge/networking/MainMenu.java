@@ -28,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.apple.ludochallenge.R;
+import com.example.apple.ludochallenge.SpinWheelActivity;
 import com.example.apple.ludochallenge.UserProgressData;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.ads.AdRequest;
@@ -328,6 +329,17 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
 
 
 
+
+        spin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SpinWheelActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
+                finish();
+            }
+        });
 
 
 
