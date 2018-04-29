@@ -184,11 +184,11 @@ public class MySQLDatabase extends SQLiteOpenHelper {
         if(cursor.moveToFirst()) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(SPIN_DATE_COL, spinDate);
-            database1.update(DATE_TABLE, contentValues, ID + "=?", new String[]{ID});
+            database1.update(DATE_TABLE, contentValues, USER_ID + "=?", new String[]{ID});
         }
         else {
 
-            String sql = "INSERT INTO " + TABLE_NAME + " VALUES (?, ?)";
+            String sql = "INSERT INTO " + DATE_TABLE + " VALUES (?, ?)";
             SQLiteStatement statement = database1.compileStatement(sql);
 
             statement.clearBindings();
@@ -196,6 +196,30 @@ public class MySQLDatabase extends SQLiteOpenHelper {
             statement.bindString(2, spinDate);
             statement.executeInsert();
         }
+        cursor.close();
+    }
+
+    public void incrementCoin(String ID, int byNum)
+    {
+        SQLiteDatabase database = getReadableDatabase();
+
+        Cursor cursor;
+
+        cursor = database.query
+                (
+                        USER_PROGRESS_TABLE,
+                        new String[] { USER_ID, COINS_COL},
+                        USER_ID + " =?",
+                        new String[]{ID}, null, null, null, null
+                );
+
+        SQLiteDatabase database1 = getWritableDatabase();
+        if(cursor.moveToNext()) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COINS_COL, byNum);
+            database1.update(USER_PROGRESS_TABLE, contentValues, USER_ID + "=?", new String[]{ID});
+        }
+
         cursor.close();
     }
 
