@@ -75,16 +75,19 @@ public class LudoBox {
 
         for (int i = 0; i < mPieceCount; i++) {
             final LudoPiece piece1 = mPieces.get(i);
-            piece1.setX(startingPointX);
-            piece1.setY(y);
-            ((ImageView) piece1.getTag()).setX(startingPointX);
-            ((ImageView) piece1.getTag()).setY(mCenterPoint.y - pieceWidth / 2);
 
-            final int finalPieceHeight = pieceHeight;
+            final int finalStartingPointX = startingPointX;
             final int finalPieceWidth = pieceWidth;
+            final int finalPieceHeight = pieceHeight;
+            final int finalY = y;
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
+
+                    piece1.setX(finalStartingPointX);
+                    piece1.setY(finalY);
+                    ((ImageView) piece1.getTag()).setX(finalStartingPointX);
+                    ((ImageView) piece1.getTag()).setY(mCenterPoint.y - finalPieceWidth / 2);
 
                     piece1.setSize(finalPieceWidth, finalPieceHeight);
                     ((ImageView) piece1.getTag()).setLayoutParams(new FrameLayout.LayoutParams(finalPieceWidth, finalPieceWidth));

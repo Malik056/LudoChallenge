@@ -33,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.apple.ludochallenge.networking.MySQLDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,6 +42,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import static com.example.apple.ludochallenge.Color.BLUE;
@@ -67,345 +69,412 @@ public class LudoActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser mCurrentUser;
 
+    private ImageView ludoBoard;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ludo);
 
+        ludoBoard = findViewById(R.id.ludoBoard);
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
 //        FrameLayout frameLayout = findViewById(R.id.ludoContainer);
 
-        auth = FirebaseAuth.getInstance();
-        mCurrentUser = auth.getCurrentUser();
-
-        if (game == null) {
-
-            DisplayManager dm = (DisplayManager) getSystemService(Service.DISPLAY_SERVICE);
-            DisplayMetrics ds = new DisplayMetrics();
-            assert dm != null;
-            dm.getDisplay(Display.DEFAULT_DISPLAY).getMetrics(ds);
-
-            float xdpi = ds.xdpi;
-            float ydpi = ds.ydpi;
-            getSupportFragmentManager().beginTransaction().add(R.id.boardContainer, new Fragment()).commit();
-            int height = ds.heightPixels > ds.widthPixels ? ds.heightPixels : ds.widthPixels;
-            final int width = ds.heightPixels < ds.widthPixels ? ds.heightPixels : ds.widthPixels;
-
-            Intent intent = getIntent();
-            String[] names = intent.getStringArrayExtra(NAMES_KEY);
-            int[] colorsInt = intent.getIntArrayExtra(COLORS_KEY);
-            int[] playerTypesInt = intent.getIntArrayExtra(PLAYERS_TYPE_KEY);
-            int players = intent.getIntExtra(PLAYERS_KEY,3);
-            final int[] currentPlayer = {intent.getIntExtra(TURN, 0)};
-
-            Color[] selectedColors = new Color[4];
-            PlayerType[] selectedPlayerTypes = new PlayerType[4];
-
-            for (int i = 0; i < players; i++)
-            {
-                    selectedColors[i] = Color.getColor(colorsInt[i]);
-                    selectedPlayerTypes[i] = PlayerType.getPlayerType(playerTypesInt[i]);
-            }
-
-            PlayerType[] playerTypes = {PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.HUMAN, PlayerType.CPU};
-
-            final int boardStartY = (height - width) / 2;
-            Color[] colors = new Color[]{RED, BLUE, GREEN, Color.YELLOW};
-            String[] p_names = new String[]{"Player 1", "Player 2", "Player 3", "Player 4"};
-
-            int oneBox = width/10;
-            int viewMargin = width/40;
+                auth = FirebaseAuth.getInstance();
+                mCurrentUser = auth.getCurrentUser();
 
 
+                if (game == null) {
 
-            final View view =
-                    fourPlayer(width, ds.heightPixels > ds.widthPixels ?
-                            xdpi : ydpi, ds.heightPixels > ds.widthPixels ?
-                            ydpi : xdpi, boardStartY);
+                    DisplayManager dm = (DisplayManager) getSystemService(Service.DISPLAY_SERVICE);
+                    final DisplayMetrics ds = new DisplayMetrics();
+                    assert dm != null;
+                    dm.getDisplay(Display.DEFAULT_DISPLAY).getMetrics(ds);
 
-            Point first = new Point(3*(oneBox)/2, (int) (boardStartY + width + width / 40 + p1TextSize*2));
-            Point two = new Point(width - 5*(oneBox)/2, (int) (boardStartY + width + width / 40 + p1TextSize*2));
-            Point three = new Point(3*(oneBox)/2, (int) (boardStartY - (width/10)- width / 40 - p1TextSize*3));
-            Point four = new Point(width - 5*(oneBox)/2, (int) (boardStartY - (width/10)- width / 40 - p1TextSize*3));
+                    final float xdpi = ds.xdpi;
+                    final float ydpi = ds.ydpi;
+//                    getSupportFragmentManager().beginTransaction().add(R.id.boardContainer, new Fragment()).commit();
+                    int height = ds.heightPixels > ds.widthPixels ? ds.heightPixels : ds.widthPixels;
+                    final int width = ds.heightPixels < ds.widthPixels ? ds.heightPixels : ds.widthPixels;
 
-            arrows = new ImageView[players];
-            dicePoints = new Point[players];
-            dicePoints[0] = first;
+                    final Intent intent = getIntent();
+                    final String[] names = intent.getStringArrayExtra(NAMES_KEY);
+                    int[] colorsInt = intent.getIntArrayExtra(COLORS_KEY);
+                    int[] playerTypesInt = intent.getIntArrayExtra(PLAYERS_TYPE_KEY);
+                    final int players = intent.getIntExtra(PLAYERS_KEY, 3);
+                    final int[] currentPlayer = {intent.getIntExtra(TURN, 0)};
 
-            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0.2f);
-            alphaAnimation.setRepeatMode(AlphaAnimation.REVERSE);
-            alphaAnimation.setRepeatCount(AlphaAnimation.INFINITE);
-            alphaAnimation.setDuration(200);
-            alphaAnimation.setInterpolator(new LinearInterpolator());
-            LudoGame.alphaAnimation = alphaAnimation;
+                    final Color[] selectedColors = new Color[4];
+                    final PlayerType[] selectedPlayerTypes = new PlayerType[4];
 
-            TranslateAnimation translateAnimation = new TranslateAnimation(
-                    TranslateAnimation.RELATIVE_TO_SELF, 0.1f,
-                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
-                    TranslateAnimation.ABSOLUTE, 0f,
-                    TranslateAnimation.ABSOLUTE, 0f);
-            translateAnimation.setDuration(100);
-            translateAnimation.setRepeatCount(-1);
-            translateAnimation.setRepeatMode(Animation.REVERSE);
-            translateAnimation.setInterpolator(new LinearInterpolator());
-            LudoGame.translateAnimation = translateAnimation;
-
-            boolean twoSelected = true;
-
-            if (players == 2) {
-                dicePoints[1] = four;
-                arrows[0] = view.findViewById(R.id.player1_arrow);
-                arrows[1] = view.findViewById(R.id.player4_arrow);
-                view.findViewById(R.id.upper_bar).setVisibility(View.INVISIBLE);
-                pNames[0] = view.findViewById(R.id.player1_name);
-                pNames[1] = view.findViewById(R.id.player4_name);
-
-            } else if (players == 3 && twoSelected) {
-                dicePoints[1] = two;
-                dicePoints[2] = four;
-                arrows[0] = view.findViewById(R.id.player1_arrow);
-                arrows[1] = view.findViewById(R.id.player2_arrow);
-                arrows[2] = view.findViewById(R.id.player4_arrow);
-                view.findViewById(R.id.player2_box).setVisibility(View.INVISIBLE);
-                pNames[0] = view.findViewById(R.id.player1_name);
-                pNames[1] = view.findViewById(R.id.player2_name);
-                pNames[2] = view.findViewById(R.id.player4_name);
-
-            } else if(players == 3 && !twoSelected)
-            {
-                dicePoints[1] = two;
-                dicePoints[2] = four;
-                arrows[0] = view.findViewById(R.id.player1_arrow);
-                arrows[1] = view.findViewById(R.id.player2_arrow);
-                arrows[2] = view.findViewById(R.id.player4_arrow);
-                view.findViewById(R.id.player2_box).setVisibility(View.INVISIBLE);
-                pNames[0] = view.findViewById(R.id.player1_name);
-                pNames[1] = view.findViewById(R.id.player2_name);
-                pNames[2] = view.findViewById(R.id.player4_name);
-            }
-            else {
-                dicePoints[1] = two;
-                dicePoints[2] = three;
-                dicePoints[3] = four;
-                arrows[0] = view.findViewById(R.id.player1_arrow);
-                arrows[1] = view.findViewById(R.id.player2_arrow);
-                arrows[2] = view.findViewById(R.id.player3_arrow);
-                arrows[3] = view.findViewById(R.id.player4_arrow);
-                pNames[0] = view.findViewById(R.id.player1_name);
-                pNames[1] = view.findViewById(R.id.player2_name);
-                pNames[2] = view.findViewById(R.id.player3_name);
-                pNames[3] = view.findViewById(R.id.player4_name);
-            }
-
-            for(int i = 0; i < players; i++)
-            {
-                pNames[i].setText(names[i]);
-            }
-
-            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    view.setY(boardStartY - (width/10) - (width / (10 * 2) + p1TextSize));
-                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-            });
-
-
-//            arrows[0].setAnimation(translateAnimation);
-//            arrows[0].setVisibility(View.VISIBLE);
-
-
-            Color p1 = colors[0];
-
-            Color[] colors1 = new Color[]{RED, BLUE, GREEN, YELLOW};
-
-            while(colors1[0] != p1)
-            {
-                for(int i = 3; i > 0; i--)
-                {
-                    Color temp = colors1[i];
-                    colors1[i] = colors1[i - 1];
-                    colors1[i - 1] = temp;
-                }
-            }
-
-            ImageView[] imageViews = new ImageView[]{((ImageView)view.findViewById(R.id.player1_pic)),((ImageView)view.findViewById(R.id.player2_pic)),((ImageView)view.findViewById(R.id.player3_pic)),((ImageView)view.findViewById(R.id.player4_pic))};
-
-            for(int i = 0; i < 4; i++)
-            {
-                if(colors1[i] == BLUE)
-                {
-                    imageViews[i].setImageResource(R.drawable.marker_blue);
-                }
-                else if(colors1[i] == RED)
-                {
-                    imageViews[i].setImageResource(R.drawable.marker_red);
-                }
-                else if(colors1[i] == YELLOW)
-                {
-                    imageViews[i].setImageResource(R.drawable.marker_yellow);
-                }
-                else if(colors1[i] == GREEN)
-                {
-                    imageViews[i].setImageResource(R.drawable.marker_green);
-                }
-            }
-
-            int rotation = 0;
-
-            if(p1 == BLUE)
-            {
-                rotation = 3;
-            } else if (p1 == YELLOW) {
-                rotation = 2;
-            }
-            else if(p1 == GREEN)
-            {
-                rotation = 1;
-            }
-
-
-
-            game = new LudoGame(LudoActivity.this,width,boardStartY,selectedColors,players,dicePoints,arrows,selectedPlayerTypes);
-
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ludo_board_4x4);
-            Matrix matrix = new Matrix();
-            matrix.preRotate(rotation*90);
-
-            Bitmap backgroundDrawable = Bitmap.createBitmap(bitmap, 0, 0, width, width, matrix, true);
-            Drawable drawable = new BitmapDrawable(getResources(), backgroundDrawable);
-            game.setBackground(drawable);
-
-            bitmap.recycle();
-            bitmap = null;
-            backgroundDrawable.recycle();
-            backgroundDrawable = null;
-
-            if(currentPlayer[0] == 1 && selectedPlayerTypes[1] == PlayerType.ONLINE) {
-
-                final DatabaseReference reference = FirebaseDatabase.getInstance().getReference(intent.getStringExtra(REFERENCE));
-                final String[] uids = new String[4];
-                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        int players = (int) dataSnapshot.child("players").getValue();
-                        for(int i = 0; i < players; i++) {
-                            if (i == 0)
-                            {
-                                uids[i] = String.valueOf(dataSnapshot.child("firstUID"));
-                            }
-                            else if (i == 1)
-                            {
-                                uids[i] = String.valueOf(dataSnapshot.child("secondUID"));
-                            }
-                            else if (i == 2)
-                            {
-                                uids[i] = String.valueOf(dataSnapshot.child("thirdUID"));
-                            }
-                            else if (i == 3)
-                            {
-                                uids[i] = String.valueOf(dataSnapshot.child("fourthUID"));
-                            }
-                        }
-
-                        while(!uids[0].equals(mCurrentUser.getUid()))
-                        {
-                            for(int i = players - 1; i > 0; i--) {
-                                String temp;
-                                temp = uids[i];
-                                uids[i] = uids[i-1];
-                                uids[i-1] = temp;
-                            }
-                        }
-
-                        game.gameRef = reference;
-                        String turn = (String) dataSnapshot.child("turn").getValue();
-
-                        for(int i = 0; i < players; i++)
-                        {
-                            if(uids[i].equals(turn))
-                            {
-                                currentPlayer[0] = i;
-                            }
-                        }
-
-                        game.currentPlayer = currentPlayer[0];
+                    for (int i = 0; i < players; i++) {
+                        selectedColors[i] = Color.getColor(colorsInt[i]);
+                        selectedPlayerTypes[i] = PlayerType.getPlayerType(playerTypesInt[i]);
                     }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    final int boardStartY = (height - width) / 2;
+                    Color[] colors = new Color[]{RED, BLUE, GREEN, Color.YELLOW};
+
+                    int oneBox = width / 10;
+                    int viewMargin = width / 40;
+
+                    final View[] view = new View[1];
+
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+
+                            view[0] = fourPlayer(width, ds.heightPixels > ds.widthPixels ?
+                                    xdpi : ydpi, ds.heightPixels > ds.widthPixels ?
+                                    ydpi : xdpi, boardStartY);
+                            synchronized (this) {
+                                this.notify();
+                            }
+                        }
+                    };
+
+                    synchronized (runnable) {
+                        runOnUiThread(runnable);
+                        try {
+                            runnable.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Point first = new Point(3 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 2));
+                    final Point two = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 2));
+                    final Point three = new Point(3 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 3));
+                    final Point four = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 3));
+
+                    arrows = new ImageView[players];
+                    dicePoints = new Point[players];
+                    dicePoints[0] = first;
+
+
+                    Runnable runnable3 = new Runnable() {
+                        @Override
+                        public void run() {
+
+
+                            AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0.2f);
+                            alphaAnimation.setRepeatMode(AlphaAnimation.REVERSE);
+                            alphaAnimation.setRepeatCount(AlphaAnimation.INFINITE);
+                            alphaAnimation.setDuration(200);
+                            alphaAnimation.setInterpolator(new
+
+                                    LinearInterpolator());
+                            LudoGame.alphaAnimation = alphaAnimation;
+
+                            TranslateAnimation translateAnimation = new TranslateAnimation(
+                                    TranslateAnimation.RELATIVE_TO_SELF, 0.1f,
+                                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
+                                    TranslateAnimation.ABSOLUTE, 0f,
+                                    TranslateAnimation.ABSOLUTE, 0f);
+                            translateAnimation.setDuration(100);
+                            translateAnimation.setRepeatCount(-1);
+                            translateAnimation.setRepeatMode(Animation.REVERSE);
+                            translateAnimation.setInterpolator(new
+
+                                    LinearInterpolator());
+                            LudoGame.translateAnimation = translateAnimation;
+
+                            boolean twoSelected = true;
+
+                            if (players == 2) {
+                                dicePoints[1] = four;
+                                arrows[0] = view[0].findViewById(R.id.player1_arrow);
+                                arrows[1] = view[0].findViewById(R.id.player4_arrow);
+                                view[0].findViewById(R.id.upper_bar).setVisibility(View.INVISIBLE);
+                                pNames[0] = view[0].findViewById(R.id.player1_name);
+                                pNames[1] = view[0].findViewById(R.id.player4_name);
+
+                            } else if (players == 3 && twoSelected) {
+                                dicePoints[1] = two;
+                                dicePoints[2] = four;
+                                arrows[0] = view[0].findViewById(R.id.player1_arrow);
+                                arrows[1] = view[0].findViewById(R.id.player2_arrow);
+                                arrows[2] = view[0].findViewById(R.id.player4_arrow);
+                                view[0].findViewById(R.id.player2_box).setVisibility(View.INVISIBLE);
+                                pNames[0] = view[0].findViewById(R.id.player1_name);
+                                pNames[1] = view[0].findViewById(R.id.player2_name);
+                                pNames[2] = view[0].findViewById(R.id.player4_name);
+
+                            } else if (players == 3 && !twoSelected) {
+                                dicePoints[1] = two;
+                                dicePoints[2] = four;
+                                arrows[0] = view[0].findViewById(R.id.player1_arrow);
+                                arrows[1] = view[0].findViewById(R.id.player2_arrow);
+                                arrows[2] = view[0].findViewById(R.id.player4_arrow);
+                                view[0].findViewById(R.id.player2_box).setVisibility(View.INVISIBLE);
+                                pNames[0] = view[0].findViewById(R.id.player1_name);
+                                pNames[1] = view[0].findViewById(R.id.player2_name);
+                                pNames[2] = view[0].findViewById(R.id.player4_name);
+                            } else {
+                                dicePoints[1] = two;
+                                dicePoints[2] = three;
+                                dicePoints[3] = four;
+                                arrows[0] = view[0].findViewById(R.id.player1_arrow);
+                                arrows[1] = view[0].findViewById(R.id.player2_arrow);
+                                arrows[2] = view[0].findViewById(R.id.player3_arrow);
+                                arrows[3] = view[0].findViewById(R.id.player4_arrow);
+                                pNames[0] = view[0].findViewById(R.id.player1_name);
+                                pNames[1] = view[0].findViewById(R.id.player2_name);
+                                pNames[2] = view[0].findViewById(R.id.player3_name);
+                                pNames[3] = view[0].findViewById(R.id.player4_name);
+                            }
+
+                            for (int i = 0; i < players; i++) {
+                                pNames[i].setText(names[i]);
+                            }
+
+                            view[0].getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                @Override
+                                public void onGlobalLayout() {
+                                    view[0].setY(boardStartY - (width / 10) - (width / (10 * 2) + p1TextSize));
+                                    view[0].getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                                }
+                            });
+                            synchronized (this)
+                            {
+                                this.notify();
+                            }
+                        }
+                    };
+
+                    synchronized (runnable3) {
+                        runOnUiThread(runnable3);
+                        try {
+                            runnable3.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+
+                    final Color p1 = colors[0];
+
+                    Color[] colors1 = new Color[]{RED, BLUE, GREEN, YELLOW};
+
+                    while (colors1[0] != p1) {
+                        for (int i = 3; i > 0; i--) {
+                            Color temp = colors1[i];
+                            colors1[i] = colors1[i - 1];
+                            colors1[i - 1] = temp;
+                        }
+                    }
+
+                    Runnable runnable1 = new Runnable() {
+                        @Override
+                        public void run() {
+
+                            ImageView[] imageViews = new ImageView[]{((ImageView) view[0].findViewById(R.id.player1_pic)), ((ImageView) view[0].findViewById(R.id.player2_pic)), ((ImageView) view[0].findViewById(R.id.player3_pic)), ((ImageView) view[0].findViewById(R.id.player4_pic))};
+
+                            byte[] player1Pic = (byte[]) MySQLDatabase.getInstance(getApplicationContext()).getData(mCurrentUser.getUid(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+                            Bitmap player1Bitmap = BitmapFactory.decodeByteArray(player1Pic, 0, player1Pic.length);
+
+
+                            for (int i = 0; i < players; i++) {
+                                if (i == 0) {
+                                    imageViews[i].setImageBitmap(player1Bitmap);
+                                } else if (i == 1) {
+                                    byte[] player2Pic = intent.getByteArrayExtra("player2Pic");
+                                    Bitmap player2Bitmap = BitmapFactory.decodeByteArray(player2Pic, 0, player2Pic.length);
+
+                                    imageViews[i].setImageBitmap(player2Bitmap);
+                                } else if (i == 2) {
+                                    byte[] player3Pic = intent.getByteArrayExtra("player3Pic");
+                                    Bitmap player3Bitmap = BitmapFactory.decodeByteArray(player3Pic, 0, player3Pic.length);
+                                    imageViews[i].setImageBitmap(player3Bitmap);
+                                } else {
+                                    byte[] player3Pic = intent.getByteArrayExtra("player4Pic");
+                                    Bitmap player3Bitmap = BitmapFactory.decodeByteArray(player3Pic, 0, player3Pic.length);
+                                    imageViews[i].setImageBitmap(player3Bitmap);
+                                }
+                            }
+
+                            int rotation = 0;
+
+                            if (p1 == BLUE) {
+                                rotation = 1;
+                            } else if (p1 == YELLOW) {
+                                rotation = 2;
+                            } else if (p1 == GREEN) {
+                                rotation = 3;
+                            }
+
+                            game = new LudoGame(LudoActivity.this, width, boardStartY, selectedColors, players, dicePoints, arrows, selectedPlayerTypes);
+
+//                            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ludo_board_4x4);
+//                            Matrix matrix = new Matrix();
+//                            matrix.preRotate(rotation * 90);
+
+                            ludoBoard.setRotation(rotation*90);
+
+                            synchronized (this) {
+                                this.notify();
+
+                            }
+                        }
+                    };
+
+                    synchronized (runnable1) {
+                        runOnUiThread(runnable1);
+                        try {
+                            runnable1.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (currentPlayer[0] == 1 && selectedPlayerTypes[1] == PlayerType.ONLINE) {
+
+                        final DatabaseReference reference = FirebaseDatabase.getInstance().getReferenceFromUrl(intent.getStringExtra(REFERENCE));
+                        final String[] uids = new String[4];
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                int players = Integer.parseInt((String) dataSnapshot.child("players").getValue());
+
+                                for (int i = 0; i < players; i++) {
+                                    if (i == 0) {
+                                        uids[i] = String.valueOf(dataSnapshot.child("firstUID").getValue());
+                                    } else if (i == 1) {
+                                        uids[i] = String.valueOf(dataSnapshot.child("secondUID").getValue());
+                                    } else if (i == 2) {
+                                        uids[i] = String.valueOf(dataSnapshot.child("thirdUID").getValue());
+                                    } else if (i == 3) {
+                                        uids[i] = String.valueOf(dataSnapshot.child("fourthUID").getValue());
+                                    }
+                                }
+
+                                while (!uids[0].equals(mCurrentUser.getUid())) {
+                                    for (int i = players - 1; i > 0; i--) {
+                                        String temp;
+                                        temp = uids[i];
+                                        uids[i] = uids[i - 1];
+                                        uids[i - 1] = temp;
+                                    }
+                                }
+
+                                game.gameRef = reference;
+
+                                String turn = (String) dataSnapshot.child("turn").getValue();
+
+                                for (int i = 0; i < players; i++) {
+                                    if (uids[i].equals(turn)) {
+                                        currentPlayer[0] = i;
+                                    }
+                                }
+
+                                game.currentPlayer = currentPlayer[0];
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
 
                     }
-                });
-
-            }
 
 
+                    final ArrayList<LudoPiece> pieces = game.getPieces();
 
-            ArrayList<LudoPiece> pieces = game.getPieces();
+                    Runnable runnable2 = new Runnable() {
+                        @Override
+                        public void run() {
 
-            ((FrameLayout) findViewById(R.id.boardContainer)).addView(game);
-            ((FrameLayout) findViewById(R.id.boardContainer)).addView(view);
+                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(game);
+                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(view[0]);
 
 //            ((FrameLayout) findViewById(R.id.boardContainer)).addView(game.getDiceGif());
-            for (int i = 0; i < pieces.size(); i++) {
-                ((FrameLayout) findViewById(R.id.boardContainer)).addView((ImageView)pieces.get(i).getTag());
-                ((FrameLayout) findViewById(R.id.boardContainer)).addView(pieces.get(i));
-            }
+                            for (int i = 0; i < pieces.size(); i++) {
+                                ((FrameLayout) findViewById(R.id.boardContainer)).addView((ImageView) pieces.get(i).getTag());
+                                ((FrameLayout) findViewById(R.id.boardContainer)).addView(pieces.get(i));
+                            }
 
-            ((FrameLayout) findViewById(R.id.boardContainer)).addView(game.getDiceImage());
+                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(game.getDiceImage());
 //            findViewById(R.id.boardContainer).setBackgroundColor(android.graphics.Color.RED);
 
-            final TextView textView = new TextView(getApplicationContext());
-            textView.setText("0");
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            textView.setLayoutParams(params);
-            textView.setTextSize(30);
-            textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int value = Integer.parseInt(textView.getText().toString());
-                    value++;
-                    textView.setText("" + value);
+                            final TextView textView = new TextView(getApplicationContext());
+                            textView.setText("0");
+                            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            textView.setLayoutParams(params);
+                            textView.setTextSize(30);
+                            textView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    int value = Integer.parseInt(textView.getText().toString());
+                                    value++;
+                                    textView.setText("" + value);
+                                }
+                            });
+
+
+                            final TextView textView1 = new TextView(getApplicationContext());
+                            FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            params1.gravity = Gravity.RIGHT;
+                            textView1.setLayoutParams(params1);
+                            textView1.setText("decrement");
+                            textView1.setTextSize(30);
+                            textView1.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    int value = Integer.parseInt(textView.getText().toString());
+                                    value--;
+                                    textView.setText("" + value);
+                                }
+                            });
+
+                            final TextView textView2 = new TextView(getApplicationContext());
+                            FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                            params2.gravity = Gravity.CENTER;
+                            textView2.setLayoutParams(params2);
+
+                            textView2.setText("ToZero");
+                            textView2.setGravity(Gravity.CENTER);
+                            textView2.setTextSize(30);
+                            textView2.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    textView.setText("0");
+                                }
+                            });
+
+                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView);
+                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView1);
+                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView2);
+                            LudoGame.textView = textView;
+
+                            synchronized (this)
+                            {
+                                this.notify();
+
+                            }
+
+                        }
+                    };
+
+                    synchronized (runnable2) {
+                        runOnUiThread(runnable2);
+                        try {
+                            runnable2.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-            });
 
-
-
-            final TextView textView1 = new TextView(getApplicationContext());
-            FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params1.gravity = Gravity.RIGHT;
-            textView1.setLayoutParams(params1);
-            textView1.setText("decrement");
-            textView1.setTextSize(30);
-            textView1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int value = Integer.parseInt(textView.getText().toString());
-                    value--;
-                    textView.setText("" + value);
-                }
-            });
-
-            final TextView textView2 = new TextView(getApplicationContext());
-            FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params2.gravity = Gravity.CENTER;
-            textView2.setLayoutParams(params2);
-
-            textView2.setText("ToZero");
-            textView2.setGravity(Gravity.CENTER);
-            textView2.setTextSize(30);
-            textView2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    textView.setText("0");
-                }
-            });
-
-            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView);
-            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView1);
-            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView2);
-            LudoGame.textView = textView;
-        }
+            }
+        });
+        thread.start();
     }
     View fourPlayer(final int width, float xdpi, float ydpi, final int y) {
         final LinearLayout linearLayout = new LinearLayout(this);

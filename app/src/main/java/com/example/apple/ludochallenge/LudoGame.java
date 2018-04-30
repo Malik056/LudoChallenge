@@ -326,13 +326,29 @@ public class LudoGame extends FrameLayout {
 
     }
 
+    public void startGame()
+    {
+        mArrows[currentPlayer].setVisibility(VISIBLE);
+        mArrows[currentPlayer].setAnimation(translateAnimation);
+
+        diceImage.setX(dicePoints[currentPlayer].x);
+        diceImage.setY(dicePoints[currentPlayer].y);
+
+        diceImage.setEnabled(true);
+
+        if(gameRef != null)
+        {
+            addOnDataChangeListener();
+        }
+
+    }
+
     public void addOnDataChangeListener() {
 
-        gameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        gameRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
                 assert user != null;
                 if (!user.getUid().equals(dataSnapshot.child("turn").getValue(String.class))) {
 

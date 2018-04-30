@@ -8,6 +8,12 @@
     android:id="@+id/boardContainer">
 
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ludo_board_4x4"
+        android:layout_gravity="center"
+        android:id="@+id/ludoBoard"/>
 
 
 

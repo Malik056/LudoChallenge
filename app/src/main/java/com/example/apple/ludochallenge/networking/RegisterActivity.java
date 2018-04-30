@@ -1,77 +1,68 @@
  package com.example.apple.ludochallenge.networking;
 
- import android.app.Activity;
  import android.app.ProgressDialog;
- import android.content.ContentResolver;
- import android.content.Intent;
- import android.graphics.Bitmap;
- import android.graphics.BitmapFactory;
- import android.graphics.drawable.BitmapDrawable;
- import android.graphics.drawable.Drawable;
- import android.net.Uri;
- import android.os.Bundle;
- import android.support.annotation.NonNull;
- import android.support.v7.app.AppCompatActivity;
- import android.text.TextUtils;
- import android.util.DisplayMetrics;
- import android.util.Log;
- import android.view.View;
- import android.view.ViewGroup;
- import android.widget.AdapterView;
- import android.widget.Button;
- import android.widget.ImageView;
- import android.widget.Spinner;
- import android.widget.TextView;
- import android.widget.Toast;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
- import com.bumptech.glide.Glide;
- import com.bumptech.glide.load.engine.DiskCacheStrategy;
- import com.bumptech.glide.request.RequestOptions;
- import com.example.apple.ludochallenge.BaseActivity;
- import com.example.apple.ludochallenge.R;
- import com.facebook.AccessToken;
- import com.facebook.CallbackManager;
- import com.facebook.FacebookCallback;
- import com.facebook.FacebookException;
- import com.facebook.GraphRequest;
- import com.facebook.GraphRequestAsyncTask;
- import com.facebook.GraphResponse;
- import com.facebook.HttpMethod;
- import com.facebook.login.LoginManager;
- import com.facebook.login.LoginResult;
- import com.google.android.gms.tasks.OnCompleteListener;
- import com.google.android.gms.tasks.OnSuccessListener;
- import com.google.android.gms.tasks.Task;
- import com.google.firebase.auth.AuthCredential;
- import com.google.firebase.auth.AuthResult;
- import com.google.firebase.auth.FacebookAuthProvider;
- import com.google.firebase.auth.FirebaseAuth;
- import com.google.firebase.auth.FirebaseUser;
- import com.google.firebase.database.DatabaseReference;
- import com.google.firebase.database.FirebaseDatabase;
- import com.google.firebase.iid.FirebaseInstanceId;
- import com.google.firebase.storage.FirebaseStorage;
- import com.google.firebase.storage.StorageReference;
- import com.google.firebase.storage.UploadTask;
- import com.sdsmdg.tastytoast.TastyToast;
- import com.squareup.picasso.Picasso;
- import com.theartofdev.edmodo.cropper.CropImage;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.apple.ludochallenge.R;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.sdsmdg.tastytoast.TastyToast;
+import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
 
- import org.json.JSONArray;
- import org.json.JSONException;
+import org.json.JSONArray;
+import org.json.JSONException;
 
- import java.io.ByteArrayOutputStream;
- import java.io.File;
- import java.io.FileNotFoundException;
- import java.io.IOException;
- import java.io.InputStream;
- import java.lang.reflect.Field;
- import java.net.MalformedURLException;
- import java.net.URL;
- import java.util.ArrayList;
- import java.util.Arrays;
- import java.util.HashMap;
- import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
  public class RegisterActivity extends AppCompatActivity {
 
@@ -333,9 +324,8 @@
         alreadyHaveAnAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.putExtra("activity", LoginActivity.class.getName());
                 startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
@@ -346,9 +336,8 @@
             public void onClick(View view) {
                 MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                 mySQLDatabase.setCurrentSession("PLAY_AS_GUEST", MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST);
-                Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.putExtra("activity", MainMenu.class.getName());
                 startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
                 finish();
@@ -381,7 +370,7 @@
      }
 
      private void updateUI() {
-         final Intent intent = new Intent(getApplicationContext(), BaseActivity.class);
+         final Intent intent = new Intent(getApplicationContext(), MainMenu.class);
          final Bitmap country_flag_bitmap ;
          BitmapDrawable bitmapDrawable = (BitmapDrawable) countryFlag.getDrawable();
          country_flag_bitmap = bitmapDrawable.getBitmap();
@@ -411,7 +400,6 @@
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_COMPUTER, "0","0", "500");
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
                  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                 intent.putExtra("activity", MainMenu.class.getName());
                  startActivity(intent);
                  overridePendingTransition(R.anim.goup, R.anim.godown);
                  loadingBar.dismiss();
@@ -445,7 +433,6 @@
                              loadingBar.dismiss();
                          }
 
-                         // ...
                      }
                  });
      }
@@ -502,12 +489,11 @@
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             storeFlag_into_Storage();
-                                            Intent intent = new Intent(getApplicationContext(),BaseActivity.class);
+                                            Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
                                             intent.putExtra("country_name", countryName.getText().toString());
                                             intent.putExtra("userName_register",name.toString());
                                             intent.putExtra("check",1);
                                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            intent.putExtra("activity", SettingsActivity.class.getName());
 
                                             MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                                             mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_COMPUTER, "0","0", "500");
