@@ -187,7 +187,8 @@ public class LudoPlayer {
                             }
                             finalBox[0].addPiece(piece);
 
-                            ((Activity) mGame.context).runOnUiThread(new Runnable() {
+                            Handler handler = new Handler(mGame.context.getMainLooper());
+                            handler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     mGame.invalidate();
@@ -203,7 +204,9 @@ public class LudoPlayer {
                     finalBox[0].addPiece(piece);
                 }
 
-                ((Activity) mGame.context).runOnUiThread(new Runnable() {
+
+
+                Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
 
@@ -225,7 +228,10 @@ public class LudoPlayer {
                         } else if (mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE) {
                         }
                     }
-                });
+                };
+
+                Handler handler = new Handler(mGame.context.getMainLooper());
+                handler.post(runnable);
 
             }
         });
@@ -342,12 +348,14 @@ public class LudoPlayer {
     }
 
     private void player_won() {
-        ((Activity) mGame.context).runOnUiThread(new Runnable() {
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(mGame.context, "Player Won", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mGame.context, "You WON", Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+        Handler handler = new Handler(mGame.context.getMainLooper());
+        handler.post(runnable);
     }
 
     private void animatePiece(final LudoPiece piece, final Point from, final Point to) {
@@ -392,7 +400,8 @@ public class LudoPlayer {
                 }
             };
             synchronized (runnable) {
-                ((Activity) mGame.context).runOnUiThread(runnable);
+                Handler handler = new Handler(mGame.context.getMainLooper());
+                handler.post(runnable);
                 try {
                     runnable.wait();
                 } catch (InterruptedException e) {
@@ -587,7 +596,9 @@ public class LudoPlayer {
                 }
             };
             synchronized (runnable) {
-                ((Activity) mGame.context).runOnUiThread(runnable);
+                Handler handler = new Handler(mGame.context.getMainLooper());
+                handler.post(runnable);
+//                ((Activity) mGame.context).runOnUiThread(runnable);
                 try {
                     runnable.wait();
                 } catch (InterruptedException e) {
@@ -615,7 +626,9 @@ public class LudoPlayer {
         };
 
         synchronized (runnable) {
-            ((Activity) mGame.context).runOnUiThread(runnable);
+            Handler handler = new Handler(mGame.context.getMainLooper());
+            handler.post(runnable);
+//            ((Activity) mGame.context).runOnUiThread(runnable);
             try {
                 runnable.wait();
             } catch (InterruptedException e) {
@@ -665,7 +678,9 @@ public class LudoPlayer {
                 }
             };
             synchronized (runnable1) {
-                ((Activity) mGame.context).runOnUiThread(runnable1);
+                Handler handler = new Handler(mGame.context.getMainLooper());
+                handler.post(runnable1);
+//                ((Activity) mGame.context).runOnUiThread(runnable1);
                 try {
                     runnable1.wait();
                 } catch (InterruptedException e) {
@@ -707,7 +722,9 @@ public class LudoPlayer {
             }
         };
         synchronized (runnable1) {
-            ((Activity) mGame.context).runOnUiThread(runnable1);
+            Handler handler = new Handler(mGame.context.getMainLooper());
+            handler.post(runnable1);
+//            ((Activity) mGame.context).runOnUiThread(runnable1);
             try {
                 runnable1.wait();
             } catch (InterruptedException e) {
@@ -746,7 +763,9 @@ public class LudoPlayer {
         };
 
         synchronized (runnable) {
-            ((Activity) mGame.context).runOnUiThread(runnable);
+            Handler handler = new Handler(mGame.context.getMainLooper());
+            handler.post(runnable);
+//            ((Activity) mGame.context).runOnUiThread(runnable);
             try {
                 runnable.wait();
             } catch (InterruptedException e) {
@@ -801,7 +820,9 @@ public class LudoPlayer {
                     }
                 };
                 synchronized (runnable1) {
-                    ((Activity) mGame.context).runOnUiThread(runnable1);
+                    Handler handler = new Handler(mGame.context.getMainLooper());
+                    handler.post(runnable1);
+//                    ((Activity) mGame.context).runOnUiThread(runnable1);
                     try {
                         runnable1.wait();
                     } catch (InterruptedException e) {
@@ -852,7 +873,9 @@ public class LudoPlayer {
             }
         };
         synchronized (runnable1) {
-            ((Activity) mGame.context).runOnUiThread(runnable1);
+            Handler handler = new Handler(mGame.context.getMainLooper());
+            handler.post(runnable1);
+//            ((Activity) mGame.context).runOnUiThread(runnable1);
             try {
                 runnable1.wait();
             } catch (InterruptedException e) {

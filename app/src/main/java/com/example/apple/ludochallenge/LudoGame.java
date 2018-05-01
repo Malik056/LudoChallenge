@@ -346,7 +346,8 @@ public class LudoGame extends FrameLayout {
                                 ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
                                 Toast.makeText(context, "dice Value is" + (num + 1), Toast.LENGTH_SHORT).show();
                             }
-                            ((Activity) game.context).runOnUiThread(new Runnable() {
+                            Handler handler = new Handler(game.context.getMainLooper());
+                            handler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (num == 5) turnChange = false;
@@ -425,7 +426,8 @@ public class LudoGame extends FrameLayout {
                         @Override
                         public void run() {
 
-                            ((Activity) game.context).runOnUiThread(new Runnable() {
+                            Handler handler = new Handler(game.context.getMainLooper());
+                            handler.post(new Runnable() {
                                 @Override
                                 public void run() {
                             if (num < 6)

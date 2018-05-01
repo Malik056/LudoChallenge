@@ -2,6 +2,7 @@ package com.example.apple.ludochallenge;
 
 import android.app.Activity;
 import android.graphics.Point;
+import android.os.Handler;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -99,7 +100,10 @@ public class LudoBox {
                 }
             };
             synchronized (runnable) {
-                ((Activity) mGame.context).runOnUiThread(runnable);
+
+                Handler handler = new Handler(mGame.context.getMainLooper());
+                handler.post(runnable);
+//                ((Activity) mGame.context).runOnUiThread(runnable);
                 startingPointX -= pieceWidth;
                 try {
                     runnable.wait();
@@ -150,7 +154,9 @@ public class LudoBox {
                 }
             };
             synchronized (runnable) {
-                ((Activity) mGame.context).runOnUiThread(runnable);
+                Handler handler = new Handler(mGame.context.getMainLooper());
+                handler.post(runnable);
+//                ((Activity) mGame.context).runOnUiThread(runnable);
                 try {
                     runnable.wait();
                 } catch (InterruptedException e) {
