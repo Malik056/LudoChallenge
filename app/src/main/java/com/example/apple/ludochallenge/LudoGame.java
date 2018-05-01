@@ -251,20 +251,10 @@ public class LudoGame extends FrameLayout {
 
                                 if (finalNum1 == 6) turnChange = false;
                                 makeMove(finalNum1);
-                                synchronized (this)
-                                {
-                                    this.notify();
-                                }
                             }
                         };
-                        synchronized (runnable) {
-                            ((Activity)context).runOnUiThread(runnable);
-                            try {
-                                runnable.wait();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        ((Activity)context).runOnUiThread(runnable);
+
                     }
                 }, 1000);
             }
