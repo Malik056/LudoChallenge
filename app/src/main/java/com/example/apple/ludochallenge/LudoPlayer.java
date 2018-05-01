@@ -5,6 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Point;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -284,32 +285,27 @@ public class LudoPlayer {
                     }
                 }
 
-                ((Activity) mGame.context).runOnUiThread(new Runnable() {
+                Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
 
-                        Toast.makeText(mGame.context, "animated", Toast.LENGTH_SHORT).show();
-
-                        mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
-                        mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
-                        mGame.getDiceImage().setEnabled(true);
-
                         mGame.getmArrows()[mGame.currentPlayer].setVisibility(View.INVISIBLE);
                         mGame.getmArrows()[mGame.currentPlayer].setAnimation(null);
-
                         if (LudoGame.turnChange) {
                             mGame.currentPlayer++;
                             mGame.currentPlayer %= mGame.numberOfPlayers;
                         } else LudoGame.turnChange = true;
-
                         mGame.getmArrows()[mGame.currentPlayer].setVisibility(VISIBLE);
                         mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
-
+                        mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
+                        mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
                         if(mGame.gameRef!=null) {
-
-                            mGame.gameRef.child("turn").setValue(mGame.uids.get(mGame.currentPlayer)).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            mGame.gameRef.child("dice_value").setValue(num);
+//                            mGame.gameRef.child("piece_number").setValue(piece.pieceNum);
+                            mGame.gameRef.child("turn").setValue(mGame.uids[mGame.currentPlayer]).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
+
                                 }
                             });
                         }
@@ -318,10 +314,27 @@ public class LudoPlayer {
                         } else if (mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE) {
 
                         }
+                        else
+                        {
+                            mGame.diceImage.setEnabled(true);
+                        }
 
+                        synchronized (this){
+                            this.notify();
+                        }
 
                     }
-                });
+                };
+                synchronized (runnable) {
+                    Handler handler = new Handler(mGame.context.getMainLooper());
+                    handler.post(runnable);
+//                    ((Activity) mGame.context).runOnUiThread(runnable);
+                    try {
+                        runnable.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
         });

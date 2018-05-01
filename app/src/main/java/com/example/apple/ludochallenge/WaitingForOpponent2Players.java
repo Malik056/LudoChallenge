@@ -84,7 +84,7 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.hasChild(hisUID) && dataSnapshot.child(hisUID).hasChild(myUID)  && dataSnapshot.child(hisUID).child(myUID).hasChild("dice_value")
                         && dataSnapshot.child(hisUID).child(myUID).hasChild("firstUID")   && dataSnapshot.child(hisUID).child(myUID).hasChild("piece")
-                        && dataSnapshot.child(hisUID).child(myUID).hasChild("secondUID")   && dataSnapshot.child(hisUID).child(myUID).hasChild("turn"))
+                        && dataSnapshot.child(hisUID).child(myUID).hasChild("secondUID")   && dataSnapshot.child(hisUID).child(myUID).hasChild("turn") && dataSnapshot.child(hisUID).child(myUID).hasChild("updateUI"))
                 {
                     reference.child("started_games").removeEventListener(this);
                     final Intent intent1 = new Intent(getApplicationContext(), LudoActivity.class);

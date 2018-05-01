@@ -810,8 +810,8 @@ import java.util.Map;
          }
 
 
-         return bitmap;
 
+         return bitmap;
      }
 
      @Override

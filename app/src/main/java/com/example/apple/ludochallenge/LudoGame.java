@@ -8,6 +8,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -42,6 +45,8 @@ public class LudoGame extends FrameLayout {
 
     int mBoxWidth;
     int pieceSize;
+    boolean gameStarted = false;
+    boolean moved = true;
     ArrayList<LudoBox> boxes = new ArrayList<>();
 
     LudoBox[] oneP;
@@ -62,9 +67,9 @@ public class LudoGame extends FrameLayout {
     ImageView[] mArrows;
     ArrayList<LudoPlayer> players = new ArrayList<>();
     ArrayList<LudoPiece> pieces = new ArrayList<>();
-    public ArrayList<String> uids = null;
+    public String[] uids = null;
 
-    static TextView textView;
+    public static TextView textView;
     ImageView diceImage;
     int width;
     LudoGame game = this;
@@ -92,48 +97,184 @@ public class LudoGame extends FrameLayout {
 
         diceImage = new ImageView(context);
         diceImage.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));
-        diceImage.setX(dicePoints[currentPlayer].x);
-        diceImage.setY(dicePoints[currentPlayer].y);
+//        diceImage.setX(dicePoints[currentPlayer].x);
+//        diceImage.setY(dicePoints[currentPlayer].y);
         setVisibility(VISIBLE);
         setLayoutParams(new LayoutParams(width, width));
         diceImage.setImageDrawable(getResources().getDrawable(R.drawable.dice_2));
         diceImage.setOnClickListener(getDiceClickListener());
         diceImage.setScaleType(ImageView.ScaleType.FIT_XY);
+        diceImage.setEnabled(false);
     }
 
     private OnClickListener pieceClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
 
+            int num = game.num;
+
             if (!((LudoPiece) v).open) {
                 ((LudoPiece) v).open = true;
                 num -= 5;
             }
-            int i = 0;
-            int pieceIndex = 0;
+//            int i = 0;
+            int pieceIndex = ((LudoPiece)v).pieceNum;
 
             for (LudoPiece l : players.get(currentPlayer).getmPiece()) {
-                if (l.startPosition.mCenterPoint == ((LudoPiece) v).startPosition.mCenterPoint) {
-                    pieceIndex = i;
-                }
+//                if (l.startPosition.mCenterPoint == ((LudoPiece) v).startPosition.mCenterPoint) {
+//                    pieceIndex = i;
+//                }
                 l.setEnabled(false);
-                l.setAnimation(null);
+                l.clearAnimation();
                 ((ImageView) l.getTag()).setVisibility(INVISIBLE);
                 ((ImageView) l.getTag()).clearAnimation();
-                i++;
+//                i++;
             }
 
             if (gameRef != null) {
-                gameRef.child("dice_number").setValue(num);
-                gameRef.child("piece_number").setValue(pieceIndex);
+                gameRef.child("dice_value").setValue(game.num);
+                gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        gameRef.child("updateUI").setValue(currentPlayer);
+                    }
+                });
             }
-
-            players.get(currentPlayer).move(num + 1, (LudoPiece) v);
+            players.get(currentPlayer).move(num, (LudoPiece) v);
 
         }
     };
 
-    private OnClickListener getDiceClickListener() {
+
+
+    private OnClickListener getDiceClickListener()
+    {
+        OnClickListener diceClickListener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                diceImage.setEnabled(false);
+                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+
+                mArrows[currentPlayer].setVisibility(INVISIBLE);
+                mArrows[currentPlayer].setAnimation(null);
+
+                ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1f);
+                valueAnimator.setDuration(150);
+                final int value = 9;
+                valueAnimator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width + boxSize), (int)(dice1.getLayoutParams().height + boxSize)));
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width - boxSize), (int)(dice1.getLayoutParams().height - boxSize)));
+
+
+                        ValueAnimator animator1 = ValueAnimator.ofFloat(0f, 1f);
+                        animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                if ((diceImage.getLayoutParams().width - value >= width / 10))
+                                    diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width - value), (diceImage.getLayoutParams().height - value)));
+                            }
+                        });
+
+                        animator1.setDuration(150);
+                        animator1.start();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                        diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width + value), (diceImage.getLayoutParams().height + value)));
+                    }
+                });
+                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                int num;
+                final View v1 = v;
+                if(players.get(currentPlayer).type != PlayerType.ONLINE)
+                {
+                    Random random = new Random();
+                    num = Integer.parseInt(textView.getText().toString()) == 0 ? random.nextInt(6) : Integer.parseInt(textView.getText().toString()) - 1;
+                    num++;
+                    game.num = num;
+                }
+                else
+                {
+                    num = game.num;
+                }
+                Glide.with(context).asGif()
+                        .load(R.raw.dice_gif)
+                        .into((ImageView) v);
+                valueAnimator.start();
+
+                final int finalNum = num;
+                final int finalNum1 = num;
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Handler handler = new Handler(context.getMainLooper());
+                        Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (finalNum < 6)
+                                    ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (finalNum + 1), "drawable", getContext().getPackageName())));
+                                else {
+                                    ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
+                                    Toast.makeText(context, "dice Value is" + (finalNum + 1), Toast.LENGTH_SHORT).show();
+                                }
+
+                                if (finalNum1 == 6) turnChange = false;
+                                makeMove(finalNum1);
+                                synchronized (this)
+                                {
+                                    this.notify();
+                                }
+                            }
+                        };
+                        synchronized (runnable) {
+                            handler.post(runnable);
+                            try {
+                                runnable.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, 1000);
+            }
+        };
+
+        return diceClickListener;
+    }
+
+
+    private OnClickListener getDiceClickListener1() {
         OnClickListener diceClickListener = new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -189,7 +330,7 @@ public class LudoGame extends FrameLayout {
                     Random random = new Random();
                     final View v1 = v;
                     final int num = Integer.parseInt(textView.getText().toString()) == 0 ? random.nextInt(6) : Integer.parseInt(textView.getText().toString()) - 1;
-                    game.num = num;
+                    game.num = num + 1;
                     Glide.with(context).asGif()
                             .load(R.raw.dice_gif)
                             .into((ImageView) v);
@@ -284,24 +425,23 @@ public class LudoGame extends FrameLayout {
                         @Override
                         public void run() {
 
+                            ((Activity) game.context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
                             if (num < 6)
                                 ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (num), "drawable", getContext().getPackageName())));
                             else {
                                 ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
                                 Toast.makeText(context, "dice Value is" + (num), Toast.LENGTH_SHORT).show();
                             }
-                            ((Activity) game.context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
+
                                     if (num == 6) turnChange = false;
-                                    makeMove(num);
+                                        makeMove(num);
                                 }
                             });
 
                         }
                     }, 1000);
-
-
                 }
             }
         };
@@ -311,68 +451,137 @@ public class LudoGame extends FrameLayout {
 
     public void start()
     {
-        mArrows[currentPlayer].setVisibility(VISIBLE);
-        mArrows[currentPlayer].setAnimation(translateAnimation);
-        mArrows[0].setVisibility(INVISIBLE);
+        Handler handler = new Handler(context.getMainLooper());
 
-        diceImage.setX(dicePoints[currentPlayer].x);
-        diceImage.setY(dicePoints[currentPlayer].y);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
 
-        if(currentPlayer == 0)
-        {
-            diceImage.setEnabled(true);
+                mArrows[currentPlayer].setVisibility(VISIBLE);
+                mArrows[currentPlayer].setAnimation(translateAnimation);
+                mArrows[0].setVisibility(INVISIBLE);
+
+                diceImage.setX(dicePoints[currentPlayer].x);
+                diceImage.setY(dicePoints[currentPlayer].y);
+
+                if(currentPlayer == 0)
+                {
+                    diceImage.setEnabled(true);
+                }
+                else diceImage.setEnabled(false);
+
+                synchronized (this)
+                {
+                    this.notify();
+                }
+
+            }
+        };
+
+        synchronized (runnable) {
+            handler.post(runnable);
+            try {
+                runnable.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        else diceImage.setEnabled(false);
-
     }
 
     public void startGame()
     {
-        mArrows[currentPlayer].setVisibility(VISIBLE);
-        mArrows[currentPlayer].setAnimation(translateAnimation);
 
-        diceImage.setX(dicePoints[currentPlayer].x);
-        diceImage.setY(dicePoints[currentPlayer].y);
+        Handler handler = new Handler(context.getMainLooper());
 
-        diceImage.setEnabled(true);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
 
-        if(gameRef != null)
-        {
-            addOnDataChangeListener();
+                mArrows[currentPlayer].setVisibility(VISIBLE);
+                mArrows[currentPlayer].setAnimation(translateAnimation);
+                diceImage.setX(dicePoints[currentPlayer].x);
+                diceImage.setY(dicePoints[currentPlayer].y);
+                diceImage.setEnabled(false);
+
+                synchronized (this) {
+                    this.notify();
+                }
+
+            }
+        };
+
+        synchronized (runnable) {
+            handler.post(runnable);
+            try {
+                runnable.wait();
+                addOnDataChangeListener();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                addOnDataChangeListener();
+            }
+
         }
-
     }
 
     public void addOnDataChangeListener() {
 
-        gameRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                assert user != null;
-                if (!user.getUid().equals(dataSnapshot.child("turn").getValue(String.class))) {
+                gameRef.child("updateUI").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (gameStarted) {
+                            dataSnapshot.getRef().getParent().addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    currentPlayer = uids.indexOf(Objects.requireNonNull(dataSnapshot.child("turn").getValue()).toString());
-                    int num = (int) dataSnapshot.child("dice_value").getValue();
-                    int piece_index = (int) dataSnapshot.child("piece_number").getValue();
+                                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                    assert user != null;
+                                    if (!user.getUid().equals(dataSnapshot.child("turn").getValue(String.class))) {
+                                        int num = ((Long) dataSnapshot.child("dice_value").getValue()).intValue();
+                                        int pieceNum = ((Long) dataSnapshot.child("piece_number").getValue()).intValue();
+                                        game.num = num;
+                                        game.pieceIndex = pieceNum;
+                                        diceImage.performClick();
+                                    } else{
+                                        diceImage.setX(dicePoints[currentPlayer].x);
+                                        diceImage.setY(dicePoints[currentPlayer].y);
+                                        mArrows[currentPlayer].setVisibility(VISIBLE);
+                                        mArrows[currentPlayer].setAnimation(translateAnimation);
+                                        diceImage.setEnabled(true);
+                                    }
+                                }
 
-                    game.num = num;
-                    game.pieceIndex = piece_index;
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
-                }
-            }
+                                }
+                            });
+                        } else {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                            diceImage.setX(dicePoints[currentPlayer].x);
+                            diceImage.setY(dicePoints[currentPlayer].y);
+                            mArrows[currentPlayer].setVisibility(VISIBLE);
+                            mArrows[currentPlayer].setAnimation(translateAnimation);
+                            if(currentPlayer == 0)
+                            {
+                                diceImage.setEnabled(true);
+                            }
+                            else diceImage.setEnabled(false);
 
-            }
-        });
+//                            diceImage.setEnabled(true);
+                            gameStarted = true;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void initializePieces(int numberOfPlayers, Color[] colors, PlayerType[] playerTypes) {
 
         LudoBox.TransitionPlayer[] transitionPlayers = {LudoBox.TransitionPlayer.ONE, LudoBox.TransitionPlayer.TWO, LudoBox.TransitionPlayer.THREE, LudoBox.TransitionPlayer.FOUR};
-
         final LudoBox[][] ludoBoxes = {oneP, twoP, threeP, fourP};
 
         for (int i = 0; i < numberOfPlayers; i++) {
@@ -381,6 +590,7 @@ public class LudoGame extends FrameLayout {
 
             for (int j = 0; j < 4; j++) {
                 final LudoPiece ludoPiece = new LudoPiece(context, player, game, colors[i], pieceSize, ludoBoxes[i][j], ludoBoxes[i][j]);
+                ludoPiece.pieceNum = j;
                 ImageView circle = new ImageView(context);
                 circle.setImageResource(R.drawable.circle);
                 circle.setWillNotDraw(false);
@@ -409,9 +619,7 @@ public class LudoGame extends FrameLayout {
     private void makeMove(int num) {
 
         LudoPiece[] ludoPieces = players.get(currentPlayer).getmPiece();
-
         int foundNum = 0;
-
         LudoPiece temp = null;
         boolean sameCordinates = true;
 
@@ -438,18 +646,34 @@ public class LudoGame extends FrameLayout {
                 postDelayed(new Runnable() {
                     @Override
                     public void run() {
+
                         currentPlayer++;
                         currentPlayer %= numberOfPlayers;
                         getDiceImage().setX(dicePoints[currentPlayer].x);
                         getDiceImage().setY(dicePoints[currentPlayer].y);
-                        getDiceImage().setEnabled(true);
+                        getDiceImage().setEnabled(false);
                         getmArrows()[currentPlayer].setVisibility(VISIBLE);
                         getmArrows()[currentPlayer].setAnimation(translateAnimation);
 
                         if (players.get(currentPlayer).type == PlayerType.CPU) {
                             getDiceImage().performClick();
                         } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
+                            gameRef.child("dice_value").setValue(game.num);
+                            gameRef.child("piece_number").setValue(-1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    gameRef.child("turn").setValue(uids[(numberOfPlayers + currentPlayer) % numberOfPlayers]).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            gameRef.child("updateUI").setValue(1);
+                                        }
+                                    });
+                                }
+                            });
 
+                        }
+                        else {
+                            getDiceImage().setEnabled(true);
                         }
 
                     }
@@ -466,19 +690,15 @@ public class LudoGame extends FrameLayout {
 //                rand = random.nextInt()%4;
 //                piece = ludoPieces[rand < 0 ? rand*-1: rand];
 //            }
-
             LudoPiece[] validPieces = new LudoPiece[4];
-
             for (LudoPiece l : ludoPieces) {
                 if (l.isValid(num)) {
                     validPieces[foundNum] = l;
                     foundNum++;
-
                     l.setEnabled(true);
                     l.setAnimation(alphaAnimation);
                     ((ImageView) l.getTag()).setVisibility(VISIBLE);
                     startRotation((ImageView) l.getTag());
-
                     if (temp != null) {
                         if (temp.mBox.mCenterPoint != l.mBox.mCenterPoint) {
                             sameCordinates = false;
@@ -500,25 +720,20 @@ public class LudoGame extends FrameLayout {
                         getDiceImage().setEnabled(true);
                         getmArrows()[currentPlayer].setVisibility(VISIBLE);
                         getmArrows()[currentPlayer].setAnimation(translateAnimation);
-
                         if (players.get(currentPlayer).type == PlayerType.CPU) {
                             getDiceImage().performClick();
                         } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
 
                         }
-
                     }
                 }, 1000);
             } else {
-
-                LudoPiece piece = null;
+                LudoPiece piece;
                 LudoPiece ludoPiece = validPieces[0];
                 int currentLoss = currentLoss(ludoPiece);
                 int moveLoss = moveProfit(ludoPiece);
                 piece = ludoPiece;
                 int min = moveLoss - currentLoss;
-
-
                 for(int i = 1; i < validPieces.length; i++)
                 {
                     ludoPiece = validPieces[i];
@@ -530,16 +745,38 @@ public class LudoGame extends FrameLayout {
                         piece = ludoPiece;
                         min = max;
                     }
-
                 }
                 players.get(currentPlayer).move(num, piece);
-
             }
         } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
-            //add online Player Code
+            if(pieceIndex != -1) {
+                LudoPiece piece = players.get(currentPlayer).getmPiece()[pieceIndex];
+                players.get(currentPlayer).move(num, piece);
+            }
+            else
+            {
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        currentPlayer++;
+                        currentPlayer %= numberOfPlayers;
+                        getDiceImage().setX(dicePoints[currentPlayer].x);
+                        getDiceImage().setY(dicePoints[currentPlayer].y);
+                        getDiceImage().setEnabled(false);
+                        getmArrows()[currentPlayer].setVisibility(VISIBLE);
+                        getmArrows()[currentPlayer].setAnimation(translateAnimation);
+                        if (players.get(currentPlayer).type == PlayerType.CPU) {
+                            getDiceImage().performClick();
+                        } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
+                            gameRef.child("turn").setValue(uids[currentPlayer]);
+                        }
+                        else{
+                            getDiceImage().setEnabled(true);
+                        }
 
-            LudoPiece piece = players.get(currentPlayer).getmPiece()[pieceIndex];
-            players.get(currentPlayer).move(num, piece);
+                    }
+                }, 1000);
+            }
         }
     }
 

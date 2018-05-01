@@ -243,6 +243,7 @@ public class UsersActivity extends AppCompatActivity {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
 
+                                                            gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("updateUI").setValue(0);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("turn").setValue(user_id);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("dice_value").setValue(4);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("piece").setValue(0);
@@ -251,15 +252,13 @@ public class UsersActivity extends AppCompatActivity {
                                                                 @Override
                                                                 public void onComplete(@NonNull Task<Void> task) {
 
-                                                                    if(task.isSuccessful()) {
+                                                                    if (task.isSuccessful()) {
                                                                         view.setEnabled(true);
                                                                         final Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
 
                                                                         FirebaseDatabase.getInstance().getReference().child("Users").child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                                                                             @Override
                                                                             public void onDataChange(DataSnapshot dataSnapshot) {
-
-
                                                                                 final String pic_url = (String) dataSnapshot.child("thumb_image").getValue();
                                                                                 final Bitmap[] bitmap = {null};
                                                                                 Thread thread = new Thread(new Runnable() {

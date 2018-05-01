@@ -29,6 +29,7 @@ public class LudoPiece extends android.support.v7.widget.AppCompatImageView {
     LudoPlayer player;
     LudoGame mGame;
     LudoBox startPosition;
+    int pieceNum;
 
     @Override
     public void setX(float x) {

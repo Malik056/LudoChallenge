@@ -1,18 +1,11 @@
 package com.example.apple.ludochallenge;
 
-import android.animation.ObjectAnimator;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RotateDrawable;
 import android.hardware.display.DisplayManager;
-import android.provider.ContactsContract;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -25,14 +18,17 @@ import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.example.apple.ludochallenge.Color;
+import com.example.apple.ludochallenge.LudoGame;
+import com.example.apple.ludochallenge.LudoPiece;
+import com.example.apple.ludochallenge.PlayerType;
+import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.networking.MySQLDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,7 +38,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import static com.example.apple.ludochallenge.Color.BLUE;
@@ -52,7 +47,7 @@ import static com.example.apple.ludochallenge.Color.YELLOW;
 
 public class LudoActivity extends AppCompatActivity {
 
-    //first step 4
+
     ImageView[] arrows;
     Point[] dicePoints;
     LudoGame game;
@@ -68,63 +63,45 @@ public class LudoActivity extends AppCompatActivity {
     public static final String UIDS = "UIDS";
     private FirebaseAuth auth;
     private FirebaseUser mCurrentUser;
-
     private ImageView ludoBoard;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ludo);
-
         ludoBoard = findViewById(R.id.ludoBoard);
-
+        final Intent intent = getIntent();
+        auth = FirebaseAuth.getInstance();
+        mCurrentUser = auth.getCurrentUser();
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-
-
-//        FrameLayout frameLayout = findViewById(R.id.ludoContainer);
-
-                auth = FirebaseAuth.getInstance();
-                mCurrentUser = auth.getCurrentUser();
-
-
-                if (game == null) {
-
+                if(game == null) {
                     DisplayManager dm = (DisplayManager) getSystemService(Service.DISPLAY_SERVICE);
                     final DisplayMetrics ds = new DisplayMetrics();
                     assert dm != null;
                     dm.getDisplay(Display.DEFAULT_DISPLAY).getMetrics(ds);
-
                     final float xdpi = ds.xdpi;
                     final float ydpi = ds.ydpi;
 //                    getSupportFragmentManager().beginTransaction().add(R.id.boardContainer, new Fragment()).commit();
                     int height = ds.heightPixels > ds.widthPixels ? ds.heightPixels : ds.widthPixels;
                     final int width = ds.heightPixels < ds.widthPixels ? ds.heightPixels : ds.widthPixels;
-
-                    final Intent intent = getIntent();
                     final String[] names = intent.getStringArrayExtra(NAMES_KEY);
                     int[] colorsInt = intent.getIntArrayExtra(COLORS_KEY);
                     int[] playerTypesInt = intent.getIntArrayExtra(PLAYERS_TYPE_KEY);
-                    final int players = intent.getIntExtra(PLAYERS_KEY, 3);
-                    final int[] currentPlayer = {intent.getIntExtra(TURN, 0)};
-
-                    final Color[] selectedColors = new Color[4];
-                    final PlayerType[] selectedPlayerTypes = new PlayerType[4];
-
+                    final int players = intent.getIntExtra(PLAYERS_KEY, 2);
+                    final int[] currentPlayer = {0};
+                    final Color[] colors = new Color[4];
+                    final PlayerType[] playerTypes = new PlayerType[4];
                     for (int i = 0; i < players; i++) {
-                        selectedColors[i] = Color.getColor(colorsInt[i]);
-                        selectedPlayerTypes[i] = PlayerType.getPlayerType(playerTypesInt[i]);
+                        colors[i] = Color.getColor(colorsInt[i]);
+                        playerTypes[i] = PlayerType.getPlayerType(playerTypesInt[i]);
                     }
-
                     final int boardStartY = (height - width) / 2;
-                    Color[] colors = new Color[]{RED, BLUE, GREEN, Color.YELLOW};
-
                     int oneBox = width / 10;
-                    int viewMargin = width / 40;
-
                     final View[] view = new View[1];
-
                     Runnable runnable = new Runnable() {
                         @Override
                         public void run() {
@@ -137,7 +114,6 @@ public class LudoActivity extends AppCompatActivity {
                             }
                         }
                     };
-
                     synchronized (runnable) {
                         runOnUiThread(runnable);
                         try {
@@ -146,31 +122,24 @@ public class LudoActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-
                     Point first = new Point(3 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 2));
                     final Point two = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 2));
                     final Point three = new Point(3 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 3));
                     final Point four = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 3));
-
                     arrows = new ImageView[players];
                     dicePoints = new Point[players];
                     dicePoints[0] = first;
-
-
                     Runnable runnable3 = new Runnable() {
                         @Override
                         public void run() {
-
-
                             AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0.2f);
                             alphaAnimation.setRepeatMode(AlphaAnimation.REVERSE);
                             alphaAnimation.setRepeatCount(AlphaAnimation.INFINITE);
                             alphaAnimation.setDuration(200);
-                            alphaAnimation.setInterpolator(new
-
-                                    LinearInterpolator());
+                            alphaAnimation.setInterpolator(
+                                    new LinearInterpolator()
+                            );
                             LudoGame.alphaAnimation = alphaAnimation;
-
                             TranslateAnimation translateAnimation = new TranslateAnimation(
                                     TranslateAnimation.RELATIVE_TO_SELF, 0.1f,
                                     TranslateAnimation.RELATIVE_TO_SELF, 0f,
@@ -180,12 +149,8 @@ public class LudoActivity extends AppCompatActivity {
                             translateAnimation.setRepeatCount(-1);
                             translateAnimation.setRepeatMode(Animation.REVERSE);
                             translateAnimation.setInterpolator(new
-
                                     LinearInterpolator());
                             LudoGame.translateAnimation = translateAnimation;
-
-                            boolean twoSelected = true;
-
                             if (players == 2) {
                                 dicePoints[1] = four;
                                 arrows[0] = view[0].findViewById(R.id.player1_arrow);
@@ -193,19 +158,7 @@ public class LudoActivity extends AppCompatActivity {
                                 view[0].findViewById(R.id.upper_bar).setVisibility(View.INVISIBLE);
                                 pNames[0] = view[0].findViewById(R.id.player1_name);
                                 pNames[1] = view[0].findViewById(R.id.player4_name);
-
-                            } else if (players == 3 && twoSelected) {
-                                dicePoints[1] = two;
-                                dicePoints[2] = four;
-                                arrows[0] = view[0].findViewById(R.id.player1_arrow);
-                                arrows[1] = view[0].findViewById(R.id.player2_arrow);
-                                arrows[2] = view[0].findViewById(R.id.player4_arrow);
-                                view[0].findViewById(R.id.player2_box).setVisibility(View.INVISIBLE);
-                                pNames[0] = view[0].findViewById(R.id.player1_name);
-                                pNames[1] = view[0].findViewById(R.id.player2_name);
-                                pNames[2] = view[0].findViewById(R.id.player4_name);
-
-                            } else if (players == 3 && !twoSelected) {
+                            } else if (players == 3) {
                                 dicePoints[1] = two;
                                 dicePoints[2] = four;
                                 arrows[0] = view[0].findViewById(R.id.player1_arrow);
@@ -228,11 +181,9 @@ public class LudoActivity extends AppCompatActivity {
                                 pNames[2] = view[0].findViewById(R.id.player3_name);
                                 pNames[3] = view[0].findViewById(R.id.player4_name);
                             }
-
                             for (int i = 0; i < players; i++) {
                                 pNames[i].setText(names[i]);
                             }
-
                             view[0].getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                                 @Override
                                 public void onGlobalLayout() {
@@ -240,13 +191,11 @@ public class LudoActivity extends AppCompatActivity {
                                     view[0].getViewTreeObserver().removeOnGlobalLayoutListener(this);
                                 }
                             });
-                            synchronized (this)
-                            {
+                            synchronized (this) {
                                 this.notify();
                             }
                         }
                     };
-
                     synchronized (runnable3) {
                         runOnUiThread(runnable3);
                         try {
@@ -255,12 +204,8 @@ public class LudoActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-
-
                     final Color p1 = colors[0];
-
                     Color[] colors1 = new Color[]{RED, BLUE, GREEN, YELLOW};
-
                     while (colors1[0] != p1) {
                         for (int i = 3; i > 0; i--) {
                             Color temp = colors1[i];
@@ -268,24 +213,18 @@ public class LudoActivity extends AppCompatActivity {
                             colors1[i - 1] = temp;
                         }
                     }
-
                     Runnable runnable1 = new Runnable() {
                         @Override
                         public void run() {
-
                             ImageView[] imageViews = new ImageView[]{((ImageView) view[0].findViewById(R.id.player1_pic)), ((ImageView) view[0].findViewById(R.id.player2_pic)), ((ImageView) view[0].findViewById(R.id.player3_pic)), ((ImageView) view[0].findViewById(R.id.player4_pic))};
-
                             byte[] player1Pic = (byte[]) MySQLDatabase.getInstance(getApplicationContext()).getData(mCurrentUser.getUid(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
                             Bitmap player1Bitmap = BitmapFactory.decodeByteArray(player1Pic, 0, player1Pic.length);
-
-
                             for (int i = 0; i < players; i++) {
                                 if (i == 0) {
                                     imageViews[i].setImageBitmap(player1Bitmap);
                                 } else if (i == 1) {
                                     byte[] player2Pic = intent.getByteArrayExtra("player2Pic");
                                     Bitmap player2Bitmap = BitmapFactory.decodeByteArray(player2Pic, 0, player2Pic.length);
-
                                     imageViews[i].setImageBitmap(player2Bitmap);
                                 } else if (i == 2) {
                                     byte[] player3Pic = intent.getByteArrayExtra("player3Pic");
@@ -297,9 +236,7 @@ public class LudoActivity extends AppCompatActivity {
                                     imageViews[i].setImageBitmap(player3Bitmap);
                                 }
                             }
-
                             int rotation = 0;
-
                             if (p1 == BLUE) {
                                 rotation = 1;
                             } else if (p1 == YELLOW) {
@@ -307,22 +244,13 @@ public class LudoActivity extends AppCompatActivity {
                             } else if (p1 == GREEN) {
                                 rotation = 3;
                             }
-
-                            game = new LudoGame(LudoActivity.this, width, boardStartY, selectedColors, players, dicePoints, arrows, selectedPlayerTypes);
-
-//                            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ludo_board_4x4);
-//                            Matrix matrix = new Matrix();
-//                            matrix.preRotate(rotation * 90);
-
-                            ludoBoard.setRotation(rotation*90);
-
+                            game = new LudoGame(getApplicationContext(), width, boardStartY, colors, players, dicePoints, arrows, playerTypes);
+                            ludoBoard.setRotation(rotation * 90);
                             synchronized (this) {
                                 this.notify();
-
                             }
                         }
                     };
-
                     synchronized (runnable1) {
                         runOnUiThread(runnable1);
                         try {
@@ -331,78 +259,19 @@ public class LudoActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-
-                    if (currentPlayer[0] == 1 && selectedPlayerTypes[1] == PlayerType.ONLINE) {
-
-                        final DatabaseReference reference = FirebaseDatabase.getInstance().getReferenceFromUrl(intent.getStringExtra(REFERENCE));
-                        final String[] uids = new String[4];
-                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                int players = Integer.parseInt((String) dataSnapshot.child("players").getValue());
-
-                                for (int i = 0; i < players; i++) {
-                                    if (i == 0) {
-                                        uids[i] = String.valueOf(dataSnapshot.child("firstUID").getValue());
-                                    } else if (i == 1) {
-                                        uids[i] = String.valueOf(dataSnapshot.child("secondUID").getValue());
-                                    } else if (i == 2) {
-                                        uids[i] = String.valueOf(dataSnapshot.child("thirdUID").getValue());
-                                    } else if (i == 3) {
-                                        uids[i] = String.valueOf(dataSnapshot.child("fourthUID").getValue());
-                                    }
-                                }
-
-                                while (!uids[0].equals(mCurrentUser.getUid())) {
-                                    for (int i = players - 1; i > 0; i--) {
-                                        String temp;
-                                        temp = uids[i];
-                                        uids[i] = uids[i - 1];
-                                        uids[i - 1] = temp;
-                                    }
-                                }
-
-                                game.gameRef = reference;
-
-                                String turn = (String) dataSnapshot.child("turn").getValue();
-
-                                for (int i = 0; i < players; i++) {
-                                    if (uids[i].equals(turn)) {
-                                        currentPlayer[0] = i;
-                                    }
-                                }
-
-                                game.currentPlayer = currentPlayer[0];
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-
-
                     final ArrayList<LudoPiece> pieces = game.getPieces();
-
                     Runnable runnable2 = new Runnable() {
                         @Override
                         public void run() {
-
                             ((FrameLayout) findViewById(R.id.boardContainer)).addView(game);
                             ((FrameLayout) findViewById(R.id.boardContainer)).addView(view[0]);
-
 //            ((FrameLayout) findViewById(R.id.boardContainer)).addView(game.getDiceGif());
                             for (int i = 0; i < pieces.size(); i++) {
                                 ((FrameLayout) findViewById(R.id.boardContainer)).addView((ImageView) pieces.get(i).getTag());
                                 ((FrameLayout) findViewById(R.id.boardContainer)).addView(pieces.get(i));
                             }
-
                             ((FrameLayout) findViewById(R.id.boardContainer)).addView(game.getDiceImage());
 //            findViewById(R.id.boardContainer).setBackgroundColor(android.graphics.Color.RED);
-
                             final TextView textView = new TextView(getApplicationContext());
                             textView.setText("0");
                             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -416,8 +285,6 @@ public class LudoActivity extends AppCompatActivity {
                                     textView.setText("" + value);
                                 }
                             });
-
-
                             final TextView textView1 = new TextView(getApplicationContext());
                             FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                             params1.gravity = Gravity.RIGHT;
@@ -432,12 +299,10 @@ public class LudoActivity extends AppCompatActivity {
                                     textView.setText("" + value);
                                 }
                             });
-
                             final TextView textView2 = new TextView(getApplicationContext());
                             FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                             params2.gravity = Gravity.CENTER;
                             textView2.setLayoutParams(params2);
-
                             textView2.setText("ToZero");
                             textView2.setGravity(Gravity.CENTER);
                             textView2.setTextSize(30);
@@ -447,21 +312,15 @@ public class LudoActivity extends AppCompatActivity {
                                     textView.setText("0");
                                 }
                             });
-
                             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView);
                             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView1);
                             ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView2);
                             LudoGame.textView = textView;
-
-                            synchronized (this)
-                            {
+                            synchronized (this) {
                                 this.notify();
-
                             }
-
                         }
                     };
-
                     synchronized (runnable2) {
                         runOnUiThread(runnable2);
                         try {
@@ -470,8 +329,53 @@ public class LudoActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                }
+                    if (playerTypes[1] == PlayerType.ONLINE) {
+                        final DatabaseReference reference = FirebaseDatabase.getInstance().
+                                getReferenceFromUrl(intent.getStringExtra(REFERENCE));
+                        final String[] uids = new String[4];
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (int i = 0; i < players; i++) {
+                                    if (i == 0) {
+                                        uids[i] = String.valueOf(dataSnapshot.child("firstUID").getValue());
+                                    } else if (i == 1) {
+                                        uids[i] = String.valueOf(dataSnapshot.child("secondUID").getValue());
+                                    } else if (i == 2) {
+                                        uids[i] = String.valueOf(dataSnapshot.child("thirdUID").getValue());
+                                    } else if (i == 3) {
+                                        uids[i] = String.valueOf(dataSnapshot.child("fourthUID").getValue());
+                                    }
+                                }
+                                while (!uids[0].equals(mCurrentUser.getUid())) {
+                                    for (int i = players - 1; i > 0; i--) {
+                                        String temp;
+                                        temp = uids[i];
+                                        uids[i] = uids[i - 1];
+                                        uids[i - 1] = temp;
+                                    }
+                                }
+                                String turn = (String) dataSnapshot.child("turn").getValue();
+                                for (int i = 0; i < players; i++) {
+                                    if (uids[i].equals(turn)) {
+                                        currentPlayer[0] = i;
+                                    }
+                                }
+                                game.currentPlayer = currentPlayer[0];
+                                game.uids = uids;
+                                game.gameRef = reference;
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        });
 
+                        game.startGame();
+                    }
+                    else {
+                        game.start();
+                    }
+                }
             }
         });
         thread.start();
@@ -611,6 +515,11 @@ public class LudoActivity extends AppCompatActivity {
         playerPic2.setImageDrawable(getResources().getDrawable(R.drawable.marker_blue));
 //        dice1.setImageDrawable(getResources().getDrawable(R.drawable.dice_1));
 //        dice2.setImageDrawable(getResources().getDrawable(R.drawable.dice_1));
+
+        dice2.setVisibility(View.INVISIBLE);
+        dice1.setVisibility(View.INVISIBLE);
+        dice1.setEnabled(false);
+        dice2.setEnabled(false);
 
         linearLayout1.addView(linearLayout3);
         linearLayout1.addView(player1);

@@ -80,12 +80,10 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".WaitingForOpponent4Players">
-        </activity>
+        <activity android:name=".WaitingForOpponent4Players"></activity>
         <activity android:name=".WaitingForOpponent3Players" />
-        <activity android:name=".WaitingForOpponent2Players">
-
-        </activity>
+        <activity android:name=".WaitingForOpponent2Players"></activity>
+        <activity android:name=".networking.LudoActivity"></activity>
     </application>
 
 </manifest>
