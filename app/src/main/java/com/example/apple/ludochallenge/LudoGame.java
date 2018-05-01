@@ -109,7 +109,7 @@ public class LudoGame extends FrameLayout {
 
     private OnClickListener pieceClickListener = new OnClickListener() {
         @Override
-        public void onClick(View v) {
+        public void onClick(final View v) {
 
             int num = game.num;
 
@@ -118,7 +118,7 @@ public class LudoGame extends FrameLayout {
                 num -= 5;
             }
 //            int i = 0;
-            int pieceIndex = ((LudoPiece)v).pieceNum;
+            final int pieceIndex = ((LudoPiece)v).pieceNum;
 
             for (LudoPiece l : players.get(currentPlayer).getmPiece()) {
 //                if (l.startPosition.mCenterPoint == ((LudoPiece) v).startPosition.mCenterPoint) {
@@ -132,16 +132,31 @@ public class LudoGame extends FrameLayout {
             }
 
             if (gameRef != null) {
-                gameRef.child("dice_value").setValue(game.num);
-                gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(new OnCompleteListener<Void>() {
+                final int finalNum = num;
+                Thread thread = new Thread(new Runnable() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        gameRef.child("updateUI").setValue(currentPlayer);
+                    public void run() {
+                        gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        gameRef.child("updateUI").setValue(currentPlayer).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                players.get(currentPlayer).move(finalNum, (LudoPiece) v);
+                                            }
+                                        });
+
+                                    }
+                                });
+                            }
+                        });
                     }
                 });
+                thread.start();
             }
-            players.get(currentPlayer).move(num, (LudoPiece) v);
-
         }
     };
 
@@ -248,13 +263,11 @@ public class LudoGame extends FrameLayout {
                                     ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
                                     Toast.makeText(context, "dice Value is" + (finalNum + 1), Toast.LENGTH_SHORT).show();
                                 }
-
                                 if (finalNum1 == 6) turnChange = false;
                                 makeMove(finalNum1);
                             }
                         };
                         ((Activity)context).runOnUiThread(runnable);
-
                     }
                 }, 1000);
             }
