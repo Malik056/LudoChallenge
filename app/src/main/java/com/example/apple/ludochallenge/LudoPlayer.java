@@ -809,7 +809,9 @@ public class LudoPlayer {
 
                             @Override
                             public void onAnimationCancel(Animator animation) {
-
+                                synchronized (runnable2) {
+                                    runnable2.notify();
+                                }
                             }
 
                             @Override
@@ -861,7 +863,9 @@ public class LudoPlayer {
 
                     @Override
                     public void onAnimationCancel(Animator animation) {
-
+                        synchronized (runnable2) {
+                            runnable2.notify();
+                        }
                     }
 
                     @Override
