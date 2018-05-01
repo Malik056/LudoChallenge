@@ -238,7 +238,7 @@ public class LudoGame extends FrameLayout {
                     @Override
                     public void run() {
 
-                        Handler handler = new Handler(context.getMainLooper());
+//                        Handler handler = new Handler(context.getMainLooper());
                         Runnable runnable = new Runnable() {
                             @Override
                             public void run() {
@@ -258,7 +258,7 @@ public class LudoGame extends FrameLayout {
                             }
                         };
                         synchronized (runnable) {
-                            handler.post(runnable);
+                            ((Activity)context).runOnUiThread(runnable);
                             try {
                                 runnable.wait();
                             } catch (InterruptedException e) {
@@ -346,8 +346,8 @@ public class LudoGame extends FrameLayout {
                                 ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
                                 Toast.makeText(context, "dice Value is" + (num + 1), Toast.LENGTH_SHORT).show();
                             }
-                            Handler handler = new Handler(game.context.getMainLooper());
-                            handler.post(new Runnable() {
+//                            Handler handler = new Handler(game.context.getMainLooper());
+                            ((Activity)context).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (num == 5) turnChange = false;
@@ -426,8 +426,8 @@ public class LudoGame extends FrameLayout {
                         @Override
                         public void run() {
 
-                            Handler handler = new Handler(game.context.getMainLooper());
-                            handler.post(new Runnable() {
+//                            Handler handler = new Handler(game.context.getMainLooper());
+                            ((Activity)context).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                             if (num < 6)
@@ -453,7 +453,7 @@ public class LudoGame extends FrameLayout {
 
     public void start()
     {
-        Handler handler = new Handler(context.getMainLooper());
+//        Handler handler = new Handler(context.getMainLooper());
 
         Runnable runnable = new Runnable() {
             @Override
@@ -481,7 +481,7 @@ public class LudoGame extends FrameLayout {
         };
 
         synchronized (runnable) {
-            handler.post(runnable);
+            ((Activity)context).runOnUiThread(runnable);
             try {
                 runnable.wait();
             } catch (InterruptedException e) {
@@ -490,12 +490,9 @@ public class LudoGame extends FrameLayout {
         }
     }
 
-    public void startGame()
-    {
+    public void startGame() {
 
-        Handler handler = new Handler(context.getMainLooper());
-
-        Runnable runnable = new Runnable() {
+        Runnable runnable1 = new Runnable() {
             @Override
             public void run() {
 
@@ -504,25 +501,13 @@ public class LudoGame extends FrameLayout {
                 diceImage.setX(dicePoints[currentPlayer].x);
                 diceImage.setY(dicePoints[currentPlayer].y);
                 diceImage.setEnabled(false);
-
-                synchronized (this) {
-                    this.notify();
-                }
-
+                addOnDataChangeListener();
             }
         };
 
-        synchronized (runnable) {
-            handler.post(runnable);
-            try {
-                runnable.wait();
-                addOnDataChangeListener();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                addOnDataChangeListener();
-            }
+        ((Activity) context).runOnUiThread(runnable1);
 
-        }
+
     }
 
     public void addOnDataChangeListener() {

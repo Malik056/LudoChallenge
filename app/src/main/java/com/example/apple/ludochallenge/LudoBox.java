@@ -101,8 +101,8 @@ public class LudoBox {
             };
             synchronized (runnable) {
 
-                Handler handler = new Handler(mGame.context.getMainLooper());
-                handler.post(runnable);
+//                Handler handler = new Handler(mGame.context.getMainLooper());
+                ((Activity)mGame.context).runOnUiThread(runnable);
 //                ((Activity) mGame.context).runOnUiThread(runnable);
                 startingPointX -= pieceWidth;
                 try {
@@ -154,8 +154,8 @@ public class LudoBox {
                 }
             };
             synchronized (runnable) {
-                Handler handler = new Handler(mGame.context.getMainLooper());
-                handler.post(runnable);
+//                Handler handler = new Handler(mGame.context.getMainLooper());
+                ((Activity)mGame.context).runOnUiThread(runnable);
 //                ((Activity) mGame.context).runOnUiThread(runnable);
                 try {
                     runnable.wait();

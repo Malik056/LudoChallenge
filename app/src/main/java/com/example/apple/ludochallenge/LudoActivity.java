@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -65,6 +66,13 @@ public class LudoActivity extends AppCompatActivity {
     private FirebaseUser mCurrentUser;
     private ImageView ludoBoard;
 
+    private Runnable runnable1;
+    private Runnable runnable2;
+    private Runnable runnable3;
+    private Runnable runnable4;
+    private Runnable runnable5;
+    private Runnable runnable6;
+    private Runnable runnable7;
 
 
     @Override
@@ -75,10 +83,11 @@ public class LudoActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         auth = FirebaseAuth.getInstance();
         mCurrentUser = auth.getCurrentUser();
-        Thread thread = new Thread(new Runnable() {
+        Runnable mainRun = new Runnable() {
             @Override
             public void run() {
-                if(game == null) {
+                final Runnable mainRun1 = this;
+                if (game == null) {
                     DisplayManager dm = (DisplayManager) getSystemService(Service.DISPLAY_SERVICE);
                     final DisplayMetrics ds = new DisplayMetrics();
                     assert dm != null;
@@ -94,7 +103,8 @@ public class LudoActivity extends AppCompatActivity {
                     final int players = intent.getIntExtra(PLAYERS_KEY, 2);
                     final int[] currentPlayer = {0};
                     final Color[] colors = new Color[4];
-                    final PlayerType[] playerTypes = new PlayerType[4];
+                    final PlayerType[] playerTypes;
+                    playerTypes = new PlayerType[4];
                     for (int i = 0; i < players; i++) {
                         colors[i] = Color.getColor(colorsInt[i]);
                         playerTypes[i] = PlayerType.getPlayerType(playerTypesInt[i]);
@@ -102,7 +112,7 @@ public class LudoActivity extends AppCompatActivity {
                     final int boardStartY = (height - width) / 2;
                     int oneBox = width / 10;
                     final View[] view = new View[1];
-                    Runnable runnable = new Runnable() {
+                    runnable1 = new Runnable() {
                         @Override
                         public void run() {
 
@@ -114,10 +124,11 @@ public class LudoActivity extends AppCompatActivity {
                             }
                         }
                     };
-                    synchronized (runnable) {
-                        runOnUiThread(runnable);
+                    synchronized (runnable1) {
+//                        Handler handler = new Handler(getApplication().getMainLooper());
+                        runOnUiThread(runnable1);
                         try {
-                            runnable.wait();
+                            runnable1.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -129,7 +140,7 @@ public class LudoActivity extends AppCompatActivity {
                     arrows = new ImageView[players];
                     dicePoints = new Point[players];
                     dicePoints[0] = first;
-                    Runnable runnable3 = new Runnable() {
+                    runnable2 = new Runnable() {
                         @Override
                         public void run() {
                             AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0.2f);
@@ -196,10 +207,12 @@ public class LudoActivity extends AppCompatActivity {
                             }
                         }
                     };
-                    synchronized (runnable3) {
-                        runOnUiThread(runnable3);
+                    synchronized (runnable2) {
+//                        Handler handler = new Handler(getApplication().getMainLooper());
+                        runOnUiThread(runnable2);
+
                         try {
-                            runnable3.wait();
+                            runnable2.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -213,7 +226,7 @@ public class LudoActivity extends AppCompatActivity {
                             colors1[i - 1] = temp;
                         }
                     }
-                    Runnable runnable1 = new Runnable() {
+                    runnable3 = new Runnable() {
                         @Override
                         public void run() {
                             ImageView[] imageViews = new ImageView[]{((ImageView) view[0].findViewById(R.id.player1_pic)), ((ImageView) view[0].findViewById(R.id.player2_pic)), ((ImageView) view[0].findViewById(R.id.player3_pic)), ((ImageView) view[0].findViewById(R.id.player4_pic))};
@@ -244,23 +257,25 @@ public class LudoActivity extends AppCompatActivity {
                             } else if (p1 == GREEN) {
                                 rotation = 3;
                             }
-                            game = new LudoGame(getApplicationContext(), width, boardStartY, colors, players, dicePoints, arrows, playerTypes);
+                            game = new LudoGame(LudoActivity.this, width, boardStartY, colors, players, dicePoints, arrows, playerTypes);
                             ludoBoard.setRotation(rotation * 90);
                             synchronized (this) {
                                 this.notify();
                             }
                         }
                     };
-                    synchronized (runnable1) {
-                        runOnUiThread(runnable1);
+                    synchronized (runnable3) {
+//                        Handler handler = new Handler(getApplication().getMainLooper());
+                        runOnUiThread(runnable3);
+
                         try {
-                            runnable1.wait();
+                            runnable3.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
                     final ArrayList<LudoPiece> pieces = game.getPieces();
-                    Runnable runnable2 = new Runnable() {
+                    runnable4 = new Runnable() {
                         @Override
                         public void run() {
                             ((FrameLayout) findViewById(R.id.boardContainer)).addView(game);
@@ -321,10 +336,11 @@ public class LudoActivity extends AppCompatActivity {
                             }
                         }
                     };
-                    synchronized (runnable2) {
-                        runOnUiThread(runnable2);
+                    synchronized (runnable4) {
+//                        Handler handler = new Handler(getApplication().getMainLooper());
+                        runOnUiThread(runnable4);
                         try {
-                            runnable2.wait();
+                            runnable4.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -365,20 +381,24 @@ public class LudoActivity extends AppCompatActivity {
                                 game.uids = uids;
                                 game.gameRef = reference;
                                 game.startGame();
+
                             }
+
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
                             }
                         });
 
-                    }
-                    else {
+                    } else {
                         game.start();
                     }
                 }
             }
-        });
-        thread.start();
+        };
+        synchronized (mainRun) {
+            Thread thread = new Thread(mainRun);
+            thread.start();
+        }
     }
     View fourPlayer(final int width, float xdpi, float ydpi, final int y) {
         final LinearLayout linearLayout = new LinearLayout(this);
