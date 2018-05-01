@@ -364,13 +364,13 @@ public class LudoActivity extends AppCompatActivity {
                                 game.currentPlayer = currentPlayer[0];
                                 game.uids = uids;
                                 game.gameRef = reference;
+                                game.startGame();
                             }
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
                             }
                         });
 
-                        game.startGame();
                     }
                     else {
                         game.start();
