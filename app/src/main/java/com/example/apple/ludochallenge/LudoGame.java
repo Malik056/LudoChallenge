@@ -519,25 +519,28 @@ public class LudoGame extends FrameLayout {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (gameStarted) {
-                            dataSnapshot.getRef().getParent().addListenerForSingleValueEvent(new ValueEventListener() {
+                            gameRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                    assert user != null;
-                                    if (!user.getUid().equals(dataSnapshot.child("turn").getValue(String.class))) {
-                                        int num = ((Long) dataSnapshot.child("dice_value").getValue()).intValue();
-                                        int pieceNum = ((Long) dataSnapshot.child("piece_number").getValue()).intValue();
-                                        game.num = num;
-                                        game.pieceIndex = pieceNum;
-                                        diceImage.performClick();
-                                    } else{
-                                        diceImage.setX(dicePoints[currentPlayer].x);
-                                        diceImage.setY(dicePoints[currentPlayer].y);
-                                        mArrows[currentPlayer].setVisibility(VISIBLE);
-                                        mArrows[currentPlayer].setAnimation(translateAnimation);
-                                        diceImage.setEnabled(true);
+                                    if(((Long) dataSnapshot.child("dice_value").getValue()) != null && ((Long) dataSnapshot.child("piece_number").getValue()) != null) {
+                                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                        assert user != null;
+                                        if (!user.getUid().equals(dataSnapshot.child("turn").getValue(String.class))) {
+                                            int num = ((Long) dataSnapshot.child("dice_value").getValue()).intValue();
+                                            int pieceNum = ((Long) dataSnapshot.child("piece_number").getValue()).intValue();
+                                            game.num = num;
+                                            game.pieceIndex = pieceNum;
+                                            diceImage.performClick();
+                                        } else {
+                                            diceImage.setX(dicePoints[currentPlayer].x);
+                                            diceImage.setY(dicePoints[currentPlayer].y);
+                                            mArrows[currentPlayer].setVisibility(VISIBLE);
+                                            mArrows[currentPlayer].setAnimation(translateAnimation);
+                                            diceImage.setEnabled(true);
+                                        }
                                     }
+                                    dataSnapshot.getRef().getParent().removeEventListener(this);
                                 }
 
                                 @Override
@@ -652,10 +655,10 @@ public class LudoGame extends FrameLayout {
                             gameRef.child("piece_number").setValue(-1).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    gameRef.child("turn").setValue(uids[(numberOfPlayers + currentPlayer) % numberOfPlayers]).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    gameRef.child("updateUI").setValue(1).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            gameRef.child("updateUI").setValue(1);
+                                            gameRef.child("turn").setValue(uids[(numberOfPlayers + (currentPlayer)) % numberOfPlayers]);
                                         }
                                     });
                                 }
