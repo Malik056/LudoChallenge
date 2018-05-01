@@ -1098,7 +1098,6 @@ public class LudoGame extends FrameLayout {
     @Override
     public void invalidate() {
         super.invalidate();
-        ((Activity) context).findViewById(R.id.boardContainer).invalidate();
     }
 
     private void startRotation(View view) {
