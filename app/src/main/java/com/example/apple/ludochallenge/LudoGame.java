@@ -533,38 +533,39 @@ public class LudoGame extends FrameLayout {
                                     @Override
                                     public void onDataChange(final DataSnapshot dataSnapshot) {
 
-                                        String currentUID = (String) dataSnapshot.child("turn").getValue();
-
-                                        for (int i = 0; i < numberOfPlayers; i++) {
-                                            if (uids[i].equals(currentUID)) {
-                                                currentPlayer = i;
-                                            }
-                                        }
-
-                                        if ((((Long) dataSnapshot.child("dice_value").getValue())).intValue() != 6) {
-                                            currentPlayer++;
-                                            currentPlayer %= numberOfPlayers;
-                                        }
-
-                                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-
-                                                if (task.isSuccessful()) {
-                                                    mArrows[currentPlayer].setVisibility(VISIBLE);
-                                                    mArrows[currentPlayer].setAnimation(translateAnimation);
-                                                    diceImage.setX(dicePoints[currentPlayer].x);
-                                                    diceImage.setY(dicePoints[currentPlayer].y);
-                                                    if (currentPlayer == 0) {
-                                                        diceImage.setEnabled(true);
-                                                    } else diceImage.setEnabled(false);
-                                                } else {
-                                                    dataSnapshot.getRef().child("turn").setValue(uids[currentPlayer]).addOnCompleteListener(this);
+                                        if(FirebaseAuth.getInstance().getUid().equals(dataSnapshot.child("firstUID"))) {
+                                            String currentUID = (String) dataSnapshot.child("turn").getValue();
+                                            for (int i = 0; i < numberOfPlayers; i++) {
+                                                if (uids[i].equals(currentUID)) {
+                                                    currentPlayer = i;
                                                 }
                                             }
-                                        };
 
-                                        dataSnapshot.getRef().child("turn").setValue(uids[currentPlayer]).addOnCompleteListener(onCompleteListener);
+                                            if ((((Long) dataSnapshot.child("dice_value").getValue())).intValue() != 6) {
+                                                currentPlayer++;
+                                                currentPlayer %= numberOfPlayers;
+                                            }
+
+                                            OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                    if (task.isSuccessful()) {
+                                                        mArrows[currentPlayer].setVisibility(VISIBLE);
+                                                        mArrows[currentPlayer].setAnimation(translateAnimation);
+                                                        diceImage.setX(dicePoints[currentPlayer].x);
+                                                        diceImage.setY(dicePoints[currentPlayer].y);
+                                                        if (currentPlayer == 0) {
+                                                            diceImage.setEnabled(true);
+                                                        } else diceImage.setEnabled(false);
+                                                    } else {
+                                                        dataSnapshot.getRef().child("turn").setValue(uids[currentPlayer]).addOnCompleteListener(this);
+                                                    }
+                                                }
+                                            };
+
+                                            dataSnapshot.getRef().child("turn").setValue(uids[currentPlayer]).addOnCompleteListener(onCompleteListener);
+                                        }
                                     }
 
                                     @Override

@@ -75,16 +75,12 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
             mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid).child("Online_Multiplayer");
         }
 
-
-
-
-
             Glide.with(getApplicationContext()).load(R.raw.random_playergif).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(waiting_for_opponent_gif);
 
             Intent onlineMultiplayer_intent = getIntent();
             noOfPlayers_online_multiplayer = onlineMultiplayer_intent.getStringExtra("noOfPlayers");
             entry_coins = onlineMultiplayer_intent.getStringExtra("entry_coins");
-            check_online_multiplayer = onlineMultiplayer_intent.getBooleanExtra("online_multiplayer", true);
+            check_online_multiplayer = onlineMultiplayer_intent.getBooleanExtra("online_multiplayer", false);
 
 
             if (!check_online_multiplayer) {
@@ -183,7 +179,7 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
                 reference.child("started_games").addValueEventListener(eventListener);
             }
 
-
+        if(check_online_multiplayer) {
             mDatabase.child("still_searching").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -193,7 +189,7 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
                             mDatabase.child("entry_coins").setValue(entry_coins).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    String player_name = (String ) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_USER, mySQLDatabase.TABLE_NAME);
+                                    String player_name = (String) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_USER, mySQLDatabase.TABLE_NAME);
                                     byte[] pic = (byte[]) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.IMAGE_PROFILE_COL, mySQLDatabase.TABLE_NAME);
                                     ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(pic);
                                     Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
@@ -221,7 +217,7 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.hasChild("still_searching")) {
                                     String code = dataSnapshot.child("still_searching").getValue(String.class);
-                                    String NO_OF_PLAYERS =  "" + dataSnapshot.child("noOfPlayers").getValue();
+                                    String NO_OF_PLAYERS = "" + dataSnapshot.child("noOfPlayers").getValue();
                                     String ENTRY_COINS = "" + dataSnapshot.child("entry_coins").getValue();
                                     if (code.equals("true") && !key.equals(current_uid) && noOfPlayers_online_multiplayer.equals(NO_OF_PLAYERS) && entry_coins.equals(ENTRY_COINS)) {
                                         Toast.makeText(getApplicationContext(), code + "  " + key, Toast.LENGTH_LONG).show();
@@ -263,6 +259,7 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
                 }
             };
             loopThrough.addValueEventListener(listener);
+        }
     }
 
 
