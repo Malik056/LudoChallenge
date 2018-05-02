@@ -21,6 +21,9 @@ import android.widget.Toast;
 
 import com.example.apple.ludochallenge.networking.MainMenu;
 import com.example.apple.ludochallenge.networking.MySQLDatabase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.sdsmdg.tastytoast.TastyToast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,19 +37,42 @@ public class SpinWheelActivity extends AppCompatActivity {
     private Button spin;
     String textResult = "";
     private FrameLayout spin_win_dialog;
-    private RelativeLayout spin_root;
+    private FrameLayout spin_root;
     private ImageView dialog_coins_text;
-    private String date;
+    private String currentDate;
+    private FirebaseAuth mAUth;
+    private FirebaseUser mUser;
+    private String current_uid;
+    private String previous_date;
+    private MySQLDatabase sqlDatabase;
+    public static boolean checkSpin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spin_wheel);
+        mAUth = FirebaseAuth.getInstance();
+        mUser = mAUth.getCurrentUser();
+        current_uid = mUser.getUid();
+
+        sqlDatabase = MySQLDatabase.getInstance(getApplicationContext());
+
+        currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        previous_date = sqlDatabase.getSpinDate(current_uid);
 
 
-        date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-        spin_root = (RelativeLayout) findViewById(R.id.spin_root);
+        if(!checkSpin){
+            if(currentDate.equals(previous_date)){
+                checkSpin = false;
+            }
+            else{
+                checkSpin = true;
+            }
+        }
+
+
+        spin_root = (FrameLayout) findViewById(R.id.spin_root);
         spin_win_dialog = (FrameLayout) findViewById(R.id.spin_win_dialog);
         spin_wheel = (ImageView) findViewById(R.id.spin_wheel);
         spin = (Button) findViewById(R.id.spin_button);
@@ -57,59 +83,59 @@ public class SpinWheelActivity extends AppCompatActivity {
         spin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final long  n = rand.nextInt(1620) + 1080;
-                final RotateAnimation rotate = new RotateAnimation(0, n, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                rotate.setDuration(4000);
-                rotate.setInterpolator(new LinearInterpolator());
-                spin_wheel.startAnimation(rotate);
-                rotate.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
+                if (checkSpin) {
+                    checkSpin = false;
+                    final long n = rand.nextInt(1620) + 1080;
+                    final RotateAnimation rotate = new RotateAnimation(0, n, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    rotate.setDuration(4000);
+                    rotate.setInterpolator(new LinearInterpolator());
+                    spin_wheel.startAnimation(rotate);
+                    rotate.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
 
-                    }
-
-                    @SuppressLint("ClickableViewAccessibility")
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        spin_wheel.setRotation(n);
-                        long result = n;
-                        while (true){
-                            if(result <=360){
-                                break;
-                            }
-                            result = result -360;
                         }
-                        getWinCoins(result);
-                        setWinCoinText(textResult);
 
-                        spin_win_dialog.setVisibility(View.VISIBLE);
-//                        Toast.makeText(getApplicationContext(),textResult,Toast.LENGTH_LONG).show();
-                        spin_root.setOnTouchListener(new View.OnTouchListener() {
-                            @Override
-                            public boolean onTouch(View v, MotionEvent event) {
-//                                MySQLDatabase mySQLDatabase;
-//                                ArrayList<String> list = new ArrayList<String>();
-                                spin_win_dialog.setVisibility(View.GONE);
-                                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
-//                                String coins = mySQLDatabase.getUserProgressData(mySQLDatabase.fetchCurrentLoggedInID()).get(0).getCoins();
-
-//                                mySQLDatabase.insertGameProgressData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_COMPUTER, MySQLDatabase.WINS_COL, MySQLDatabase.LOSES_COL, MySQLDatabase.COINS_COL + textResult);
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.goup, R.anim.godown);
-                                finish();
-
-                                return true;
+                        @SuppressLint("ClickableViewAccessibility")
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            spin_wheel.setRotation(n);
+                            long result = n;
+                            while (true) {
+                                if (result <= 360) {
+                                    break;
+                                }
+                                result = result - 360;
                             }
-                        });
-                    }
+                            getWinCoins(result);
+                            setWinCoinText(textResult);
+                            spin_win_dialog.setVisibility(View.VISIBLE);
+                            sqlDatabase.incrementCoin(sqlDatabase.fetchCurrentLoggedInID(), textResult);
 
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
+                            spin_root.setOnTouchListener(new View.OnTouchListener() {
+                                @Override
+                                public boolean onTouch(View v, MotionEvent event) {
+                                    spin_win_dialog.setVisibility(View.GONE);
+                                    Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                                    finish();
 
-                    }
-                });
+                                    return true;
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+
+                        }
+                    });
+                }
+                else{
+                    TastyToast.makeText(getApplicationContext(),"You don't have any SPIN right now!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
+                }
             }
         });
 
@@ -172,6 +198,13 @@ public class SpinWheelActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 
     @Override
     public void onDestroy() {

@@ -15,7 +15,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -25,6 +24,8 @@ import com.example.apple.ludochallenge.LudoActivity;
 import com.example.apple.ludochallenge.PlayerType;
 import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.UserProgressData;
+import com.example.apple.ludochallenge.WaitingForOpponent2Players;
+import com.example.apple.ludochallenge.WaitingForOpponent4Players;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -37,7 +38,6 @@ import com.google.firebase.storage.StorageReference;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -88,7 +88,7 @@ public class PlayActivity extends AppCompatActivity {
     FrameLayout playWithFriends_dialogBox;
     ImageView playWithFriends_backBtn;
     private ImageView play_editProfileDialog_edit_profileBtn;
-    LinearLayout playWithFriends_2players;
+    ImageView playWithFriends_2players;
     public static MySQLDatabase mySQLDatabase;
     private String LOGIN_STATUS;
     String facebook_display_name;
@@ -110,8 +110,45 @@ public class PlayActivity extends AppCompatActivity {
     private String current_uid;
     private ImageView play_backBtn;
     private ImageView play_coinIcon;
-
-
+    private FrameLayout onlineMultiplayer_dialog;
+    private LinearLayout online_multiplayer_two_players;
+    private LinearLayout online_multiplayer_four_players;
+    private ImageView online_multiplyer_dialog_back;
+    private Button online_multiplayer_btn;
+    private ImageView three_players_playWithFriends;
+    private ImageView four_players_playWithFriends;
+    public static final String NAMES_KEY = "NAMES";
+    public static final String PLAYERS_KEY = "PLAYERS";
+    public static final String COLORS_KEY = "COLORS";
+    public static final String PLAYERS_TYPE_KEY = "PLAYERS_TYPE";
+    int[] colors_array = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
+    private FrameLayout online_multiplayer_coins_2players_dialog;
+    private ImageView multiplayer_coins_2players_btn1;
+    private ImageView multiplayer_coins_2players_btn2;
+    private ImageView multiplayer_coins_2players_btn3;
+    private ImageView multiplayer_coins_2players_btn4;
+    private ImageView multiplayer_coins_2players_btn5;
+    private ImageView multiplayer_coins_2players_btn6;
+    private ImageView multiplayer_coins_2players_btn7;
+    private ImageView multiplayer_coins_2players_btn8;
+    private ImageView multiplayer_coins_2players_btn9;
+    private FrameLayout online_multiplayer_not_enough_coins_dialog;
+    private ImageView online_multiplayer_play_another_room;
+    private ImageView online_multiplayer_get_more_coins;
+    private boolean checkOnlineCoinPlayers = false;
+    private ImageView online_multiplayer_2Players_back;
+    String facebook_uid;
+    private FrameLayout online_multiplayer_coins_4players_dialog;
+    private ImageView online_multiplayer_4Players_back;
+    private ImageView online_multiplayer_coins_4players_btn1;
+    private ImageView online_multiplayer_coins_4players_btn2;
+    private ImageView online_multiplayer_coins_4players_btn3;
+    private ImageView online_multiplayer_coins_4players_btn4;
+    private ImageView online_multiplayer_coins_4players_btn5;
+    private ImageView online_multiplayer_coins_4players_btn6;
+    private ImageView online_multiplayer_coins_4players_btn7;
+    private ImageView online_multiplayer_coins_4players_btn8;
+    private ImageView online_multiplayer_coins_4players_btn9;
 
 
     String LudoChallenge_vsComputer_WIN;
@@ -213,7 +250,7 @@ public class PlayActivity extends AppCompatActivity {
         playWithFriends = (Button) findViewById(R.id.play_playWithFriends);
         playWithFriends_dialogBox = (FrameLayout) findViewById(R.id.play_slectNoOfPlayers_dialogBox_playWithFriends);
         playWithFriends_backBtn = (ImageView) findViewById(R.id.select_no_of_players_playWithFriends_back);
-        playWithFriends_2players = (LinearLayout) findViewById(R.id.two_players_playWithFriends);
+        playWithFriends_2players = (ImageView) findViewById(R.id.two_players_playWithFriends);
         play_editProfileDialog_edit_profileBtn = (ImageView) findViewById(R.id.play_editProfileDialog_edit_profileBtn);
         play_dialog_coins = (TextView) findViewById(R.id.play_dialog_coins);
         play_coins = (TextView) findViewById(R.id.play_coins);
@@ -228,6 +265,43 @@ public class PlayActivity extends AppCompatActivity {
         play_dialog_level = (TextView) findViewById(R.id.play_dialog_level);
         play_backBtn = (ImageView) findViewById(R.id.play_backBtn);
         play_coinIcon = (ImageView) findViewById(R.id.play_coinIcon);
+        onlineMultiplayer_dialog = (FrameLayout) findViewById(R.id.play_slectNoOfPlayers_online_multiplayer_dialogBox);
+        online_multiplayer_two_players = (LinearLayout) findViewById(R.id.online_multiplayer_two_players);
+        online_multiplayer_four_players = (LinearLayout) findViewById(R.id.online_multiplayer_four_players);
+        online_multiplyer_dialog_back = (ImageView) findViewById(R.id.online_multiplyer_dialog_back);
+        online_multiplayer_btn = (Button) findViewById(R.id.online_multiplayer_btn);
+        three_players_playWithFriends = (ImageView) findViewById(R.id.three_players_playWithFriends);
+        four_players_playWithFriends = (ImageView) findViewById(R.id.four_players_playWithFriends);
+        online_multiplayer_coins_2players_dialog = (FrameLayout) findViewById(R.id.online_multiplayer_coins_2players_dialog);
+        multiplayer_coins_2players_btn1 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn1);
+        multiplayer_coins_2players_btn2 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn2);
+        multiplayer_coins_2players_btn3 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn3);
+        multiplayer_coins_2players_btn4 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn4);
+        multiplayer_coins_2players_btn5 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn5);
+        multiplayer_coins_2players_btn6 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn6);
+        multiplayer_coins_2players_btn7 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn7);
+        multiplayer_coins_2players_btn8 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn8);
+        multiplayer_coins_2players_btn9 = (ImageView) findViewById(R.id.online_multiplayer_coins_2players_btn9);
+        online_multiplayer_not_enough_coins_dialog = (FrameLayout) findViewById(R.id.online_multiplayer_not_enough_coins_dialog);
+        online_multiplayer_play_another_room = (ImageView) findViewById(R.id.online_multiplayer_play_another_room);
+        online_multiplayer_get_more_coins = (ImageView)  findViewById(R.id.online_multiplayer_get_more_coins);
+        online_multiplayer_2Players_back = (ImageView) findViewById(R.id.online_multiplayer_2Players_back);
+        online_multiplayer_coins_4players_dialog = (FrameLayout) findViewById(R.id.online_multiplayer_coins_4players_dialog);
+        online_multiplayer_4Players_back = (ImageView) findViewById(R.id.online_multiplayer_4Players_back);
+        online_multiplayer_coins_4players_dialog = (FrameLayout) findViewById(R.id.online_multiplayer_coins_4players_dialog);
+        online_multiplayer_4Players_back = (ImageView) findViewById(R.id.online_multiplayer_4Players_back);
+        online_multiplayer_coins_4players_btn1 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn1);
+        online_multiplayer_coins_4players_btn2 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn2);
+        online_multiplayer_coins_4players_btn3 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn3);
+        online_multiplayer_coins_4players_btn4 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn4);
+        online_multiplayer_coins_4players_btn5 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn5);
+        online_multiplayer_coins_4players_btn6 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn6);
+        online_multiplayer_coins_4players_btn7 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn7);
+        online_multiplayer_coins_4players_btn8 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn8);
+        online_multiplayer_coins_4players_btn9 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn9);
+
+
+
 
 
 
@@ -261,16 +335,7 @@ public class PlayActivity extends AppCompatActivity {
             current_uid = mCurrentUser.getUid();
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
 
-
-
-
-
-
-
-
             String ID = mySQLDatabase.fetchCurrentLoggedInID();
-
-
             ArrayList<UserProgressData> userProgressData = mySQLDatabase.getUserProgressData(ID);
             coins = userProgressData.get(0).getCoins();
 
@@ -321,9 +386,8 @@ public class PlayActivity extends AppCompatActivity {
 
 
         if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)){
-//            Toast.makeText(this, "FACEBOOK LOGGED IN!", Toast.LENGTH_SHORT).show();
-//            facebook_display_name = mCurrentUser.getDisplayName();
-//            facebook_photo_Uri = mCurrentUser.getPhotoUrl();
+            Intent intent = getIntent();
+            facebook_uid = intent.getStringExtra("facebook_uid");
             MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
 
             facebook_display_name = (String) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_USER, MySQLDatabase.FACEBOOK_USER_TABLE);
@@ -382,6 +446,500 @@ public class PlayActivity extends AppCompatActivity {
 
         }
 
+        online_multiplayer_4Players_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                online_multiplayer_coins_4players_dialog.setVisibility(View.GONE);
+            }
+        });
+
+        online_multiplayer_play_another_room.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!checkOnlineCoinPlayers){
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.GONE);
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        online_multiplayer_get_more_coins.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        online_multiplayer_2Players_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+            }
+        });
+
+
+        online_multiplayer_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                disableButtons();
+                onlineMultiplayer_dialog.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        online_multiplyer_dialog_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enableButtons();
+                onlineMultiplayer_dialog.setVisibility(View.GONE);
+            }
+        });
+        online_multiplayer_two_players.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enableButtons();
+                onlineMultiplayer_dialog.setVisibility(View.GONE);
+                online_multiplayer_coins_2players_dialog.setVisibility(View.VISIBLE);
+
+            }
+        });
+        online_multiplayer_four_players.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enableButtons();
+                onlineMultiplayer_dialog.setVisibility(View.GONE);
+                online_multiplayer_coins_4players_dialog.setVisibility(View.VISIBLE);
+            }
+        });
+
+        multiplayer_coins_2players_btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 100){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -100);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "100");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        multiplayer_coins_2players_btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 500){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -500);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "500");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        multiplayer_coins_2players_btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 5000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -5000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "5000");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        multiplayer_coins_2players_btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 25000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -25000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "25000");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        multiplayer_coins_2players_btn5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 50000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -50000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "50000");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        multiplayer_coins_2players_btn6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 100000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -100000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "100000");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        multiplayer_coins_2players_btn7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 250000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -250000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "250000");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        multiplayer_coins_2players_btn8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 500000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -500000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "500000");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        multiplayer_coins_2players_btn9.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 750000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -750000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "750000");
+                    intent.putExtra("noOfPlayers","2");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+
+
+        online_multiplayer_coins_4players_btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 100){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -100);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "100");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+
+        online_multiplayer_coins_4players_btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 500){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -500);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "500");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        online_multiplayer_coins_4players_btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 5000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -5000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "5000");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+
+            }
+        });
+
+        online_multiplayer_coins_4players_btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 25000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -25000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "25000");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        online_multiplayer_coins_4players_btn5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 50000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -50000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "50000");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        online_multiplayer_coins_4players_btn6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 100000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -100000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "100000");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        online_multiplayer_coins_4players_btn7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 250000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -250000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "250000");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        online_multiplayer_coins_4players_btn8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 500000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -500000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "500000");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        online_multiplayer_coins_4players_btn9.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checkCoin = Integer.parseInt(play_coins.getText().toString());
+                if(checkCoin >= 750000){
+                    mySQLDatabase.incrementCoin(mySQLDatabase.fetchCurrentLoggedInID(), ""+ -750000);
+                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("online_multiplayer", true);
+                    intent.putExtra("entry_coins", "750000");
+                    intent.putExtra("noOfPlayers","4");
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.goup, R.anim.godown);
+                    finish();
+
+                }
+                else{
+                    //don't have enough coins
+                    online_multiplayer_coins_2players_dialog.setVisibility(View.GONE);
+                    online_multiplayer_not_enough_coins_dialog.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+
+
+
         play_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -418,6 +976,7 @@ public class PlayActivity extends AppCompatActivity {
                             intent.putExtra("noOfPlayers", noOfPlayers);
                             intent.putExtra("color", color);
                             intent.putExtra("vsComputer", vsComputer);
+                            intent.putExtra("facebook_uid", facebook_uid);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             overridePendingTransition(R.anim.goup, R.anim.godown);
@@ -449,12 +1008,46 @@ public class PlayActivity extends AppCompatActivity {
             }
         });
 
+        three_players_playWithFriends.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noOfPlayers = 3;
+                color = 3;
+                vsComputer = 0;
+                playWithFriends_dialogBox.setVisibility(View.GONE);
+                Intent intent = new Intent(getApplicationContext(), UsersActivityThreePlayers.class);
+                intent.putExtra("noOfPlayers",noOfPlayers);
+                intent.putExtra("color",color);
+                intent.putExtra("vsComputer",vsComputer);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
+            }
+        });
+
+        four_players_playWithFriends.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noOfPlayers = 4;
+                color = 3;
+                vsComputer = 0;
+                playWithFriends_dialogBox.setVisibility(View.GONE);
+                Intent intent = new Intent(getApplicationContext(), UsersActivityThreePlayers.class);
+                intent.putExtra("noOfPlayers",noOfPlayers);
+                intent.putExtra("color",color);
+                intent.putExtra("vsComputer",vsComputer);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
+            }
+        });
+
+
         play_editProfileDialog_edit_profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 edit_profile_dialogBox.setVisibility(View.GONE);
                 Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
@@ -601,7 +1194,6 @@ public class PlayActivity extends AppCompatActivity {
                 else{
                     three_player_frameLayout.setVisibility(View.GONE);
                     Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
-
                     intent.putExtra("noOfPlayers",noOfPlayers);
                     intent.putExtra("color",color_3players);
                     intent.putExtra("vsComputer",vsComputer);
@@ -630,9 +1222,14 @@ public class PlayActivity extends AppCompatActivity {
                 else{
                     two_player_frameLayout.setVisibility(View.GONE);
                     Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
-                    intent.putExtra("noOfPlayers",noOfPlayers);
-                    intent.putExtra("color",color);
-                    intent.putExtra("vsComputer",vsComputer);
+                    String[] player_names = new String[2];
+                    player_names[0] = player1_name;
+                    player_names[1] = player2_name;
+                    int[] player_types = new int[]{PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.HUMAN)};
+                    intent.putExtra(PLAYERS_KEY,noOfPlayers);
+                    intent.putExtra(COLORS_KEY,colors_array);
+                    intent.putExtra(PLAYERS_TYPE_KEY, player_types);
+                    intent.putExtra(NAMES_KEY,player_names);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     overridePendingTransition(R.anim.goup, R.anim.godown);
@@ -665,7 +1262,6 @@ public class PlayActivity extends AppCompatActivity {
 
 
     void setColor(){
-
         two_players_leftPress1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -673,14 +1269,14 @@ public class PlayActivity extends AppCompatActivity {
                     two_players_pawn1.setImageResource(R.drawable.select_your_color_blue_pawn);
                     two_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
                     checkPawn = 1;
-                    color = 3;
+                    colors_array = new int[]{Color.getInt(Color.BLUE), Color.getInt(Color.GREEN)};
                 }
                 else if(checkPawn == 1) {
                     two_players_pawn1.setImageResource(R.drawable.select_your_color_red_pawn);
                     two_players_pawn2.setImageResource(R.drawable.select_your_color_yellow_pawn);
                     checkPawn = 0;
                     checkPawn = 0;
-                    color = 1;
+                    colors_array = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
                 }
             }
         });
@@ -691,14 +1287,14 @@ public class PlayActivity extends AppCompatActivity {
                     two_players_pawn1.setImageResource(R.drawable.select_your_color_blue_pawn);
                     two_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
                     checkPawn = 1;
-                    color = 3;
+                    colors_array = new int[]{Color.getInt(Color.BLUE), Color.getInt(Color.GREEN)};
                 }
                 else if(checkPawn == 1) {
                     two_players_pawn1.setImageResource(R.drawable.select_your_color_red_pawn);
                     two_players_pawn2.setImageResource(R.drawable.select_your_color_yellow_pawn);
                     checkPawn = 0;
                     checkPawn = 0;
-                    color = 1;
+                    colors_array = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
                 }
             }
         });
@@ -708,13 +1304,13 @@ public class PlayActivity extends AppCompatActivity {
                 if(checkPawn == 0) {
                     two_players_pawn1.setImageResource(R.drawable.select_your_color_blue_pawn);
                     two_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
-                    color = 3;
+                    colors_array = new int[]{Color.getInt(Color.BLUE), Color.getInt(Color.GREEN)};
                     checkPawn = 1;
                 }
                 else if(checkPawn == 1) {
                     two_players_pawn1.setImageResource(R.drawable.select_your_color_red_pawn);
                     two_players_pawn2.setImageResource(R.drawable.select_your_color_yellow_pawn);
-                    color = 1;
+                    colors_array = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
                     checkPawn = 0;
                 }
             }
@@ -725,13 +1321,13 @@ public class PlayActivity extends AppCompatActivity {
                 if(checkPawn == 0) {
                     two_players_pawn1.setImageResource(R.drawable.select_your_color_blue_pawn);
                     two_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
-                    color = 3;
+                    colors_array = new int[]{Color.getInt(Color.BLUE), Color.getInt(Color.GREEN)};
                     checkPawn = 1;
                 }
                 else if(checkPawn == 1) {
                     two_players_pawn1.setImageResource(R.drawable.select_your_color_red_pawn);
                     two_players_pawn2.setImageResource(R.drawable.select_your_color_yellow_pawn);
-                    color = 1;
+                    colors_array = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
                     checkPawn = 0;
                 }
             }
