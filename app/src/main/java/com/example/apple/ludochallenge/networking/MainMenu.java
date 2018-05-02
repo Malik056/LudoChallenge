@@ -16,6 +16,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -36,6 +38,8 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -47,6 +51,7 @@ import com.sdsmdg.tastytoast.TastyToast;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainMenu extends AppCompatActivity implements RewardedVideoAdListener {
 
@@ -110,6 +115,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
     private ImageView mainMenu_SAL;
     private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
     private static final String APP_ID = "ca-app-pub-3940256099942544~3347511713";
+    private String facebook_uid;
 
 
     final int REQUEST_CODE_GALLERY = 999;
@@ -124,6 +130,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
     String SAL_vsMultiplayer_WIN;
     String SAL_vsMultiplayer_LOSE;
     String coins;
+    String textResult = null;
     private  ArrayList<UserProgressData> userProgressData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -255,11 +262,9 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
 
 
         if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)){
-//            Toast.makeText(this, "FACEBOOK LOGGED IN!", Toast.LENGTH_SHORT).show();
-//            facebook_display_name = mCurrentUser.getDisplayName();
-//            facebook_photo_Uri = mCurrentUser.getPhotoUrl();
+            Intent intent = getIntent();
+            facebook_uid = intent.getStringExtra("facebook_uid");
             MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
-
             facebook_display_name = (String) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_USER, MySQLDatabase.FACEBOOK_USER_TABLE);
             facebook_country_name = (String) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_FLAG, MySQLDatabase.FACEBOOK_USER_TABLE);
             facebook_photo_byte_array = (byte[]) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.FACEBOOK_USER_TABLE);
@@ -276,9 +281,6 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
             flagPic.setImageBitmap(bitmap1);
             edit_profile_flagImage.setImageBitmap(bitmap1);
             edit_profile.setVisibility(View.GONE);
-            bitmap = null;
-            bitmap1 = null;
-
         }
 
     if(LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_LUDOCHALLENGE)) {
@@ -327,6 +329,17 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         getSettingsUsername = intent.getStringExtra("userName_toMain");
 
 
+
+        mainMenu_SAL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), PlayActivitySAL.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                overridePendingTransition(R.anim.goup, R.anim.godown);
+                finish();
+            }
+        });
 
 
 
@@ -527,6 +540,7 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("facebook_uid", facebook_uid);
                 startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
             }
@@ -680,6 +694,8 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         spin.setEnabled(true);
         mainMenu_SAL.setEnabled(true);
     }
+
+
 
     @Override
     public void onBackPressed() {

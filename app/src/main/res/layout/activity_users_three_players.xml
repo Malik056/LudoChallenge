@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".networking.UsersActivity"
+    android:background="@drawable/drop_down_menu_background"
+    android:id="@+id/usersActivityRoot">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.6"
+                android:gravity="center"
+                android:weightSum="1"
+                android:orientation="horizontal">
+                <android.support.v7.widget.RecyclerView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.85"
+                    android:id="@+id/users_recyclerlist"/>
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:weightSum="1"
+                android:layout_weight="0.1"
+                android:orientation="horizontal">
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:id="@+id/challenge_btn"
+                android:tag="challenge"
+                android:src="@drawable/recycler_view_challenge"
+                android:layout_weight="0.4"/>
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.02"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_weight="0.2"
+                android:weightSum="1"
+                android:visibility="visible"
+                android:id="@+id/ll_player2"
+                android:orientation="vertical">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.75"
+                    android:id="@+id/second_player"
+                    app:civ_border_width="4dp"
+                    app:civ_border_color="#D9BE75"
+                    android:visibility="visible"
+                    android:src="@drawable/default_pic"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:textStyle="bold"
+                    android:layout_weight="0.25"
+                    android:textAlignment="center"
+                    android:id="@+id/player2_name"
+                    android:gravity="center"
+                    android:text="Player 2"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.05"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_weight="0.2"
+                android:weightSum="1"
+                android:visibility="visible"
+                android:id="@+id/ll_player3"
+                android:orientation="vertical">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.75"
+                    android:id="@+id/third_player"
+                    app:civ_border_width="4dp"
+                    app:civ_border_color="#D9BE75"
+                    android:visibility="visible"
+                    android:src="@drawable/default_pic"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:textStyle="bold"
+                    android:layout_weight="0.25"
+                    android:textAlignment="center"
+                    android:id="@+id/player3_name"
+                    android:gravity="center"
+                    android:text="Player 2"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.05"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_weight="0.2"
+                android:weightSum="1"
+                android:visibility="visible"
+                android:id="@+id/ll_player4"
+                android:orientation="vertical">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.75"
+                    android:id="@+id/fourth_player"
+                    app:civ_border_width="4dp"
+                    app:civ_border_color="#D9BE75"
+                    android:visibility="visible"
+                    android:src="@drawable/default_pic"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:textStyle="bold"
+                    android:layout_weight="0.25"
+                    android:textAlignment="center"
+                    android:id="@+id/player4_name"
+                    android:gravity="center"
+                    android:text="Player 2"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+
+</FrameLayout>

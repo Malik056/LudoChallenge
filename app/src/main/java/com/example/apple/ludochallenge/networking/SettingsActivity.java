@@ -91,6 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
     String editProfileDialog_toSetting = "0";
     String download_url;
     String thumb_downloadUrl;
+    private String online_multiplayer = "false";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -241,12 +242,14 @@ public class SettingsActivity extends AppCompatActivity {
                 loadingBar.setMessage("Please wait, while we are creating your account");
                 loadingBar.setCanceledOnTouchOutside(false);
                 loadingBar.show();
+                String deviceToken = FirebaseInstanceId.getInstance().getToken();
                 HashMap<String, String> userMap = new HashMap<>();
                 userMap.put("name", edit_profileUserName.getText().toString());
                 userMap.put("image", download_url);
                 userMap.put("thumb_image", thumb_downloadUrl);
                 userMap.put("flag_image", String.valueOf(edit_profile_flagImage));
                 userMap.put("country", clickedCountryName);
+                userMap.put("device_token", deviceToken);
                 FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
                 String uid = current_user.getUid();
                 mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
@@ -255,23 +258,32 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            storeFlag_into_Storage();
-                            Intent intent = new Intent(getApplicationContext(), MainMenu.class);
-                            intent.putExtra("settings_activity_to_main", "0");
-                            intent.putExtra("country_name_toMain", countryName_toMain);
-                            intent.putExtra("userName_toMain",    userNamefromPreviousActivity_register);
+                            HashMap<String, String> userMap = new HashMap<>();
+                            userMap.put("still_searching","false");
+                            userMap.put("game_started","false");
+                            userMap.put("noOfPlayers","0");
+                            userMap.put("entry_coins","0");
+                            mDatabase.child("Online_Multiplayer").setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    storeFlag_into_Storage();
+                                    Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                                    intent.putExtra("settings_activity_to_main", "0");
+                                    intent.putExtra("country_name_toMain", countryName_toMain);
+                                    intent.putExtra("userName_toMain",    userNamefromPreviousActivity_register);
 
 
-                            Bitmap bmp = ((BitmapDrawable) edit_profile_profileImage.getDrawable()).getBitmap();
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            bmp.compress(Bitmap.CompressFormat.PNG, 50, stream);
-                            byte[] byteArray = stream.toByteArray();
+                                    Bitmap bmp = ((BitmapDrawable) edit_profile_profileImage.getDrawable()).getBitmap();
+                                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                    bmp.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                                    byte[] byteArray = stream.toByteArray();
 
-                            intent.putExtra("profileImage_toMain", byteArray);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
-                            bmp = null;
+                                    intent.putExtra("profileImage_toMain", byteArray);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            });
                         } else {
                             TastyToast.makeText(getApplicationContext(),"Error updating your profile!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                         }

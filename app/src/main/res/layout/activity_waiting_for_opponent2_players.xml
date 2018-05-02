@@ -150,6 +150,7 @@
                     android:gravity="center"
                     android:textColor="#ff4"
                     android:textStyle="bold"
+                    android:id="@+id/yourName"
                     android:src="@drawable/random_player_border"/>
             </LinearLayout>
 

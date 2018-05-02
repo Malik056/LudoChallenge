@@ -1,68 +1,78 @@
  package com.example.apple.ludochallenge.networking;
 
+ import android.app.Activity;
  import android.app.ProgressDialog;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
+ import android.content.ContentResolver;
+ import android.content.Intent;
+ import android.graphics.Bitmap;
+ import android.graphics.BitmapFactory;
+ import android.graphics.drawable.BitmapDrawable;
+ import android.graphics.drawable.Drawable;
+ import android.media.MediaCas;
+ import android.net.Uri;
+ import android.os.Bundle;
+ import android.service.textservice.SpellCheckerService;
+ import android.support.annotation.NonNull;
+ import android.support.v7.app.AppCompatActivity;
+ import android.text.TextUtils;
+ import android.util.DisplayMetrics;
+ import android.util.Log;
+ import android.view.View;
+ import android.view.ViewGroup;
+ import android.widget.AdapterView;
+ import android.widget.Button;
+ import android.widget.ImageView;
+ import android.widget.Spinner;
+ import android.widget.TextView;
+ import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
-import com.example.apple.ludochallenge.R;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphRequestAsyncTask;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.sdsmdg.tastytoast.TastyToast;
-import com.squareup.picasso.Picasso;
-import com.theartofdev.edmodo.cropper.CropImage;
+ import com.bumptech.glide.Glide;
+ import com.bumptech.glide.load.engine.DiskCacheStrategy;
+ import com.bumptech.glide.request.RequestOptions;
+ import com.example.apple.ludochallenge.R;
+ import com.facebook.AccessToken;
+ import com.facebook.CallbackManager;
+ import com.facebook.FacebookCallback;
+ import com.facebook.FacebookException;
+ import com.facebook.GraphRequest;
+ import com.facebook.GraphRequestAsyncTask;
+ import com.facebook.GraphResponse;
+ import com.facebook.HttpMethod;
+ import com.facebook.login.LoginManager;
+ import com.facebook.login.LoginResult;
+ import com.google.android.gms.tasks.OnCompleteListener;
+ import com.google.android.gms.tasks.OnSuccessListener;
+ import com.google.android.gms.tasks.Task;
+ import com.google.firebase.auth.AuthCredential;
+ import com.google.firebase.auth.AuthResult;
+ import com.google.firebase.auth.FacebookAuthProvider;
+ import com.google.firebase.auth.FirebaseAuth;
+ import com.google.firebase.auth.FirebaseUser;
+ import com.google.firebase.database.DatabaseReference;
+ import com.google.firebase.database.FirebaseDatabase;
+ import com.google.firebase.iid.FirebaseInstanceId;
+ import com.google.firebase.storage.FirebaseStorage;
+ import com.google.firebase.storage.StorageReference;
+ import com.google.firebase.storage.UploadTask;
+ import com.sdsmdg.tastytoast.TastyToast;
+ import com.squareup.picasso.Picasso;
+ import com.theartofdev.edmodo.cropper.CropImage;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+ import org.json.JSONArray;
+ import org.json.JSONException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+ import java.io.ByteArrayOutputStream;
+ import java.io.File;
+ import java.io.FileNotFoundException;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.lang.reflect.Field;
+ import java.net.MalformedURLException;
+ import java.net.URL;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.HashMap;
+ import java.util.Map;
 
  public class RegisterActivity extends AppCompatActivity {
 
@@ -162,7 +172,6 @@ import java.util.Map;
                 LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(final LoginResult loginResult) {
-
                         handleFacebookAccessToken(loginResult.getAccessToken());
 
                         GraphRequestAsyncTask graphRequestAsyncTask = new GraphRequest(
@@ -400,6 +409,7 @@ import java.util.Map;
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_COMPUTER, "0","0", "500");
                  mySQLDatabase.insertGameProgressData(email,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
                  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                 intent.putExtra("facebook_uid", facebook_uid);
                  startActivity(intent);
                  overridePendingTransition(R.anim.goup, R.anim.godown);
                  loadingBar.dismiss();
@@ -423,16 +433,28 @@ import java.util.Map;
                               name = task.getResult().getUser().getDisplayName();
                               email =task.getResult().getUser().getEmail();
                               photoUrl = task.getResult().getUser().getPhotoUrl();
+                              facebook_uid = task.getResult().getUser().getUid();
                               MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
                               mySQLDatabase.setCurrentSession(email, MySQLDatabase.LOGIN_STATUS_FACEBOOK);
                               Log.d(TAG, "signInWithCredential:success");
-                             updateUI();
-                             facebookLogin.setEnabled(true);
+                              DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(facebook_uid);
+                              HashMap<String, String> userMap = new HashMap<>();
+                              userMap.put("still_searching","false");
+                              userMap.put("game_started","false");
+                              userMap.put("noOfPlayers","0");
+                              userMap.put("entry_coins","0");
+                              databaseReference.child("Online_Multiplayer").setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                  @Override
+                                  public void onComplete(@NonNull Task<Void> task) {
+                                      updateUI();
+                                  }});
+                              facebookLogin.setEnabled(true);
                          } else {
                              TastyToast.makeText(getApplicationContext(),"Authentication Failed!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
                              loadingBar.dismiss();
                          }
 
+                         // ...
                      }
                  });
      }
@@ -813,6 +835,8 @@ import java.util.Map;
 
          return bitmap;
      }
+
+
 
      @Override
      public void onDestroy() {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -226,21 +227,21 @@ public class LudoActivity extends AppCompatActivity {
                         public void run() {
                             ImageView[] imageViews = new ImageView[]{((ImageView) view[0].findViewById(R.id.player1_pic)), ((ImageView) view[0].findViewById(R.id.player2_pic)), ((ImageView) view[0].findViewById(R.id.player3_pic)), ((ImageView) view[0].findViewById(R.id.player4_pic))};
                             byte[] player1Pic = (byte[]) MySQLDatabase.getInstance(getApplicationContext()).getData(mCurrentUser.getUid(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
-                            Bitmap player1Bitmap = BitmapFactory.decodeByteArray(player1Pic, 0, player1Pic.length);
+                            Bitmap player1Bitmap = player1Pic != null ? BitmapFactory.decodeByteArray(player1Pic, 0, player1Pic.length) : ((BitmapDrawable)imageViews[0].getDrawable()).getBitmap();
                             for (int i = 0; i < players; i++) {
                                 if (i == 0) {
                                     imageViews[i].setImageBitmap(player1Bitmap);
                                 } else if (i == 1) {
                                     byte[] player2Pic = intent.getByteArrayExtra("player2Pic");
-                                    Bitmap player2Bitmap = BitmapFactory.decodeByteArray(player2Pic, 0, player2Pic.length);
+                                    Bitmap player2Bitmap = player2Pic != null ? BitmapFactory.decodeByteArray(player2Pic, 0, player2Pic.length) : ((BitmapDrawable)imageViews[i].getDrawable()).getBitmap();
                                     imageViews[i].setImageBitmap(player2Bitmap);
                                 } else if (i == 2) {
                                     byte[] player3Pic = intent.getByteArrayExtra("player3Pic");
-                                    Bitmap player3Bitmap = BitmapFactory.decodeByteArray(player3Pic, 0, player3Pic.length);
+                                    Bitmap player3Bitmap = player3Pic != null ? BitmapFactory.decodeByteArray(player3Pic, 0, player3Pic.length) : ((BitmapDrawable)imageViews[i].getDrawable()).getBitmap();
                                     imageViews[i].setImageBitmap(player3Bitmap);
                                 } else {
                                     byte[] player3Pic = intent.getByteArrayExtra("player4Pic");
-                                    Bitmap player3Bitmap = BitmapFactory.decodeByteArray(player3Pic, 0, player3Pic.length);
+                                    Bitmap player3Bitmap = player3Pic != null ? BitmapFactory.decodeByteArray(player3Pic, 0, player3Pic.length) : ((BitmapDrawable)imageViews[i].getDrawable()).getBitmap();
                                     imageViews[i].setImageBitmap(player3Bitmap);
                                 }
                             }

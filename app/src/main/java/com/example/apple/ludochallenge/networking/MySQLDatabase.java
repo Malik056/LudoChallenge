@@ -94,7 +94,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
                 LOSES_COL + " VARCHAR, " +
                 COINS_COL + " VARCHAR "+
                 ")");
-        queuryData("CREATE TABLE IF NOT EXISTS " + USER_PROGRESS_TABLE + "(" +
+        queuryData("CREATE TABLE IF NOT EXISTS " + DATE_TABLE + "(" +
                 USER_ID + " VARCHAR PRIMARY KEY, " +
                 SPIN_DATE_COL + " VARCHAR )" );
 
@@ -199,7 +199,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    public void incrementCoin(String ID, int byNum)
+    public void incrementCoin(String ID, String byNum)
     {
         SQLiteDatabase database = getReadableDatabase();
 
@@ -214,9 +214,13 @@ public class MySQLDatabase extends SQLiteOpenHelper {
                 );
 
         SQLiteDatabase database1 = getWritableDatabase();
-        if(cursor.moveToNext()) {
+        if(cursor.moveToFirst()) {
+            String coins = cursor.getString(1);
+            int int_coins = Integer.parseInt(coins);
+            int int_byNum = Integer.parseInt(byNum);
+            int final_coins = int_byNum + int_coins;
             ContentValues contentValues = new ContentValues();
-            contentValues.put(COINS_COL, byNum);
+            contentValues.put(COINS_COL, ""+final_coins);
             database1.update(USER_PROGRESS_TABLE, contentValues, USER_ID + "=?", new String[]{ID});
         }
 

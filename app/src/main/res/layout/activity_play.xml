@@ -183,6 +183,7 @@
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:id="@+id/online_multiplayer_btn"
                         android:background="@drawable/online_multiplayer"
                         android:layout_weight="0.5"/>
 
@@ -518,6 +519,157 @@
 
                 <ImageView
                     android:id="@+id/select_no_of_players_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.1"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/back"
+                    android:scaleType="center" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/play_slectNoOfPlayers_online_multiplayer_dialogBox"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.8"
+            android:background="#000000" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.8"
+                    android:src="@drawable/sal_dialog_color_selcet_2players" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.7"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.01" />
+
+                <LinearLayout
+                    android:id="@+id/online_multiplayer_two_players"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.10"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.15"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/dice_gif0" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.05" />
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:src="@drawable/two_players_text" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.07" />
+
+                <LinearLayout
+                    android:id="@+id/online_multiplayer_four_players"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.10"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.15"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/dice_gif0" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.05" />
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.35"
+                        android:src="@drawable/four_players_text" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.15"
+                android:orientation="vertical"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.78" />
+
+                <ImageView
+                    android:id="@+id/online_multiplyer_dialog_back"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.1"
@@ -2200,7 +2352,6 @@
                     android:layout_weight="0.01" />
 
                 <LinearLayout
-                    android:id="@+id/two_players_playWithFriends"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.10"
@@ -2222,6 +2373,7 @@
 
                     <ImageView
                         android:layout_width="0dp"
+                        android:id="@+id/two_players_playWithFriends"
                         android:layout_height="match_parent"
                         android:layout_weight="0.35"
                         android:src="@drawable/two_players_text" />
@@ -2233,7 +2385,6 @@
                     android:layout_weight="0.07" />
 
                 <LinearLayout
-                    android:id="@+id/three_players_playWithFriends"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.10"
@@ -2255,6 +2406,7 @@
 
                     <ImageView
                         android:layout_width="0dp"
+                        android:id="@+id/three_players_playWithFriends"
                         android:layout_height="match_parent"
                         android:layout_weight="0.35"
                         android:src="@drawable/three_players_text" />
@@ -2267,7 +2419,6 @@
                     android:layout_weight="0.07" />
 
                 <LinearLayout
-                    android:id="@+id/four_players_playWithFriends"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.10"
@@ -2289,6 +2440,7 @@
 
                     <ImageView
                         android:layout_width="0dp"
+                        android:id="@+id/four_players_playWithFriends"
                         android:layout_height="match_parent"
                         android:layout_weight="0.35"
                         android:src="@drawable/four_players_text" />
@@ -2327,6 +2479,515 @@
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/online_multiplayer_coins_2players_dialog"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:alpha="0.8"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_weight="0.6"
+                android:weightSum="1">
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.9"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/online_multiplayer_coins_dialog"/>
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="0.7"
+                android:weightSum="1">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.06"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:weightSum="1"
+                    android:layout_weight="0.21"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn1"
+                        android:src="@drawable/online_multiplayer_2players_cost100_win200"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn2"
+                        android:src="@drawable/online_multiplayer_2players_cost500_win1k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn3"
+                        android:src="@drawable/online_multiplayer_2players_cost5k_win10k"/>
+                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.01"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:weightSum="1"
+                    android:gravity="center"
+                    android:layout_weight="0.21"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn4"
+                        android:src="@drawable/online_multiplayer_2players_cost25k_win50k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn5"
+                        android:src="@drawable/online_multiplayer_2players_cost50k_win100k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn6"
+                        android:src="@drawable/online_multiplayer_2players_cost100k_win200k"/>
+
+                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.01"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:weightSum="1"
+                    android:gravity="center"
+                    android:layout_weight="0.21"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn7"
+                        android:src="@drawable/online_multiplayer_2players_cost250k_win500k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn8"
+                        android:src="@drawable/online_multiplayer_2players_cost500k_win1000k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_2players_btn9"
+                        android:src="@drawable/online_multiplayer_2players_cost750k_win2000k"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.18"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:layout_weight="0.1">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.76"/>
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/back"
+                    android:id="@+id/online_multiplayer_2Players_back"
+                    android:layout_weight="0.2"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/online_multiplayer_coins_4players_dialog"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:alpha="0.8"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_weight="0.6"
+                android:weightSum="1">
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.9"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/online_multiplayer_coins_dialog"/>
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="0.7"
+                android:weightSum="1">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.06"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:weightSum="1"
+                    android:layout_weight="0.21"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn1"
+                        android:src="@drawable/online_multiplyaer_4players_cost100_win400"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn2"
+                        android:src="@drawable/online_multiplayer_4players_cost500_win2k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn3"
+                        android:src="@drawable/online_multiplayer_4players_cost5k_win20k"/>
+                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.01"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:weightSum="1"
+                    android:gravity="center"
+                    android:layout_weight="0.21"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn4"
+                        android:src="@drawable/online_multiplayer_4players_cost25k_win100k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn5"
+                        android:src="@drawable/online_multiplayer_4players_cost50k_win200k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn6"
+                        android:src="@drawable/online_multiplayer_4players_cost100k_win400k"/>
+
+                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.01"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:weightSum="1"
+                    android:gravity="center"
+                    android:layout_weight="0.21"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn7"
+                        android:src="@drawable/online_multiplayer_4players_cost250k_win1000k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn8"
+                        android:src="@drawable/online_multiplayer_4players_cost500k_win2000k"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.02"/>
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.22"
+                        android:scaleType="fitXY"
+                        android:id="@+id/online_multiplayer_coins_4players_btn9"
+                        android:src="@drawable/online_multiplayer_4players_cost750k_win3000k"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.18"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:layout_weight="0.1">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.76"/>
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/back"
+                    android:id="@+id/online_multiplayer_4Players_back"
+                    android:layout_weight="0.2"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/online_multiplayer_not_enough_coins_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.8"
+            android:background="#000000" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.45"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:adjustViewBounds="true"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.9"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/not_enough_coins_to_play_int_this_room_dialog" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.42"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:weightSum="1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_weight="0.3">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.6"
+                    android:weightSum="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:id="@+id/online_multiplayer_play_another_room"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.3"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/online_multiplayer_play_another_room"/>
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:id="@+id/online_multiplayer_get_more_coins"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.3"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/online_multiplayer_get_moew_coins"/>
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+
+
+    </FrameLayout>
+
 
 
 
