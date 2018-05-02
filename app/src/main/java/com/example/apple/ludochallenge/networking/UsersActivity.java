@@ -1,13 +1,9 @@
 package com.example.apple.ludochallenge.networking;
 
-import android.animation.ValueAnimator;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-
-import com.example.apple.ludochallenge.Color;
-
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -17,16 +13,14 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.apple.ludochallenge.Color;
 import com.example.apple.ludochallenge.FacebookFriendAdapter;
 import com.example.apple.ludochallenge.LudoActivity;
-import com.example.apple.ludochallenge.LudoPiece;
 import com.example.apple.ludochallenge.PlayerType;
 import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.WaitingForOpponent2Players;
@@ -266,6 +260,10 @@ public class UsersActivity extends AppCompatActivity {
                                                                                     public void run() {
                                                                                         try {
                                                                                             bitmap[0] = Picasso.get().load(pic_url).get();
+                                                                                            if(bitmap[0] == null)
+                                                                                            {
+                                                                                                bitmap[0] = BitmapFactory.decodeResource(getResources(), R.drawable.default_pic2);
+                                                                                            }
                                                                                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                                                                                             bitmap[0].compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
 
@@ -276,7 +274,7 @@ public class UsersActivity extends AppCompatActivity {
                                                                                             String[] names = new String[]{myName, model.name};
                                                                                             int[] colors = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
                                                                                             int noOfPlayer = 2;
-                                                                                            int[] playerTypes = new int[]{PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.ONLINE)};
+                                                                                            int[] playerTypes = new int[]{PlayerType.getInt(PlayerType.ONLINE), PlayerType.getInt(PlayerType.ONLINE)};
                                                                                             String[] uids = new String[]{mCurrent_user.getUid(), user_id};
                                                                                             intent.putExtra(LudoActivity.NAMES_KEY, names);
                                                                                             intent.putExtra(LudoActivity.PLAYERS_KEY, noOfPlayer);

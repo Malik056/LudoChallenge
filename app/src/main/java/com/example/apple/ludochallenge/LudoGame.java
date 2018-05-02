@@ -3,16 +3,13 @@ package com.example.apple.ludochallenge;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -31,10 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
-
-import static com.example.apple.ludochallenge.SALGame.translateAnimation;
 
 /**
  * Created by Taha Malik on 4/18/2018.
@@ -46,9 +40,9 @@ public class LudoGame extends FrameLayout {
     int mBoxWidth;
     int pieceSize;
     boolean gameStarted = false;
-    boolean moved = true;
     ArrayList<LudoBox> boxes = new ArrayList<>();
-
+    boolean firstupdate = true;
+    int updateNum = 0;
     LudoBox[] oneP;
     LudoBox[] twoP;
     LudoBox[] threeP;
@@ -57,7 +51,6 @@ public class LudoGame extends FrameLayout {
     static boolean turnChange = true;
 
     Context context;
-    public boolean updatingUser = false;
     public int currentPlayer = 0;
     public DatabaseReference gameRef = null;
     int numberOfPlayers;
@@ -87,7 +80,6 @@ public class LudoGame extends FrameLayout {
         this.numberOfPlayers = numberOfPlayers;
         mArrows = arrows;
         this.dicePoints = dicePoints;
-        this.diceImage = diceImage;
         boardStart = y;
         pieceSize = mBoxWidth / 4;
         setY(y);
@@ -112,7 +104,6 @@ public class LudoGame extends FrameLayout {
         public void onClick(final View v) {
 
             int num = game.num;
-
             if (!((LudoPiece) v).open) {
                 ((LudoPiece) v).open = true;
                 num -= 5;
@@ -136,27 +127,49 @@ public class LudoGame extends FrameLayout {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+
+                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        gameRef.child("updateUI").setValue(currentPlayer).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                players.get(currentPlayer).move(finalNum, (LudoPiece) v);
-                                            }
-                                        });
+                                if(!task.isSuccessful())
+                                {
+                                    gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(this);
 
-                                    }
-                                });
+                                }
                             }
-                        });
+                        };
+                        OnCompleteListener<Void> onCompleteListener1 = new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(!task.isSuccessful())
+                                {
+                                    gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(this);
+                                }
+                            }
+                        };
+                        OnCompleteListener<Void> onCompleteListener2 = new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(!task.isSuccessful())
+                                {
+                                    gameRef.child("updateUI").setValue(updateNum++%26).addOnCompleteListener(this);
+                                }
+                            }
+                        };
+
+
+                        gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(onCompleteListener);
+                        gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(onCompleteListener1);
+                        gameRef.child("updateUI").setValue(updateNum++%26).addOnCompleteListener(onCompleteListener2);
+
+                        players.get(currentPlayer).move(finalNum, (LudoPiece) v);
                     }
                 });
                 thread.start();
             }
+            else
+                players.get(currentPlayer).move(num, (LudoPiece)v);
         }
     };
 
@@ -165,294 +178,158 @@ public class LudoGame extends FrameLayout {
     private OnClickListener getDiceClickListener()
     {
         OnClickListener diceClickListener = new OnClickListener() {
+
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
 
                 diceImage.setEnabled(false);
-                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
-                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
-                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
-                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
-                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
-                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
-
                 mArrows[currentPlayer].setVisibility(INVISIBLE);
                 mArrows[currentPlayer].setAnimation(null);
 
-                ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1f);
-                valueAnimator.setDuration(150);
-                final int value = 9;
-                valueAnimator.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width + boxSize), (int)(dice1.getLayoutParams().height + boxSize)));
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width - boxSize), (int)(dice1.getLayoutParams().height - boxSize)));
-
-
-                        ValueAnimator animator1 = ValueAnimator.ofFloat(0f, 1f);
-                        animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                if ((diceImage.getLayoutParams().width - value >= width / 10))
-                                    diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width - value), (diceImage.getLayoutParams().height - value)));
-                            }
-                        });
-
-                        animator1.setDuration(150);
-                        animator1.start();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-                    }
-                });
-                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width + value), (diceImage.getLayoutParams().height + value)));
-                    }
-                });
-                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
-                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
-                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
-                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
-                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
-                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
-                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
-                int num;
-                final View v1 = v;
-                if(players.get(currentPlayer).type != PlayerType.ONLINE)
-                {
-                    Random random = new Random();
-                    num = Integer.parseInt(textView.getText().toString()) == 0 ? random.nextInt(6) : Integer.parseInt(textView.getText().toString()) - 1;
-                    num++;
-                    game.num = num;
-                }
-                else
-                {
-                    num = game.num;
-                }
-                Glide.with(context).asGif()
-                        .load(R.raw.dice_gif)
-                        .into((ImageView) v);
-                valueAnimator.start();
-
-                final int finalNum = num;
-                final int finalNum1 = num;
-                postDelayed(new Runnable() {
+                Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
 
-//                        Handler handler = new Handler(context.getMainLooper());
+                        Runnable runnable1 = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (gameRef != null) {
+                                    final OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task task) {
+                                            if(!task.isSuccessful())
+                                            {
+                                                gameRef.child("updated").setValue(false).addOnCompleteListener(this);
+                                            }
+                                        }
+                                    };
+
+                                    gameRef.child("updated").setValue(false).addOnCompleteListener(onCompleteListener);
+
+                                    synchronized (this) {
+                                        this.notify();
+                                    }
+                                }
+                            }
+                        };
+                        synchronized (runnable1)
+                        {
+                            new Thread(runnable1).start();
+                            try {
+                                runnable1.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         Runnable runnable = new Runnable() {
                             @Override
                             public void run() {
-                                if (finalNum < 6)
-                                    ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (finalNum + 1), "drawable", getContext().getPackageName())));
-                                else {
-                                    ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
-                                    Toast.makeText(context, "dice Value is" + (finalNum + 1), Toast.LENGTH_SHORT).show();
+                                int num;
+
+                                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+                                //DICE ANIMATION START///////////////DICE ANIMATION START////////////////DICE ANIMATION START////////////////////
+
+                                ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1f);
+                                valueAnimator.setDuration(150);
+                                final int value = 9;
+                                valueAnimator.addListener(new Animator.AnimatorListener() {
+                                    @Override
+                                    public void onAnimationStart(Animator animator) {
+//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width + boxSize), (int)(dice1.getLayoutParams().height + boxSize)));
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(Animator animator) {
+//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width - boxSize), (int)(dice1.getLayoutParams().height - boxSize)));
+
+
+                                        ValueAnimator animator1 = ValueAnimator.ofFloat(0f, 1f);
+                                        animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                            @Override
+                                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                                if ((diceImage.getLayoutParams().width - value >= width / 10))
+                                                    diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width - value), (diceImage.getLayoutParams().height - value)));
+                                            }
+                                        });
+
+                                        animator1.setDuration(150);
+                                        animator1.start();
+                                    }
+
+                                    @Override
+                                    public void onAnimationCancel(Animator animator) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationRepeat(Animator animator) {
+
+                                    }
+                                });
+                                valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                    @Override
+                                    public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                        diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width + value), (diceImage.getLayoutParams().height + value)));
+                                    }
+                                });
+                                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                                //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
+                                final View v1 = v;
+
+                                if (players.get(currentPlayer).type != PlayerType.ONLINE) {
+                                    Random random = new Random();
+                                    num = Integer.parseInt(textView.getText().toString()) == 0 ? random.nextInt(6) : Integer.parseInt(textView.getText().toString()) - 1;
+                                    num++;
+                                    game.num = num;
+                                } else {
+                                    num = game.num;
                                 }
-                                if (finalNum1 == 6) turnChange = false;
-                                makeMove(finalNum1);
+
+                                Glide.with(context).asGif()
+                                        .load(R.raw.dice_gif)
+                                        .into((ImageView) v);
+                                valueAnimator.start();
+
+                                final int finalNum = num;
+                                final int finalNum1 = num;
+
+                                postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (finalNum <= 6)
+                                            ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (finalNum), "drawable", getContext().getPackageName())));
+                                        else {
+                                            ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
+                                            Toast.makeText(context, "dice Value is" + (finalNum + 1), Toast.LENGTH_SHORT).show();
+                                        }
+                                        if (finalNum1 == 6) turnChange = false;
+                                        makeMove(finalNum1);
+                                    }
+                                }, 1000);
+
                             }
                         };
-                        ((Activity)context).runOnUiThread(runnable);
+                        ((Activity) context).runOnUiThread(runnable);
                     }
-                }, 1000);
+                });
+                thread.start();
             }
         };
+
+
 
         return diceClickListener;
     }
 
-
-    private OnClickListener getDiceClickListener1() {
-        OnClickListener diceClickListener = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (players.get(currentPlayer).type != PlayerType.ONLINE) {
-                    diceImage.setEnabled(false);
-                    mArrows[currentPlayer].setVisibility(INVISIBLE);
-                    mArrows[currentPlayer].setAnimation(null);
-                    ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1f);
-                    valueAnimator.setDuration(150);
-                    final int value = 9;
-                    valueAnimator.addListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animator) {
-//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width + boxSize), (int)(dice1.getLayoutParams().height + boxSize)));
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animator) {
-//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width - boxSize), (int)(dice1.getLayoutParams().height - boxSize)));
-
-
-                            ValueAnimator animator1 = ValueAnimator.ofFloat(0f, 1f);
-                            animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                    if ((diceImage.getLayoutParams().width - value >= width / 10))
-                                        diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width - value), (diceImage.getLayoutParams().height - value)));
-                                }
-                            });
-
-                            animator1.setDuration(150);
-                            animator1.start();
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animator) {
-
-                        }
-                    });
-                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width + value), (diceImage.getLayoutParams().height + value)));
-                        }
-                    });
-
-                    Random random = new Random();
-                    final View v1 = v;
-                    final int num = Integer.parseInt(textView.getText().toString()) == 0 ? random.nextInt(6) : Integer.parseInt(textView.getText().toString()) - 1;
-                    game.num = num + 1;
-                    Glide.with(context).asGif()
-                            .load(R.raw.dice_gif)
-                            .into((ImageView) v);
-                    valueAnimator.start();
-
-                    postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            if (num < 6)
-                                ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (num + 1), "drawable", getContext().getPackageName())));
-                            else {
-                                ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
-                                Toast.makeText(context, "dice Value is" + (num + 1), Toast.LENGTH_SHORT).show();
-                            }
-//                            Handler handler = new Handler(game.context.getMainLooper());
-                            ((Activity)context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (num == 5) turnChange = false;
-                                    makeMove(num + 1);
-//                                diceImage.setX(dicePoints[currentPlayer].x);
-//                                diceImage.setY(dicePoints[currentPlayer].y);
-//                                diceImage.setEnabled(true);
-////                                arrows[(currentPlayer+numberOfPlayers-1)%numberOfPlayers].setAnimation(null);
-////                                arrows[(currentPlayer+numberOfPlayers-1)%numberOfPlayers].setVisibility(INVISIBLE);
-//                                arrows[currentPlayer].setVisibility(VISIBLE);
-//                                arrows[currentPlayer].setAnimation(translateAnimation);
-                                }
-                            });
-
-                        }
-                    }, 1000);
-
-                }
-                else
-                {
-                    diceImage.setEnabled(false);
-                    mArrows[currentPlayer].setVisibility(INVISIBLE);
-                    mArrows[currentPlayer].setAnimation(null);
-                    ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1f);
-                    valueAnimator.setDuration(150);
-                    final int value = 9;
-                    valueAnimator.addListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animator) {
-//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width + boxSize), (int)(dice1.getLayoutParams().height + boxSize)));
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animator) {
-//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width - boxSize), (int)(dice1.getLayoutParams().height - boxSize)));
-
-
-                            ValueAnimator animator1 = ValueAnimator.ofFloat(0f, 1f);
-                            animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                    if ((diceImage.getLayoutParams().width - value >= width / 10))
-                                        diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width - value), (diceImage.getLayoutParams().height - value)));
-                                }
-                            });
-
-                            animator1.setDuration(150);
-                            animator1.start();
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animator) {
-
-                        }
-                    });
-                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                            diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width + value), (diceImage.getLayoutParams().height + value)));
-                        }
-                    });
-
-                    final View v1 = v;
-                    final int num = game.num;
-                    Glide.with(context).asGif()
-                            .load(R.raw.dice_gif)
-                            .into((ImageView) v);
-                    valueAnimator.start();
-
-                    postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-
-//                            Handler handler = new Handler(game.context.getMainLooper());
-                            ((Activity)context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                            if (num < 6)
-                                ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (num), "drawable", getContext().getPackageName())));
-                            else {
-                                ((ImageView) v1).setImageDrawable(getResources().getDrawable(getResources().getIdentifier("dice_" + (6), "drawable", getContext().getPackageName())));
-                                Toast.makeText(context, "dice Value is" + (num), Toast.LENGTH_SHORT).show();
-                            }
-
-                                    if (num == 6) turnChange = false;
-                                        makeMove(num);
-                                }
-                            });
-
-                        }
-                    }, 1000);
-                }
-            }
-        };
-        return diceClickListener;
-
-    }
 
     public void start()
     {
@@ -462,35 +339,17 @@ public class LudoGame extends FrameLayout {
             @Override
             public void run() {
 
+
                 mArrows[currentPlayer].setVisibility(VISIBLE);
                 mArrows[currentPlayer].setAnimation(translateAnimation);
-                mArrows[0].setVisibility(INVISIBLE);
-
                 diceImage.setX(dicePoints[currentPlayer].x);
                 diceImage.setY(dicePoints[currentPlayer].y);
-
-                if(currentPlayer == 0)
-                {
-                    diceImage.setEnabled(true);
-                }
-                else diceImage.setEnabled(false);
-
-                synchronized (this)
-                {
-                    this.notify();
-                }
+                diceImage.setEnabled(true);
 
             }
         };
+        ((Activity)context).runOnUiThread(runnable);
 
-        synchronized (runnable) {
-            ((Activity)context).runOnUiThread(runnable);
-            try {
-                runnable.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public void startGame() {
@@ -503,19 +362,21 @@ public class LudoGame extends FrameLayout {
                 mArrows[currentPlayer].setAnimation(translateAnimation);
                 diceImage.setX(dicePoints[currentPlayer].x);
                 diceImage.setY(dicePoints[currentPlayer].y);
-                diceImage.setEnabled(false);
+                if(currentPlayer == 0)
+                {
+                    diceImage.setEnabled(true);
+                }
+                else diceImage.setEnabled(false);
                 addOnDataChangeListener();
             }
         };
 
         ((Activity) context).runOnUiThread(runnable1);
 
-
     }
 
     public void addOnDataChangeListener() {
-
-                gameRef.child("updateUI").addValueEventListener(new ValueEventListener() {
+        gameRef.child("updateUI").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (gameStarted) {
@@ -532,17 +393,17 @@ public class LudoGame extends FrameLayout {
                                             game.num = num;
                                             game.pieceIndex = pieceNum;
                                             diceImage.performClick();
-                                        } else {
-                                            diceImage.setX(dicePoints[currentPlayer].x);
-                                            diceImage.setY(dicePoints[currentPlayer].y);
-                                            mArrows[currentPlayer].setVisibility(VISIBLE);
-                                            mArrows[currentPlayer].setAnimation(translateAnimation);
-                                            diceImage.setEnabled(true);
                                         }
+//                                        else {
+//                                            diceImage.setX(dicePoints[currentPlayer].x);
+//                                            diceImage.setY(dicePoints[currentPlayer].y);
+//                                            mArrows[currentPlayer].setVisibility(VISIBLE);
+//                                            mArrows[currentPlayer].setAnimation(translateAnimation);
+//                                            diceImage.setEnabled(true);
+//                                        }
                                     }
                                     dataSnapshot.getRef().getParent().removeEventListener(this);
                                 }
-
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
 
@@ -559,8 +420,6 @@ public class LudoGame extends FrameLayout {
                                 diceImage.setEnabled(true);
                             }
                             else diceImage.setEnabled(false);
-
-//                            diceImage.setEnabled(true);
                             gameStarted = true;
                         }
                     }
@@ -570,6 +429,160 @@ public class LudoGame extends FrameLayout {
 
                     }
                 });
+
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                gameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                        final Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                boolean updated = false;
+
+                                for (int i = 0; i < numberOfPlayers; i++) {
+                                    updated = dataSnapshot.child(uids[i]).getValue(Boolean.class) != null && (boolean) dataSnapshot.child(uids[i]).getValue();
+                                }
+
+                                if (updated) {
+                                    final Runnable runnable = new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    gameRef.child("updated").setValue(true).addOnCompleteListener(this);
+                                                }
+                                            };
+
+                                            gameRef.child("updated").setValue(true).addOnCompleteListener(onCompleteListener);
+                                            this.notify();
+                                        }
+                                    };
+                                    synchronized (runnable) {
+                                        new Thread(runnable).start();
+                                        try {
+                                            runnable.wait();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                                }
+                            }
+                        });
+                        thread.start();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        for(int i = 0; i < numberOfPlayers; i++) {
+            gameRef.child(uids[i]).addValueEventListener(valueEventListener);
+        }
+        gameRef.child("updated").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!firstupdate) {
+                            if (!(boolean) dataSnapshot.getValue()) {
+                                gameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+                                        Thread thread1 = new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                for (int i = 0; i < numberOfPlayers; i++) {
+                                                    final int finalI = i;
+                                                    OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            dataSnapshot.getRef().child(uids[finalI]).setValue(false).addOnCompleteListener(this);
+                                                        }
+                                                    };
+                                                    dataSnapshot.getRef().child(uids[i]).setValue(false).addOnCompleteListener(onCompleteListener);
+                                                }
+                                            }
+                                        });
+                                        thread1.start();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            } else
+                                gameRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                                        String currentUID = (String) dataSnapshot.child("turn").getValue();
+
+                                        for (int i = 0; i < numberOfPlayers; i++) {
+                                            if (uids[i].equals(currentUID)) {
+                                                currentPlayer = i;
+                                            }
+                                        }
+
+                                        if ((((Long) dataSnapshot.child("dice_value").getValue())).intValue() != 6) {
+                                            currentPlayer++;
+                                            currentPlayer %= numberOfPlayers;
+                                        }
+
+                                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                                if (task.isSuccessful()) {
+                                                    mArrows[currentPlayer].setVisibility(VISIBLE);
+                                                    mArrows[currentPlayer].setAnimation(translateAnimation);
+                                                    diceImage.setX(dicePoints[currentPlayer].x);
+                                                    diceImage.setY(dicePoints[currentPlayer].y);
+                                                    if (currentPlayer == 0) {
+                                                        diceImage.setEnabled(true);
+                                                    } else diceImage.setEnabled(false);
+                                                } else {
+                                                    dataSnapshot.getRef().child("turn").setValue(uids[currentPlayer]).addOnCompleteListener(this);
+                                                }
+                                            }
+                                        };
+
+                                        dataSnapshot.getRef().child("turn").setValue(uids[currentPlayer]).addOnCompleteListener(onCompleteListener);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                        } else firstupdate = false;
+                    }
+                });
+                thread.start();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
     private void initializePieces(int numberOfPlayers, Color[] colors, PlayerType[] playerTypes) {
@@ -609,168 +622,212 @@ public class LudoGame extends FrameLayout {
         }
     }
 
-    private void makeMove(int num) {
+    private void makeMove(final int num) {
 
-        LudoPiece[] ludoPieces = players.get(currentPlayer).getmPiece();
-        int foundNum = 0;
-        LudoPiece temp = null;
-        boolean sameCordinates = true;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LudoPiece[] ludoPieces = players.get(currentPlayer).getmPiece();
+                int foundNum = 0;
+                LudoPiece temp = null;
+                boolean sameCoordinates = true;
+                if (players.get(currentPlayer).type == PlayerType.HUMAN) {
+                    for (LudoPiece l : ludoPieces) {
+                        if (l.isValid(num)) {
+                            foundNum++;
+                            l.setEnabled(true);
+                            l.setAnimation(alphaAnimation);
+                            ((ImageView) l.getTag()).setVisibility(VISIBLE);
+                            startRotation((ImageView) l.getTag());
 
-        if (players.get(currentPlayer).type == PlayerType.HUMAN) {
-            for (LudoPiece l : ludoPieces) {
-                if (l.isValid(num)) {
-                    foundNum++;
-                    l.setEnabled(true);
-                    l.setAnimation(alphaAnimation);
-                    ((ImageView) l.getTag()).setVisibility(VISIBLE);
-                    startRotation((ImageView) l.getTag());
-
-                    if (temp != null) {
-                        if (temp.mBox.mCenterPoint != l.mBox.mCenterPoint) {
-                            sameCordinates = false;
+                            if (temp != null) {
+                                if (temp.mBox.mCenterPoint != l.mBox.mCenterPoint) {
+                                    sameCoordinates = false;
+                                }
+                            }
+                            temp = l;
                         }
                     }
-                    temp = l;
-                }
-            }
-            if (foundNum == 1 || (sameCordinates && temp != null)) {
-                temp.performClick();
-            } else if (foundNum == 0) {
-                postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
+                    if (foundNum == 1 || (sameCoordinates && temp != null)) {
+                        temp.performClick();
+                    } else if (foundNum == 0) {
+                        postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                currentPlayer++;
+                                currentPlayer %= numberOfPlayers;
+                                getDiceImage().setX(dicePoints[currentPlayer].x);
+                                getDiceImage().setY(dicePoints[currentPlayer].y);
+                                getDiceImage().setEnabled(true);
+                                getmArrows()[currentPlayer].setVisibility(VISIBLE);
+                                getmArrows()[currentPlayer].setAnimation(translateAnimation);
+                                if (players.get(currentPlayer).type == PlayerType.CPU) {
+                                    getDiceImage().performClick();
+                                }
+                            }
+                        }, 1000);
+                    }
+                } else if (players.get(currentPlayer).type == PlayerType.CPU) {
 
-                        currentPlayer++;
-                        currentPlayer %= numberOfPlayers;
-                        getDiceImage().setX(dicePoints[currentPlayer].x);
-                        getDiceImage().setY(dicePoints[currentPlayer].y);
-                        getDiceImage().setEnabled(false);
-                        getmArrows()[currentPlayer].setVisibility(VISIBLE);
-                        getmArrows()[currentPlayer].setAnimation(translateAnimation);
+                    LudoPiece[] validPieces = new LudoPiece[4];
 
-                        if (players.get(currentPlayer).type == PlayerType.CPU) {
-                            getDiceImage().performClick();
-                        } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
-                            gameRef.child("dice_value").setValue(game.num);
-                            gameRef.child("piece_number").setValue(-1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    for (LudoPiece l : ludoPieces) {
+                        if (l.isValid(num)) {
+                            validPieces[foundNum] = l;
+                            foundNum++;
+                            l.setEnabled(true);
+                            l.setAnimation(alphaAnimation);
+                            ((ImageView) l.getTag()).setVisibility(VISIBLE);
+                            startRotation((ImageView) l.getTag());
+                            if (temp != null) {
+                                if (temp.mBox.mCenterPoint != l.mBox.mCenterPoint) {
+                                    sameCoordinates = false;
+                                }
+                            }
+                            temp = l;
+                        }
+                    }
+                    if (foundNum == 1 || (sameCoordinates && temp != null)) {
+                        temp.performClick();
+                    } else if (foundNum == 0) {
+                        postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                currentPlayer++;
+                                currentPlayer %= numberOfPlayers;
+                                getDiceImage().setX(dicePoints[currentPlayer].x);
+                                getDiceImage().setY(dicePoints[currentPlayer].y);
+                                getDiceImage().setEnabled(true);
+                                getmArrows()[currentPlayer].setVisibility(VISIBLE);
+                                getmArrows()[currentPlayer].setAnimation(translateAnimation);
+                                if (players.get(currentPlayer).type == PlayerType.CPU) {
+                                    getDiceImage().performClick();
+                                }
+                            }
+                        }, 1000);
+                    } else {
+                        LudoPiece piece;
+                        LudoPiece ludoPiece = validPieces[0];
+                        int currentLoss = currentLoss(ludoPiece);
+                        int moveLoss = moveProfit(ludoPiece);
+                        piece = ludoPiece;
+                        int min = moveLoss - currentLoss;
+                        for(int i = 1; i < validPieces.length; i++)
+                        {
+                            ludoPiece = validPieces[i];
+                            currentLoss = currentLoss(ludoPiece);
+                            moveLoss = moveProfit(ludoPiece);
+                            int max = moveLoss - currentLoss;
+                            if(max > min)
+                            {
+                                piece = ludoPiece;
+                                min = max;
+                            }
+                        }
+                        players.get(currentPlayer).move(num, piece);
+                    }
+                } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
+
+                    if(!FirebaseAuth.getInstance().getUid().equals(uids[currentPlayer])) {
+                        if (pieceIndex != -1) {
+                            LudoPiece piece = players.get(currentPlayer).getmPiece()[pieceIndex];
+                            players.get(currentPlayer).move(num, piece);
+                        } else {
+                            postDelayed(new Runnable() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    gameRef.child("updateUI").setValue(1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                public void run() {
+                                    Thread thread = new Thread(new Runnable() {
                                         @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            gameRef.child("turn").setValue(uids[(numberOfPlayers + (currentPlayer)) % numberOfPlayers]);
+                                        public void run() {
+                                            OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(!task.isSuccessful())
+                                                    {
+                                                        gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(this);
+                                                    }
+                                                }
+                                            };
+                                            gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
                                         }
                                     });
+                                    thread.start();
                                 }
-                            });
-
-                        }
-                        else {
-                            getDiceImage().setEnabled(true);
-                        }
-
-                    }
-                }, 1000);
-
-            }
-        } else if (players.get(currentPlayer).type == PlayerType.CPU) {
-//            Random random = new Random();
-//            int rand = random.nextInt()%4;
-//            LudoPiece piece = ludoPieces[rand < 0 ? rand*-1:rand];
-//
-//            while (!piece.isValid(num))
-//            {
-//                rand = random.nextInt()%4;
-//                piece = ludoPieces[rand < 0 ? rand*-1: rand];
-//            }
-            LudoPiece[] validPieces = new LudoPiece[4];
-            for (LudoPiece l : ludoPieces) {
-                if (l.isValid(num)) {
-                    validPieces[foundNum] = l;
-                    foundNum++;
-                    l.setEnabled(true);
-                    l.setAnimation(alphaAnimation);
-                    ((ImageView) l.getTag()).setVisibility(VISIBLE);
-                    startRotation((ImageView) l.getTag());
-                    if (temp != null) {
-                        if (temp.mBox.mCenterPoint != l.mBox.mCenterPoint) {
-                            sameCordinates = false;
+                            }, 1000);
                         }
                     }
-                    temp = l;
-                }
-            }
-            if (foundNum == 1 || (sameCordinates && temp != null)) {
-                temp.performClick();
-            } else if (foundNum == 0) {
-                postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        currentPlayer++;
-                        currentPlayer %= numberOfPlayers;
-                        getDiceImage().setX(dicePoints[currentPlayer].x);
-                        getDiceImage().setY(dicePoints[currentPlayer].y);
-                        getDiceImage().setEnabled(true);
-                        getmArrows()[currentPlayer].setVisibility(VISIBLE);
-                        getmArrows()[currentPlayer].setAnimation(translateAnimation);
-                        if (players.get(currentPlayer).type == PlayerType.CPU) {
-                            getDiceImage().performClick();
-                        } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
+                    else{
+                        for (LudoPiece l : ludoPieces) {
+                            if (l.isValid(num)) {
+                                foundNum++;
+                                l.setEnabled(true);
+                                l.setAnimation(alphaAnimation);
+                                ((ImageView) l.getTag()).setVisibility(VISIBLE);
+                                startRotation((ImageView) l.getTag());
 
+                                if (temp != null) {
+                                    if (temp.mBox.mCenterPoint != l.mBox.mCenterPoint) {
+                                        sameCoordinates = false;
+                                    }
+                                }
+                                temp = l;
+                            }
                         }
-                    }
-                }, 1000);
-            } else {
-                LudoPiece piece;
-                LudoPiece ludoPiece = validPieces[0];
-                int currentLoss = currentLoss(ludoPiece);
-                int moveLoss = moveProfit(ludoPiece);
-                piece = ludoPiece;
-                int min = moveLoss - currentLoss;
-                for(int i = 1; i < validPieces.length; i++)
-                {
-                    ludoPiece = validPieces[i];
-                    currentLoss = currentLoss(ludoPiece);
-                    moveLoss = moveProfit(ludoPiece);
-                    int max = moveLoss - currentLoss;
-                    if(max > min)
-                    {
-                        piece = ludoPiece;
-                        min = max;
+                        if (foundNum == 1 || (sameCoordinates && temp != null)) {
+                            temp.performClick();
+                        }
+                        else if(foundNum == 0)
+                        {
+
+                            OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(!task.isSuccessful())
+                                    {
+                                        gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(this);
+                                    }
+                                }
+                            };
+                            OnCompleteListener<Void> onCompleteListener1 = new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(!task.isSuccessful())
+                                    {
+                                        gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(this);
+                                    }
+                                }
+                            };
+                            OnCompleteListener<Void> onCompleteListener2 = new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(!task.isSuccessful())
+                                    {
+                                        gameRef.child("updateUI").setValue(updateNum++%26).addOnCompleteListener(this);
+                                    }
+                                }
+                            };
+                            OnCompleteListener<Void> onCompleteListener3 = new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(!task.isSuccessful())
+                                    {
+                                        gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(this);
+                                    }
+                                }
+                            };
+
+
+                            gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(onCompleteListener);
+                            gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(onCompleteListener1);
+                            gameRef.child("updateUI").setValue(++updateNum%26).addOnCompleteListener(onCompleteListener2);
+                            gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(onCompleteListener3);
+                        }
                     }
                 }
-                players.get(currentPlayer).move(num, piece);
             }
-        } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
-            if(pieceIndex != -1) {
-                LudoPiece piece = players.get(currentPlayer).getmPiece()[pieceIndex];
-                players.get(currentPlayer).move(num, piece);
-            }
-            else
-            {
-                postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        currentPlayer++;
-                        currentPlayer %= numberOfPlayers;
-                        getDiceImage().setX(dicePoints[currentPlayer].x);
-                        getDiceImage().setY(dicePoints[currentPlayer].y);
-                        getDiceImage().setEnabled(false);
-                        getmArrows()[currentPlayer].setVisibility(VISIBLE);
-                        getmArrows()[currentPlayer].setAnimation(translateAnimation);
-                        if (players.get(currentPlayer).type == PlayerType.CPU) {
-                            getDiceImage().performClick();
-                        } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
-                            gameRef.child("turn").setValue(uids[currentPlayer]);
-                        }
-                        else{
-                            getDiceImage().setEnabled(true);
-                        }
+        });
+        thread.start();
 
-                    }
-                }, 1000);
-            }
-        }
     }
 
     public ImageView getDiceImage() {

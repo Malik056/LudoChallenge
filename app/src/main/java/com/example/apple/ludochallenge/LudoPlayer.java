@@ -5,21 +5,16 @@ import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Point;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.google.firebase.auth.FirebaseAuth;
 
 import static android.view.View.VISIBLE;
-import static android.view.View.combineMeasuredStates;
 import static com.example.apple.ludochallenge.SALGame.translateAnimation;
 
 /**
@@ -56,186 +51,6 @@ public class LudoPlayer {
 
     public void setmPiece(LudoPiece[] mPiece) {
         this.mPiece = mPiece;
-    }
-
-    public void move2(final int num, final LudoPiece piece) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                LudoBox ludoBox = piece.mBox;
-                if (ludoBox.mPieceCount > 2) {
-
-                    if (!ludoBox.stop) {
-
-                        int opponent = 0;
-                        int mine = -1;
-                        final LudoPiece[] ludoPieces = new LudoPiece[4];
-                        for (LudoPiece l : ludoBox.mPieces) {
-                            if (l.player.player != piece.player.player) {
-                                opponent++;
-                            } else {
-                                if (l != piece)
-                                    ludoPieces[++mine] = l;
-                            }
-                        }
-
-                        if (opponent == mine) {
-                            for (int i = 0; i < mine; i++) {
-
-                                final int finalI = i;
-
-                                Thread thread1 = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        LudoPiece ludoPiece = ludoPieces[finalI];
-                                        killPiece(ludoPiece);
-                                    }
-                                });
-                                thread1.start();
-
-                            }
-                            LudoGame.turnChange = false;
-                        }
-                    }
-                }
-
-                ludoBox.removePiece(piece);
-
-                LudoBox fromBox = piece.mBox;
-                Point to = new Point();
-                Point from = new Point();
-                final LudoBox[] finalBox = new LudoBox[1];
-
-                for (int i = 0; i < num; i++) {
-
-                    from.x = fromBox.firstX;
-                    from.y = fromBox.firstY;
-
-                    if (player == fromBox.transitionPlayer) {
-                        to.y = fromBox.transitionBox.firstY;
-                        to.x = fromBox.transitionBox.firstX;
-                        finalBox[0] = fromBox.transitionBox;
-
-                    } else {
-                        to.y = fromBox.nextBox.firstY;
-                        to.x = fromBox.nextBox.firstX;
-                        finalBox[0] = fromBox.nextBox;
-                    }
-
-                    animatePiece(piece, from, to);
-
-                    try {
-                        Thread.sleep(350);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    fromBox = finalBox[0];
-                }
-
-                if (finalBox[0].winBox) {
-                    LudoGame.turnChange = false;
-
-                    if (finalBox[0].mPieceCount == 4) {
-                        player_won();
-                    }
-                } else if (finalBox[0].mPieceCount > 0) {
-                    if (!finalBox[0].stop) {
-                        int opponent = 0;
-                        int mine = 1;
-                        final LudoPiece[] ludoPieces = {null, null, null, null};
-                        for (LudoPiece l : finalBox[0].mPieces) {
-                            if (l.player.player != piece.player.player) {
-                                ludoPieces[opponent++] = l;
-                            } else {
-                                mine++;
-                            }
-                        }
-
-                        if (opponent == mine) {
-
-                            final LudoPiece[] ludoPiece = {ludoPieces[0]};
-
-                            ludoBox = finalBox[0];
-
-                            int toIndex = mGame.boxes.indexOf(ludoPiece[0].startPosition.nextBox);
-                            int fromIndex = mGame.boxes.indexOf(ludoBox);
-
-                            int n = (52 + (fromIndex - toIndex)) % 52;
-                            n += 2;
-
-                            for (int i = 0; i < opponent; i++) {
-
-                                ludoPiece[0] = ludoPieces[i];
-                                finalBox[0].removePiece(ludoPiece[0]);
-
-                                Thread thread1 = new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        killPiece(ludoPiece[0]);
-                                    }
-                                });
-                                thread1.start();
-                            }
-                            LudoGame.turnChange = false;
-
-                            try {
-                                Thread.sleep(n * 103 + (opponent * 10));
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            finalBox[0].addPiece(piece);
-
-//                            Handler handler = new Handler(mGame.context.getMainLooper());
-                            ((Activity)mGame.context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mGame.invalidate();
-                                }
-                            });
-                        } else {
-                            finalBox[0].addPiece(piece);
-                        }
-                    } else {
-                        finalBox[0].addPiece(piece);
-                    }
-                } else {
-                    finalBox[0].addPiece(piece);
-                }
-
-
-
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-
-                        if (LudoGame.turnChange) {
-                            mGame.currentPlayer++;
-                            mGame.currentPlayer %= mGame.numberOfPlayers;
-                        } else LudoGame.turnChange = true;
-
-                        mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
-                        mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
-                        mGame.getDiceImage().setEnabled(true);
-//                                arrows[(currentPlayer+numberOfPlayers-1)%numberOfPlayers].setAnimation(null);
-//                                arrows[(currentPlayer+numberOfPlayers-1)%numberOfPlayers].setVisibility(INVISIBLE);
-                        mGame.getmArrows()[mGame.currentPlayer].setVisibility(VISIBLE);
-                        mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
-
-                        if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
-                            mGame.getDiceImage().performClick();
-                        } else if (mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE) {
-                        }
-                    }
-                };
-
-//                Handler handler = new Handler(mGame.context.getMainLooper());
-                ((Activity)mGame.context).runOnUiThread(runnable);
-
-            }
-        });
-        thread.start();
     }
 
     public void move(final int num, final LudoPiece piece) {
@@ -295,36 +110,27 @@ public class LudoPlayer {
                     @Override
                     public void run() {
 
-                        mGame.getmArrows()[mGame.currentPlayer].setVisibility(View.INVISIBLE);
-                        mGame.getmArrows()[mGame.currentPlayer].setAnimation(null);
-                        if (LudoGame.turnChange) {
-                            mGame.currentPlayer++;
-                            mGame.currentPlayer %= mGame.numberOfPlayers;
-                        } else LudoGame.turnChange = true;
-                        mGame.getmArrows()[mGame.currentPlayer].setVisibility(VISIBLE);
-                        mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
-                        mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
-                        mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
-                        if(mGame.gameRef!=null) {
-//                            mGame.gameRef.child("dice_value").setValue(num);
-//                            mGame.gameRef.child("piece_number").setValue(piece.pieceNum);
-                            mGame.gameRef.child("turn").setValue(mGame.uids[mGame.currentPlayer]).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
+                        if(mGame.players.get(mGame.currentPlayer).type != PlayerType.ONLINE){
+                            mGame.getmArrows()[mGame.currentPlayer].setVisibility(View.INVISIBLE);
+                            mGame.getmArrows()[mGame.currentPlayer].setAnimation(null);
+                            if (LudoGame.turnChange) {
+                                mGame.currentPlayer++;
+                                mGame.currentPlayer %= mGame.numberOfPlayers;
+                            } else LudoGame.turnChange = true;
 
-                                }
-                            });
-                        }
-                        if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
-                            mGame.getDiceImage().performClick();
-                        } else if (mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE) {
+                            mGame.getmArrows()[mGame.currentPlayer].setVisibility(VISIBLE);
+                            mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
+                            mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
+                            mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
+                            if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
+                                mGame.getDiceImage().performClick();
 
+                            }
                         }
                         else
                         {
-                            mGame.diceImage.setEnabled(true);
-                        }
 
+                        }
                         synchronized (this){
                             this.notify();
                         }
@@ -337,6 +143,32 @@ public class LudoPlayer {
 //                    ((Activity) mGame.context).runOnUiThread(runnable);
                     try {
                         runnable.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+                Runnable runnable1 = new Runnable() {
+                    @Override
+                    public void run() {
+                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                mGame.gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(this);
+                            }
+                        };
+                        mGame.gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
+                        synchronized (this){
+                            this.notify();
+                        }
+                    }
+                };
+                synchronized (runnable1)
+                {
+                    new Thread(runnable1).start();
+                    try {
+                        runnable1.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

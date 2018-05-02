@@ -6,9 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -25,11 +24,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.apple.ludochallenge.Color;
-import com.example.apple.ludochallenge.LudoGame;
-import com.example.apple.ludochallenge.LudoPiece;
-import com.example.apple.ludochallenge.PlayerType;
-import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.networking.MySQLDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -86,7 +80,6 @@ public class LudoActivity extends AppCompatActivity {
         Runnable mainRun = new Runnable() {
             @Override
             public void run() {
-                final Runnable mainRun1 = this;
                 if (game == null) {
                     DisplayManager dm = (DisplayManager) getSystemService(Service.DISPLAY_SERVICE);
                     final DisplayMetrics ds = new DisplayMetrics();
@@ -133,10 +126,12 @@ public class LudoActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
+
                     Point first = new Point(3 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 2));
                     final Point two = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 2));
                     final Point three = new Point(3 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 3));
                     final Point four = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 3));
+
                     arrows = new ImageView[players];
                     dicePoints = new Point[players];
                     dicePoints[0] = first;
@@ -412,13 +407,14 @@ public class LudoActivity extends AppCompatActivity {
         view2.findViewWithTag(R.id.player2_pic).setId(R.id.player4_pic);
         view2.findViewWithTag(R.id.player2_dice).setId(R.id.player4_dice);
         view2.findViewWithTag(R.id.player2_arrow).setId(R.id.player4_arrow);
+        view2.findViewWithTag(R.id.player2_box).setId(R.id.player4_box);
+
 
         view2.findViewWithTag(R.id.player1_name).setId(R.id.player3_name);
         view2.findViewWithTag(R.id.player1_pic).setId(R.id.player3_pic);
         view2.findViewWithTag(R.id.player1_dice).setId(R.id.player3_dice);
         view2.findViewWithTag(R.id.player1_arrow).setId(R.id.player3_arrow);
         view2.findViewWithTag(R.id.player1_box).setId(R.id.player3_box);
-        view2.findViewWithTag(R.id.player2_box).setId(R.id.player4_box);
 
         TextView textView = new TextView(this);
         textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (width + width / (10 * 2) + p1TextSize*2)));
@@ -454,7 +450,7 @@ public class LudoActivity extends AppCompatActivity {
         LinearLayout linearLayout2 = new LinearLayout(this);
         linearLayout2.setOrientation(LinearLayout.VERTICAL);
 //        linearLayout2.setLayoutParams(new LinearLayout.LayoutParams((width/10)*4, (width/10) + 20));
-        linearLayout1.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        linearLayout2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         final LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);

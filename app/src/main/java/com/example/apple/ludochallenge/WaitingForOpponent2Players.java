@@ -1,11 +1,10 @@
 package com.example.apple.ludochallenge;
 
-import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,7 +15,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.apple.ludochallenge.networking.MySQLDatabase;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +24,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.EventListener;
 
 import static com.example.apple.ludochallenge.LudoActivity.UIDS;
 import static com.example.apple.ludochallenge.LudoActivity.UPDATING_USER;
@@ -72,7 +69,7 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
         final String[] names = intent.getStringArrayExtra("names");
         final int[] colors = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
         final int noOfPlayer = 2;
-        final int[] playerTypes = new int[]{PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.ONLINE)};
+        final int[] playerTypes = new int[]{PlayerType.getInt(PlayerType.ONLINE), PlayerType.getInt(PlayerType.ONLINE)};
         final String[] uids = intent.getStringArrayExtra("UIDS");
 
 
