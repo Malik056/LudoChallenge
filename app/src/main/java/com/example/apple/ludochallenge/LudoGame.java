@@ -816,7 +816,6 @@ public class LudoGame extends FrameLayout {
                                 }
                             };
 
-
                             gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(onCompleteListener);
                             gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(onCompleteListener1);
                             gameRef.child("updateUI").setValue(++updateNum%26).addOnCompleteListener(onCompleteListener2);
