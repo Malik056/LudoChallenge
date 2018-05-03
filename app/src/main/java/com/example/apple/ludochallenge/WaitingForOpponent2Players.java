@@ -189,12 +189,17 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
                             mDatabase.child("entry_coins").setValue(entry_coins).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    String player_name = (String) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_USER, mySQLDatabase.TABLE_NAME);
-                                    byte[] pic = (byte[]) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.IMAGE_PROFILE_COL, mySQLDatabase.TABLE_NAME);
-                                    ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(pic);
-                                    Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
-                                    yourPic.setImageBitmap(bitmap);
-                                    yourName.setText(player_name);
+                                    mDatabase.child("player1_uid").setValue(current_uid).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            String player_name = (String) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_USER, mySQLDatabase.TABLE_NAME);
+                                            byte[] pic = (byte[]) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.IMAGE_PROFILE_COL, mySQLDatabase.TABLE_NAME);
+                                            ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(pic);
+                                            Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
+                                            yourPic.setImageBitmap(bitmap);
+                                            yourName.setText(player_name);
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -203,43 +208,69 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
             });
 
 
-            final DatabaseReference loopThrough = FirebaseDatabase.getInstance().getReference().child("Users");
+            final DatabaseReference[] loopThrough = {FirebaseDatabase.getInstance().getReference().child("Users")};
             final ValueEventListener listener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     final ValueEventListener listener1 = this;
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         final String key = (String) ds.getKey();
-
-                        DatabaseReference keyReference = FirebaseDatabase.getInstance().getReference().child("Users").child(key).child("Online_Multiplayer");
-                        keyReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        final DatabaseReference[] keyReference = {FirebaseDatabase.getInstance().getReference().child("Users").child(key).child("Online_Multiplayer")};
+                        keyReference[0].addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
+                            public void onDataChange(final DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.hasChild("still_searching")) {
                                     String code = dataSnapshot.child("still_searching").getValue(String.class);
                                     String NO_OF_PLAYERS = "" + dataSnapshot.child("noOfPlayers").getValue();
                                     String ENTRY_COINS = "" + dataSnapshot.child("entry_coins").getValue();
                                     if (code.equals("true") && !key.equals(current_uid) && noOfPlayers_online_multiplayer.equals(NO_OF_PLAYERS) && entry_coins.equals(ENTRY_COINS)) {
                                         Toast.makeText(getApplicationContext(), code + "  " + key, Toast.LENGTH_LONG).show();
-                                        DatabaseReference firebaseDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(key);
-                                        firebaseDatabase.addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                String opponent_name = dataSnapshot.child("name").getValue().toString();
-                                                if (dataSnapshot.hasChild("thumb_image")) {
-                                                    String opponent_pic = dataSnapshot.child("thumb_image").getValue().toString();
-                                                    Picasso.get().load(opponent_pic).into(player2Pic);
+                                        String check_player2_value = dataSnapshot.child("player2_uid").getValue().toString();
+                                        if(check_player2_value.equals("0")){
+                                            dataSnapshot.child("player2_uid").getRef().setValue(current_uid).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    dataSnapshot.child("still_searching").getRef().setValue("false").addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            final DatabaseReference[] firebaseDatabase = {FirebaseDatabase.getInstance().getReference().child("Users")};
+                                                            firebaseDatabase[0].addValueEventListener(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(final DataSnapshot dataSnapshot) {
+                                                                    loopThrough[0].child(current_uid).child("Online_Multiplayer").child("player2_uid").setValue(key).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                            loopThrough[0].child(current_uid).child("Online_Multiplayer").child("still_searching").setValue("false").addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                    if(dataSnapshot.child(key).hasChild("name")){
+                                                                                        if(dataSnapshot.child(key).hasChild("thumb_image")){
+                                                                                            String opponent_name = dataSnapshot.child(key).child("name").getValue().toString();
+                                                                                            player2_name.setText(opponent_name);
+                                                                                            String opponent_pic = dataSnapshot.child(key).child("thumb_image").getValue().toString();
+                                                                                            Picasso.get().load(opponent_pic).into(player2Pic);
+                                                                                            loopThrough[0].removeEventListener(listener1);
+                                                                                        }
+                                                                                    }
+
+                                                                                }
+                                                                            });
+
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                                }
+                                                            });
+                                                        }
+                                                    });
                                                 }
-                                                player2_name.setText(opponent_name);
-                                                loopThrough.removeEventListener(listener1);
+                                            });
+                                        }
 
-                                            }
-
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
-
-                                            }
-                                        });
                                     }
                                 }
                             }
@@ -258,7 +289,7 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
 
                 }
             };
-            loopThrough.addValueEventListener(listener);
+            loopThrough[0].addValueEventListener(listener);
         }
     }
 

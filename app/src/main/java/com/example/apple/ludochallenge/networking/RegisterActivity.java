@@ -443,6 +443,8 @@
                               userMap.put("game_started","false");
                               userMap.put("noOfPlayers","0");
                               userMap.put("entry_coins","0");
+                              userMap.put("player1_uid", "0");
+                              userMap.put("player2_uid", "0");
                               databaseReference.child("Online_Multiplayer").setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                   @Override
                                   public void onComplete(@NonNull Task<Void> task) {
