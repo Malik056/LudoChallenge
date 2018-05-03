@@ -2,6 +2,8 @@ package com.example.apple.ludochallenge.networking;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDex;
+
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
@@ -25,6 +27,6 @@ public class OfflineCapabilities extends Application {
     @Override
     protected void attachBaseContext(Context context) {
         super.attachBaseContext(context);
-
+        MultiDex.install(this);
     }
 }
