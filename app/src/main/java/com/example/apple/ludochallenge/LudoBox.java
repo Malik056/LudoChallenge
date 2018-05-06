@@ -2,9 +2,11 @@ package com.example.apple.ludochallenge;
 
 import android.app.Activity;
 import android.graphics.Point;
+import android.os.Handler;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -135,16 +137,15 @@ public class LudoBox {
 
         for (int i = 0; i < mPieceCount; i++) {
             final LudoPiece piece1 = mPieces.get(i);
+            piece1.setX(startingPointX);
+            ((ImageView) piece1.getTag()).setX(startingPointX);
+            ((ImageView) piece1.getTag()).setY(mCenterPoint.y - pieceWidth / 2);
             final int finalPieceWidth = pieceWidth;
             final int finalPieceHeight = pieceHeight;
-            final int finalStartingPointX = startingPointX;
             final int finalY = y;
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    piece1.setX(finalStartingPointX);
-                    ((ImageView) piece1.getTag()).setX(finalStartingPointX);
-                    ((ImageView) piece1.getTag()).setY(mCenterPoint.y - finalPieceWidth / 2);
                     piece1.setSize(finalPieceWidth, finalPieceHeight);
                     ((ImageView) piece1.getTag()).setLayoutParams(new FrameLayout.LayoutParams(finalPieceWidth, finalPieceWidth));
                     piece1.setY(finalY);
@@ -164,6 +165,7 @@ public class LudoBox {
                     e.printStackTrace();
                 }
             }
+
             startingPointX -= pieceWidth;
         }
     }

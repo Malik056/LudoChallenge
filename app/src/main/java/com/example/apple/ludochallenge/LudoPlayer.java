@@ -110,7 +110,7 @@ public class LudoPlayer {
                     @Override
                     public void run() {
 
-                        if (mGame.players.get(mGame.currentPlayer).type != PlayerType.ONLINE) {
+                        if(mGame.players.get(mGame.currentPlayer).type != PlayerType.ONLINE){
                             mGame.getmArrows()[mGame.currentPlayer].setVisibility(View.INVISIBLE);
                             mGame.getmArrows()[mGame.currentPlayer].setAnimation(null);
                             if (LudoGame.turnChange) {
@@ -123,51 +123,17 @@ public class LudoPlayer {
                             mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
                             mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
                             mGame.getDiceImage().setEnabled(true);
+
                             if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
                                 mGame.getDiceImage().performClick();
 
                             }
-                        } else {
-                            if (LudoGame.turnChange) {
-                                mGame.currentPlayer++;
-                                mGame.currentPlayer %= mGame.numberOfPlayers;
-                            }
-                            mGame.diceImage.setX(mGame.dicePoints[mGame.currentPlayer].x);
-                            mGame.diceImage.setY(mGame.dicePoints[mGame.currentPlayer].y);
-
-
-                            Runnable runnable1 = new Runnable() {
-                                @Override
-                                public void run() {
-                                    OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if(!task.isSuccessful() || !task.isComplete()) {
-                                                mGame.gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(this);
-                                            }
-                                            else{
-                                                mGame.done = false;
-                                                synchronized (this){
-                                                    this.notify();
-                                                }
-                                            }
-                                        }
-                                    };
-                                    mGame.gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
-                                }
-                            };
-                            synchronized (runnable1)
-                            {
-                                new Thread(runnable1).start();
-                                try {
-                                    runnable1.wait();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                        }
+                        else
+                        {
 
                         }
-                        synchronized (this) {
+                        synchronized (this){
                             this.notify();
                         }
 
@@ -175,7 +141,7 @@ public class LudoPlayer {
                 };
                 synchronized (runnable) {
 //                    Handler handler = new Handler(mGame.context.getMainLooper());
-                    ((Activity) mGame.context).runOnUiThread(runnable);
+                    ((Activity)mGame.context).runOnUiThread(runnable);
 //                    ((Activity) mGame.context).runOnUiThread(runnable);
                     try {
                         runnable.wait();
@@ -184,11 +150,36 @@ public class LudoPlayer {
                     }
                 }
 
+                if(mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE) {
+
+                    Runnable runnable1 = new Runnable() {
+                        @Override
+                        public void run() {
+                            OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    mGame.gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(this);
+                                }
+                            };
+                            mGame.gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
+                            synchronized (this) {
+                                this.notify();
+                            }
+                        }
+                    };
+                    synchronized (runnable1) {
+                        new Thread(runnable1).start();
+                        try {
+                            runnable1.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
+
         });
-
         thread.start();
-
 
     }
 
@@ -634,12 +625,12 @@ public class LudoPlayer {
                         final Runnable runnable2 = this;
                         for (int i = 1; i < pieces.length; i++) {
                             if (pieces[i] != null) {
-                                pieces[i].animate().translationY(to.y).setDuration(50).start();
-                                pieces[i].animate().translationX(to.x).setDuration(50).start();
+                                pieces[i].animate().translationY(to.y).setDuration(100).start();
+                                pieces[i].animate().translationX(to.x).setDuration(100).start();
                             }
                         }
-                        pieces[0].animate().translationY(to.y).setDuration(50).start();
-                        pieces[0].animate().translationX(to.x).setDuration(50).setListener(new Animator.AnimatorListener() {
+                        pieces[0].animate().translationY(to.y).setDuration(100).start();
+                        pieces[0].animate().translationX(to.x).setDuration(100).setListener(new Animator.AnimatorListener() {
                             @Override
                             public void onAnimationStart(Animator animation) {
 
@@ -668,7 +659,7 @@ public class LudoPlayer {
                 };
                 synchronized (runnable1) {
 //                    Handler handler = new Handler(mGame.context.getMainLooper());
-                    ((Activity) mGame.context).runOnUiThread(runnable1);
+                    ((Activity)mGame.context).runOnUiThread(runnable1);
 //                    ((Activity) mGame.context).runOnUiThread(runnable1);
                     try {
                         runnable1.wait();
@@ -678,7 +669,6 @@ public class LudoPlayer {
                 }
                 ludoBox = ludoBox.previousBox;
             }
-
         }
 
         Runnable runnable1 = new Runnable() {
@@ -688,13 +678,13 @@ public class LudoPlayer {
 
                 for (int i = 1; i < pieces.length; i++) {
                     if (pieces[i] != null) {
-                        pieces[i].animate().translationX(pieces[i].startPosition.firstX).setDuration(100).start();
-                        pieces[i].animate().translationY(pieces[i].startPosition.firstY).setDuration(100).start();
+                        pieces[i].animate().translationX(pieces[i].startPosition.firstX).setDuration(200).start();
+                        pieces[i].animate().translationY(pieces[i].startPosition.firstY).setDuration(200).start();
                     }
                 }
 
-                pieces[0].animate().translationX(pieces[0].startPosition.firstX).setDuration(100).start();
-                pieces[0].animate().translationY(pieces[0].startPosition.firstY).setDuration(100).setListener(new Animator.AnimatorListener() {
+                pieces[0].animate().translationX(pieces[0].startPosition.firstX).setDuration(200).start();
+                pieces[0].animate().translationY(pieces[0].startPosition.firstY).setDuration(200).setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
 

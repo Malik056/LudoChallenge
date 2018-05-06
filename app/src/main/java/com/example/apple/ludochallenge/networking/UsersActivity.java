@@ -237,6 +237,9 @@ public class UsersActivity extends AppCompatActivity {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
 
+                                                            gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child(mCurrent_user.getUid()).setValue(false);
+                                                            gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child(user_id).setValue(false);
+                                                            gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("updated").setValue(false);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("updateUI").setValue(0);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("turn").setValue(user_id);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("dice_value").setValue(4);
