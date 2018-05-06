@@ -162,7 +162,6 @@ public class LudoGame extends FrameLayout {
                         gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(onCompleteListener);
                         gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(onCompleteListener1);
                         gameRef.child("updateUI").setValue(++updateNum%26).addOnCompleteListener(onCompleteListener2);
-
                         players.get(currentPlayer).move(finalNum, (LudoPiece) v);
                     }
                 });
@@ -564,7 +563,7 @@ public class LudoGame extends FrameLayout {
                                                             }
                                                         }
                                                     };
-                                                    if (dataSnapshot.child("firstUID").getValue().toString().equals(FirebaseAuth.getInstance().getUid())) {
+                                                    if (dataSnapshot.child("firstUID").getValue().toString().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                                                         dataSnapshot.getRef().child("updated").setValue(false).addOnCompleteListener(onCompleteListener1);
                                                     }
                                                 } else {
@@ -649,13 +648,29 @@ public class LudoGame extends FrameLayout {
                 LudoPiece temp = null;
                 boolean sameCoordinates = true;
                 if (players.get(currentPlayer).type == PlayerType.HUMAN) {
-                    for (LudoPiece l : ludoPieces) {
+                    for (final LudoPiece l : ludoPieces) {
                         if (l.isValid(num)) {
                             foundNum++;
-                            l.setEnabled(true);
-                            l.setAnimation(alphaAnimation);
-                            ((ImageView) l.getTag()).setVisibility(VISIBLE);
-                            startRotation((ImageView) l.getTag());
+                            Runnable runnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    l.setEnabled(true);
+                                    l.setAnimation(alphaAnimation);
+                                    ((ImageView) l.getTag()).setVisibility(VISIBLE);
+                                     startRotation((ImageView) l.getTag());
+                                     synchronized (this){
+                                         this.notify();
+                                     }
+                                }
+                            };
+                            synchronized (runnable) {
+                                ((Activity) context).runOnUiThread(runnable);
+                                try {
+                                    runnable.wait();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
 
                             if (temp != null) {
                                 if (temp.mBox.mCenterPoint != l.mBox.mCenterPoint) {
@@ -665,25 +680,35 @@ public class LudoGame extends FrameLayout {
                             temp = l;
                         }
                     }
-                    if (foundNum == 1 || (sameCoordinates && temp != null)) {
-                        temp.performClick();
-                    } else if (foundNum == 0) {
-                        postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                currentPlayer++;
-                                currentPlayer %= numberOfPlayers;
-                                getDiceImage().setX(dicePoints[currentPlayer].x);
-                                getDiceImage().setY(dicePoints[currentPlayer].y);
-                                getDiceImage().setEnabled(true);
-                                getmArrows()[currentPlayer].setVisibility(VISIBLE);
-                                getmArrows()[currentPlayer].setAnimation(translateAnimation);
-                                if (players.get(currentPlayer).type == PlayerType.CPU) {
-                                    getDiceImage().performClick();
-                                }
+                    final boolean finalSameCoordinates = sameCoordinates;
+                    final LudoPiece finalTemp = temp;
+                    final int finalFoundNum = foundNum;
+                    Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+
+                            if (finalFoundNum == 1 || (finalSameCoordinates && finalTemp != null)) {
+                                finalTemp.performClick();
+                            } else if (finalFoundNum == 0) {
+                                postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        currentPlayer++;
+                                        currentPlayer %= numberOfPlayers;
+                                        getDiceImage().setX(dicePoints[currentPlayer].x);
+                                        getDiceImage().setY(dicePoints[currentPlayer].y);
+                                        getDiceImage().setEnabled(true);
+                                        getmArrows()[currentPlayer].setVisibility(VISIBLE);
+                                        getmArrows()[currentPlayer].setAnimation(translateAnimation);
+                                        if (players.get(currentPlayer).type == PlayerType.CPU) {
+                                            getDiceImage().performClick();
+                                        }
+                                    }
+                                }, 1000);
                             }
-                        }, 1000);
-                    }
+                        }
+                    };
+                    ((Activity)context).runOnUiThread(runnable);
                 } else if (players.get(currentPlayer).type == PlayerType.CPU) {
 
                     LudoPiece[] validPieces = new LudoPiece[4];
@@ -745,7 +770,7 @@ public class LudoGame extends FrameLayout {
                     }
                 } else if (players.get(currentPlayer).type == PlayerType.ONLINE) {
 
-                    if(!FirebaseAuth.getInstance().getUid().equals(uids[currentPlayer])) {
+                    if(!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(uids[currentPlayer])) {
                         if (pieceIndex != -1) {
                             LudoPiece piece = players.get(currentPlayer).getmPiece()[pieceIndex];
                             players.get(currentPlayer).move(num, piece);
@@ -761,11 +786,11 @@ public class LudoGame extends FrameLayout {
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(!task.isSuccessful())
                                                     {
-                                                        gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(this);
+                                                        gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(this);
                                                     }
                                                 }
                                             };
-                                            gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
+                                            gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
                                         }
                                     });
                                     thread.start();
@@ -828,7 +853,7 @@ public class LudoGame extends FrameLayout {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if(!task.isSuccessful())
                                     {
-                                        gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(this);
+                                        gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(this);
                                     }
                                 }
                             };
@@ -836,7 +861,7 @@ public class LudoGame extends FrameLayout {
                             gameRef.child("dice_value").setValue(game.num).addOnCompleteListener(onCompleteListener);
                             gameRef.child("piece_number").setValue(pieceIndex).addOnCompleteListener(onCompleteListener1);
                             gameRef.child("updateUI").setValue(++updateNum%26).addOnCompleteListener(onCompleteListener2);
-                            gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(onCompleteListener3);
+                            gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(onCompleteListener3);
                         }
                     }
                 }

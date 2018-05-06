@@ -142,11 +142,13 @@ public class LudoBox {
             ((ImageView) piece1.getTag()).setY(mCenterPoint.y - pieceWidth / 2);
             final int finalPieceWidth = pieceWidth;
             final int finalPieceHeight = pieceHeight;
+            final int finalY = y;
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
                     piece1.setSize(finalPieceWidth, finalPieceHeight);
                     ((ImageView) piece1.getTag()).setLayoutParams(new FrameLayout.LayoutParams(finalPieceWidth, finalPieceWidth));
+                    piece1.setY(finalY);
                     synchronized (this)
                     {
                         this.notify();
@@ -163,7 +165,7 @@ public class LudoBox {
                     e.printStackTrace();
                 }
             }
-            piece1.setY(y);
+
             startingPointX -= pieceWidth;
         }
     }

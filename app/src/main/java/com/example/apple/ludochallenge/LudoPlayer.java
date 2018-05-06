@@ -122,6 +122,8 @@ public class LudoPlayer {
                             mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
                             mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
                             mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
+                            mGame.getDiceImage().setEnabled(true);
+
                             if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
                                 mGame.getDiceImage().performClick();
 
@@ -148,35 +150,37 @@ public class LudoPlayer {
                     }
                 }
 
+                if(mGame.players.get(mGame.currentPlayer).type == PlayerType.ONLINE) {
 
-                Runnable runnable1 = new Runnable() {
-                    @Override
-                    public void run() {
-                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                mGame.gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(this);
+                    Runnable runnable1 = new Runnable() {
+                        @Override
+                        public void run() {
+                            OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    mGame.gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(this);
+                                }
+                            };
+                            mGame.gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
+                            synchronized (this) {
+                                this.notify();
                             }
-                        };
-                        mGame.gameRef.child(FirebaseAuth.getInstance().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
-                        synchronized (this){
-                            this.notify();
                         }
-                    }
-                };
-                synchronized (runnable1)
-                {
-                    new Thread(runnable1).start();
-                    try {
-                        runnable1.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    };
+                    synchronized (runnable1) {
+                        new Thread(runnable1).start();
+                        try {
+                            runnable1.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
 
         });
         thread.start();
+
     }
 
     private void player_won() {
