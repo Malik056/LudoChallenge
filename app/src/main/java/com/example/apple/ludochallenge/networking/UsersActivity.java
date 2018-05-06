@@ -241,6 +241,9 @@ public class UsersActivity extends AppCompatActivity {
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("turn").setValue(user_id);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("dice_value").setValue(4);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("piece").setValue(0);
+                                                            gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child(mCurrent_user.getUid()).setValue(false);
+                                                            gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child(user_id).setValue(false);
+                                                            gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("updated").setValue(false);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("firstUID").setValue(user_id);
                                                             gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("secondUID").setValue(mCurrent_user.getUid()).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                 @Override
