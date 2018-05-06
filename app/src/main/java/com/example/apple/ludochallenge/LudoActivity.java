@@ -17,14 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.apple.ludochallenge.networking.MySQLDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.example.apple.ludochallenge.Color.BLUE;
 import static com.example.apple.ludochallenge.Color.GREEN;
@@ -103,7 +104,7 @@ public class LudoActivity extends AppCompatActivity {
                         colors[i] = Color.getColor(colorsInt[i]);
                         playerTypes[i] = PlayerType.getPlayerType(playerTypesInt[i]);
                     }
-                    final int boardStartY = (height - width) / 2;
+                    final int boardStartY = (height - width) / 2 - width/30;
                     int oneBox = width / 10;
                     final View[] view = new View[1];
                     runnable1 = new Runnable() {
@@ -112,7 +113,7 @@ public class LudoActivity extends AppCompatActivity {
 
                             view[0] = fourPlayer(width, ds.heightPixels > ds.widthPixels ?
                                     xdpi : ydpi, ds.heightPixels > ds.widthPixels ?
-                                    ydpi : xdpi, boardStartY);
+                                    ydpi : xdpi, boardStartY, playerTypes[0] == PlayerType.ONLINE);
                             synchronized (this) {
                                 this.notify();
                             }
@@ -128,10 +129,10 @@ public class LudoActivity extends AppCompatActivity {
                         }
                     }
 
-                    Point first = new Point(3 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 2));
-                    final Point two = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 2));
-                    final Point three = new Point(3 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 3));
-                    final Point four = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 3));
+                    Point first = new Point(3 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 3));
+                    final Point two = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY + width + width / 40 + p1TextSize * 3));
+                    final Point three = new Point(3 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize * 2));
+                    final Point four = new Point(width - 5 * (oneBox) / 2, (int) (boardStartY - (width / 10) - width / 40 - p1TextSize *2));
 
                     arrows = new ImageView[players];
                     dicePoints = new Point[players];
@@ -147,46 +148,110 @@ public class LudoActivity extends AppCompatActivity {
                                     new LinearInterpolator()
                             );
                             LudoGame.alphaAnimation = alphaAnimation;
-                            TranslateAnimation translateAnimation = new TranslateAnimation(
-                                    TranslateAnimation.RELATIVE_TO_SELF, 0.1f,
-                                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
-                                    TranslateAnimation.ABSOLUTE, 0f,
-                                    TranslateAnimation.ABSOLUTE, 0f);
-                            translateAnimation.setDuration(100);
-                            translateAnimation.setRepeatCount(-1);
-                            translateAnimation.setRepeatMode(Animation.REVERSE);
-                            translateAnimation.setInterpolator(new
-                                    LinearInterpolator());
-                            LudoGame.translateAnimation = translateAnimation;
+
+//                            TranslateAnimation translateAnimation = new TranslateAnimation(
+//                                    TranslateAnimation.RELATIVE_TO_SELF, 0.1f,
+//                                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
+//                                    TranslateAnimation.ABSOLUTE, 0f,
+//                                    TranslateAnimation.ABSOLUTE, 0f);
+//                            translateAnimation.setDuration(100);
+//                            translateAnimation.setRepeatCount(-1);
+//                            translateAnimation.setRepeatMode(Animation.REVERSE);
+//                            translateAnimation.setInterpolator(new
+//                                    LinearInterpolator());
+                            LudoGame.translateAnimation = null;
                             if (players == 2) {
                                 dicePoints[1] = four;
                                 arrows[0] = view[0].findViewById(R.id.player1_arrow);
                                 arrows[1] = view[0].findViewById(R.id.player4_arrow);
-                                view[0].findViewById(R.id.upper_bar).setVisibility(View.INVISIBLE);
+                                arrows[0].setTag(null);
+                                arrows[1].setTag(null);
+                                Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.left_arrow_down)
+                                        .into(arrows[0]);
+                                Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.right_arrow_up)
+                                        .into(arrows[1]);
+                                view[0].findViewById(R.id.player2_box).setVisibility(View.INVISIBLE);
+                                view[0].findViewById(R.id.player3_box).setVisibility(View.INVISIBLE);
+                                ((ImageView)view[0].findViewById(R.id.player4_pic)).setImageResource(getPieceIdFromColor(colors[1]));
+                                ((ImageView)view[0].findViewById(R.id.player1_pic)).setImageResource(getPieceIdFromColor(colors[0]));
                                 pNames[0] = view[0].findViewById(R.id.player1_name);
                                 pNames[1] = view[0].findViewById(R.id.player4_name);
+
                             } else if (players == 3) {
                                 dicePoints[1] = two;
                                 dicePoints[2] = four;
                                 arrows[0] = view[0].findViewById(R.id.player1_arrow);
                                 arrows[1] = view[0].findViewById(R.id.player2_arrow);
                                 arrows[2] = view[0].findViewById(R.id.player4_arrow);
-                                view[0].findViewById(R.id.player2_box).setVisibility(View.INVISIBLE);
+
+                                arrows[0].setTag(null);
+                                arrows[1].setTag(null);
+                                arrows[2].setTag(null);
+
+                                Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.left_arrow_down)
+                                        .into(arrows[0]);
+                                Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.right_arrown_down)
+                                        .into(arrows[1]);
+                                Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.right_arrow_up)
+                                        .into(arrows[2]);
+                                view[0].findViewById(R.id.player3_box).setVisibility(View.INVISIBLE);
+
+                                ((ImageView)view[0].findViewById(R.id.player2_pic)).setImageResource(getPieceIdFromColor(colors[1]));
+                                ((ImageView)view[0].findViewById(R.id.player1_pic)).setImageResource(getPieceIdFromColor(colors[0]));
+                                ((ImageView)view[0].findViewById(R.id.player4_pic)).setImageResource(getPieceIdFromColor(colors[2]));
+
+
                                 pNames[0] = view[0].findViewById(R.id.player1_name);
                                 pNames[1] = view[0].findViewById(R.id.player2_name);
                                 pNames[2] = view[0].findViewById(R.id.player4_name);
                             } else {
                                 dicePoints[1] = two;
-                                dicePoints[2] = three;
-                                dicePoints[3] = four;
+                                dicePoints[2] = four;
+                                dicePoints[3] = three;
                                 arrows[0] = view[0].findViewById(R.id.player1_arrow);
                                 arrows[1] = view[0].findViewById(R.id.player2_arrow);
-                                arrows[2] = view[0].findViewById(R.id.player3_arrow);
-                                arrows[3] = view[0].findViewById(R.id.player4_arrow);
+                                arrows[2] = view[0].findViewById(R.id.player4_arrow);
+                                arrows[3] = view[0].findViewById(R.id.player3_arrow);
+
+                                arrows[0].setTag(null);
+                                arrows[1].setTag(null);
+                                arrows[2].setTag(null);
+                                arrows[3].setTag(null);
+
+                                ((ImageView)view[0].findViewById(R.id.player2_pic)).setImageResource(getPieceIdFromColor(colors[1]));
+                                ((ImageView)view[0].findViewById(R.id.player1_pic)).setImageResource(getPieceIdFromColor(colors[0]));
+                                ((ImageView)view[0].findViewById(R.id.player4_pic)).setImageResource(getPieceIdFromColor(colors[2]));
+                                ((ImageView)view[0].findViewById(R.id.player3_pic)).setImageResource(getPieceIdFromColor(colors[3]));
+                                Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.left_arrow_down)
+                                        .into(arrows[0]);
+                                Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.right_arrown_down)
+                                        .into(arrows[1]);
+                                Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.right_arrow_up)
+                                        .into(arrows[2]);
+                                        Glide.with(getApplicationContext())
+                                        .asGif()
+                                        .load(R.drawable.left_arrow_up)
+                                        .into(arrows[3]);
                                 pNames[0] = view[0].findViewById(R.id.player1_name);
                                 pNames[1] = view[0].findViewById(R.id.player2_name);
-                                pNames[2] = view[0].findViewById(R.id.player3_name);
-                                pNames[3] = view[0].findViewById(R.id.player4_name);
+                                pNames[2] = view[0].findViewById(R.id.player4_name);
+                                pNames[3] = view[0].findViewById(R.id.player3_name);
                             }
                             for (int i = 0; i < players; i++) {
                                 pNames[i].setText(names[i]);
@@ -225,7 +290,29 @@ public class LudoActivity extends AppCompatActivity {
                     runnable3 = new Runnable() {
                         @Override
                         public void run() {
-                            ImageView[] imageViews = new ImageView[]{((ImageView) view[0].findViewById(R.id.player1_pic)), ((ImageView) view[0].findViewById(R.id.player2_pic)), ((ImageView) view[0].findViewById(R.id.player3_pic)), ((ImageView) view[0].findViewById(R.id.player4_pic))};
+
+                            ImageView[] imageViews;
+
+                            imageViews = players == 4 ? new ImageView[]{
+                                    view[0].findViewById(R.id.player1_pic),
+                                    view[0].findViewById(R.id.player2_pic),
+                                    view[0].findViewById(R.id.player3_pic),
+                                    view[0].findViewById(R.id.player4_pic)
+                            }
+                            : players == 2 ? new ImageView[]{
+                                    view[0].findViewById(R.id.player1_pic),
+                                    view[0].findViewById(R.id.player4_pic)
+                            }
+                            : players == 3 ? new ImageView[]{
+                                    view[0].findViewById(R.id.player1_pic),
+                                    view[0].findViewById(R.id.player2_pic),
+                                    view[0].findViewById(R.id.player4_pic)
+                            }
+                            :new ImageView[]{
+                                    view[0].findViewById(R.id.player1_pic)
+                            };
+
+
                             byte[] player1Pic = (byte[]) MySQLDatabase.getInstance(getApplicationContext()).getData(mCurrentUser.getUid(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
                             Bitmap player1Bitmap = player1Pic != null ? BitmapFactory.decodeByteArray(player1Pic, 0, player1Pic.length) : ((BitmapDrawable)imageViews[0].getDrawable()).getBitmap();
                             for (int i = 0; i < players; i++) {
@@ -254,6 +341,7 @@ public class LudoActivity extends AppCompatActivity {
                                 rotation = 3;
                             }
                             game = new LudoGame(LudoActivity.this, width, boardStartY, colors, players, dicePoints, arrows, playerTypes);
+                            ludoBoard.setY(boardStartY);
                             ludoBoard.setRotation(rotation * 90);
                             synchronized (this) {
                                 this.notify();
@@ -396,13 +484,13 @@ public class LudoActivity extends AppCompatActivity {
             thread.start();
         }
     }
-    View fourPlayer(final int width, float xdpi, float ydpi, final int y) {
+    View fourPlayer(final int width, float xdpi, float ydpi, final int y, boolean online) {
         final LinearLayout linearLayout = new LinearLayout(this);
 
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        final View view2 = layoutForTwo(width, xdpi, ydpi, y);
+        final View view2 = layoutForTwo(width, xdpi, ydpi, y, online);
 
         view2.findViewWithTag(R.id.player2_name).setId(R.id.player4_name);
         view2.findViewWithTag(R.id.player2_pic).setId(R.id.player4_pic);
@@ -420,7 +508,7 @@ public class LudoActivity extends AppCompatActivity {
         TextView textView = new TextView(this);
         textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (width + width / (10 * 2) + p1TextSize*2)));
 
-        View view1 = layoutForTwo(width, xdpi, ydpi, y);
+        View view1 = layoutForTwo(width, xdpi, ydpi, y, online);
 
         view1.findViewWithTag(R.id.player2_name).setId(R.id.player2_name);
         view1.findViewWithTag(R.id.player2_pic).setId(R.id.player2_pic);
@@ -443,30 +531,30 @@ public class LudoActivity extends AppCompatActivity {
         return linearLayout;
 
     }
-    View layoutForTwo(int width, float xdpi, float ydpi, final int y) {
-        LinearLayout linearLayout1 = new LinearLayout(this);
+    View layoutForTwo(int width, float xdpi, float ydpi, final int y, boolean online) {
+        LinearLayout linearLayout1 = new LinearLayout(getApplicationContext());
         linearLayout1.setOrientation(LinearLayout.VERTICAL);
         linearLayout1.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        LinearLayout linearLayout2 = new LinearLayout(this);
+        LinearLayout linearLayout2 = new LinearLayout(getApplicationContext());
         linearLayout2.setOrientation(LinearLayout.VERTICAL);
 //        linearLayout2.setLayoutParams(new LinearLayout.LayoutParams((width/10)*4, (width/10) + 20));
         linearLayout2.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        final LinearLayout linearLayout = new LinearLayout(this);
+        final LinearLayout linearLayout = new LinearLayout(getApplicationContext());
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        LinearLayout linearLayout3 = new LinearLayout(this);
+        LinearLayout linearLayout3 = new LinearLayout(getApplicationContext());
         linearLayout3.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout3.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        LinearLayout linearLayout4 = new LinearLayout(this);
+        LinearLayout linearLayout4 = new LinearLayout(getApplicationContext());
         linearLayout4.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout4.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        TextView player1 = new TextView(this);
-        int textWidth = width * 2;
+        TextView player1 = new TextView(getApplicationContext());
+        int textWidth = width * 4;
         int maxLength = 15;
         player1.setTextColor(android.graphics.Color.WHITE);
         InputFilter[] inputFilters = new InputFilter[]{new InputFilter.LengthFilter(maxLength)};
@@ -479,8 +567,7 @@ public class LudoActivity extends AppCompatActivity {
         player1.setGravity(Gravity.CENTER);
         player1.setSingleLine(true);
 
-
-        TextView player2 = new TextView(this);
+        TextView player2 = new TextView(getApplicationContext());
 
         player2.setLayoutParams(new LinearLayout.LayoutParams(textWidth / 10, textWidth / 60));
         player2.setTextSize(oneChar / (maxLength + 1));
@@ -490,43 +577,49 @@ public class LudoActivity extends AppCompatActivity {
         player2.setGravity(Gravity.CENTER);
         player2.setSingleLine(true);
 
-        ImageView imageView = new ImageView(this);
+        ImageView imageView = online ? new CircleImageView(getApplicationContext()) : new ImageView(getApplicationContext());
         imageView.setTag(R.id.player1_pic);
         imageView.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));
 
-        ImageView dice1 = new ImageView(this);
+        ImageView dice1 = new ImageView(getApplicationContext());
         dice1.setTag(R.id.player1_dice);
         dice1.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));
 
-        ImageView arrow1 = new ImageView(this);
+        ImageView arrow1 = new ImageView(getApplicationContext());
         arrow1.setTag(R.id.player1_arrow);
         arrow1.setVisibility(View.INVISIBLE);
-        arrow1.setImageDrawable(getResources().getDrawable(R.drawable.left_arrow_up));
         arrow1.setLayoutParams(new LinearLayout.LayoutParams(width / 5, width / 10));
 
-        ImageView arrow2 = new ImageView(this);
+        ImageView arrow2 = new ImageView(getApplicationContext());
         arrow2.setTag(R.id.player2_arrow);
         arrow2.setLayoutParams(new LinearLayout.LayoutParams(width / 5, width / 10));
         arrow2.setVisibility(View.INVISIBLE);
-        arrow2.setImageDrawable(getResources().getDrawable(R.drawable.right_arrown_down));
 
-        TextView textView = new TextView(this);
+        TextView textView = new TextView(getApplicationContext());
         textView.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));
-        ImageView playerPic2 = new ImageView(this);
+        ImageView playerPic2 = online ? new CircleImageView(getApplicationContext()) : new ImageView(getApplicationContext());
         playerPic2.setTag(R.id.player2_pic);
         playerPic2.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));
+        playerPic2.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        ImageView dice2 = new ImageView(this);
+        ImageView dice2 = new ImageView(getApplicationContext());
         dice2.setTag(R.id.player2_dice);
         dice2.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));
 
+        TextView p1Gap = new TextView(getApplicationContext());
+        p1Gap.setLayoutParams(new LinearLayout.LayoutParams(width/40, width/10));
+
+        TextView p2Gap = new TextView(getApplicationContext());
+        p2Gap.setLayoutParams(new LinearLayout.LayoutParams(width/40, width/10));
+
         linearLayout3.addView(imageView);
+        linearLayout3.addView(p1Gap);
         linearLayout3.addView(dice1);
         linearLayout3.addView(arrow1);
         linearLayout4.addView(arrow2);
         linearLayout4.addView(dice2);
+        linearLayout3.addView(p2Gap);
         linearLayout4.addView(playerPic2);
-
 
         imageView.setImageDrawable(getResources().getDrawable(R.drawable.marker_yellow));
         playerPic2.setImageDrawable(getResources().getDrawable(R.drawable.marker_blue));
@@ -543,6 +636,8 @@ public class LudoActivity extends AppCompatActivity {
         linearLayout2.addView(linearLayout4);
         linearLayout2.addView(player2);
 
+        player1.setPadding(0,0,width/5,0);
+        player2.setPadding(width/5,0,0,0);
         linearLayout1.setTag(R.id.player1_box);
         linearLayout2.setTag(R.id.player2_box);
         linearLayout1.setGravity(Gravity.CENTER);
@@ -556,4 +651,37 @@ public class LudoActivity extends AppCompatActivity {
         return linearLayout;
     }
 
+    private int getPieceIdFromColor(Color color)
+    {
+        if(color == BLUE)
+        {
+            return R.drawable.marker_blue;
+        }
+        else         if(color == GREEN)
+        {
+            return R.drawable.marker_green;
+        }
+        else        if(color == YELLOW)
+        {
+            return R.drawable.marker_yellow;
+        }
+        else
+        {
+            return R.drawable.marker_red;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(game!=null)
+        {
+            for(TrackingListeners t : game.listeners)
+            {
+                t.reference.removeEventListener(t.listener);
+            }
+        }
+
+    }
 }
