@@ -1,728 +1,605 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ludoBaseLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="0dp"
-    android:background="@drawable/spin_background">
+    tools:context=".LudoActivity"
+    android:background="@drawable/drop_down_menu_background"
+    android:id="@+id/boardContainer">
 
-    <ImageView
-        android:id="@+id/ludoBoard"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/ludo_board_4x4"
-        app:layout_constraintBottom_toTopOf="@id/player1_name"
-        app:layout_constraintEnd_toEndOf="@id/player4_name"
-        app:layout_constraintHeight_percent="0.52"
-        app:layout_constraintStart_toStartOf="@id/player1_name"
-        app:layout_constraintTop_toBottomOf="@id/player4_name" />
-
-    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:maxHeight="51dp"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/addUnit"
-        ads:layout_constraintBottom_toTopOf="@id/player4_box"
-        ads:layout_constraintEnd_toEndOf="@id/player4_name"
-        ads:layout_constraintHeight_max="51dp"
-        ads:layout_constraintHeight_percent="0.1"
-        ads:layout_constraintHorizontal_bias="0.5"
-        ads:layout_constraintStart_toStartOf="@id/player1_name"
-        ads:layout_constraintTop_toTopOf="parent"
-        ads:layout_constraintVertical_chainStyle="spread" />
-
-    <ImageView
-        android:id="@+id/player3_pic"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:scaleX="0.85"
-        android:scaleY="0.85"
-        android:src="#0000FF"
-        app:layout_constraintBottom_toBottomOf="@+id/player4_pic"
-        app:layout_constraintEnd_toEndOf="@+id/player3_pic_box"
-        app:layout_constraintStart_toStartOf="@+id/player3_pic_box"
-        app:layout_constraintTop_toTopOf="@+id/player4_pic" />
-
-    <ImageView
-        android:id="@+id/player3_pic_box"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/pic_box"
-        app:layout_constraintBottom_toBottomOf="@+id/player4_pic_box"
-        app:layout_constraintEnd_toStartOf="@+id/player3_box"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/player4_pic_box" />
-
-    <ImageView
-        android:id="@+id/player3_box"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/dice_box"
-        app:layout_constraintBottom_toBottomOf="@+id/player4_box"
-        app:layout_constraintEnd_toStartOf="@+id/player3_arrow"
-        app:layout_constraintStart_toEndOf="@id/player3_pic_box"
-        app:layout_constraintTop_toTopOf="@+id/player4_box"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <ImageView
-        android:id="@+id/player3_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/left_arrow_up"
-        app:layout_constraintBottom_toBottomOf="@+id/player4_pic_box"
-        app:layout_constraintEnd_toStartOf="@+id/player4_box"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toEndOf="@id/player3_box"
-        app:layout_constraintTop_toTopOf="@+id/player4_pic_box" />
-
-    <ImageView
-        android:id="@+id/player4_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:maxHeight="150dp"
-        android:src="@drawable/right_arrow_up"
-        app:layout_constraintBottom_toBottomOf="@+id/player3_arrow"
-        app:layout_constraintEnd_toEndOf="@+id/player3_arrow"
-        app:layout_constraintStart_toStartOf="@+id/player3_arrow"
-        app:layout_constraintTop_toTopOf="@+id/player3_arrow" />
-
-    <ImageView
-        android:id="@+id/player4_box"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/dice_box"
-        app:layout_constraintBottom_toTopOf="@+id/player4_name"
-        app:layout_constraintEnd_toStartOf="@+id/player4_pic_box"
-        app:layout_constraintHeight_percent="0.12"
-        app:layout_constraintStart_toEndOf="@id/player3_arrow"
-        app:layout_constraintTop_toBottomOf="@id/adView" />
-
-    <ImageView
-        android:id="@+id/player4_pic"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:scaleX="0.85"
-        android:scaleY="0.85"
-        android:src="#0000FF"
-        app:layout_constraintBottom_toBottomOf="@id/player4_pic_box"
-        app:layout_constraintEnd_toEndOf="@id/player4_pic_box"
-        app:layout_constraintStart_toStartOf="@id/player4_pic_box"
-        app:layout_constraintTop_toTopOf="@id/player4_pic_box" />
-
-    <ImageView
-        android:id="@+id/player4_pic_box"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/pic_box"
-        app:layout_constraintBottom_toBottomOf="@+id/player4_box"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.09"
-        app:layout_constraintStart_toEndOf="@id/player4_box"
-        app:layout_constraintTop_toTopOf="@id/player4_box" />
-
-    <ImageView
-        android:id="@+id/player1_pic"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:scaleX="0.85"
-        android:scaleY="0.85"
-        android:src="#0000FF"
-        app:layout_constraintBottom_toBottomOf="@+id/player1_pic_box"
-        app:layout_constraintEnd_toEndOf="@+id/player1_pic_box"
-        app:layout_constraintStart_toStartOf="@+id/player1_pic_box"
-        app:layout_constraintTop_toTopOf="@+id/player1_pic_box" />
-
-    <ImageView
-        android:id="@+id/player1_pic_box"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/pic_box"
-        app:layout_constraintBottom_toBottomOf="@+id/player1_box"
-        app:layout_constraintEnd_toStartOf="@+id/player1_box"
-        app:layout_constraintHeight_percent="0.09"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/player1_box" />
-
-    <ImageView
-        android:id="@+id/player1_box"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/dice_box"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/player1_arrow"
-        app:layout_constraintHeight_percent="0.12"
-        app:layout_constraintStart_toEndOf="@id/player1_pic_box"
-        app:layout_constraintTop_toBottomOf="@+id/player1_name" />
-
-    <!--<FrameLayout-->
-    <!--android:layout_width="50dp"-->
-    <!--android:layout_height="0dp"-->
-    <!--app:layout_constraintStart_toEndOf="@id/player3_box"-->
-    <!--app:layout_constraintTop_toTopOf="@id/player3_pic_box"-->
-    <!--app:layout_constraintBottom_toBottomOf="@id/player3_pic_box"-->
-    <!--android:id="@+id/player34_arrow">-->
-
-    <ImageView
-        android:id="@+id/player1_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/left_arrow_up"
-        app:layout_constraintBottom_toBottomOf="@+id/player2_pic_box"
-        app:layout_constraintEnd_toStartOf="@+id/player2_box"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toEndOf="@id/player1_box"
-        app:layout_constraintTop_toTopOf="@+id/player2_pic_box" />
-
-    <ImageView
-        android:id="@+id/player2_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/right_arrow_up"
-        app:layout_constraintBottom_toBottomOf="@+id/player1_arrow"
-        app:layout_constraintEnd_toEndOf="@+id/player1_arrow"
-        app:layout_constraintStart_toStartOf="@+id/player1_arrow"
-        app:layout_constraintTop_toTopOf="@+id/player1_arrow" />
-
-    <!--</FrameLayout>-->
-
-    <ImageView
-        android:id="@+id/player2_box"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/dice_box"
-        app:layout_constraintBottom_toBottomOf="@id/player1_box"
-        app:layout_constraintEnd_toStartOf="@+id/player2_pic_box"
-        app:layout_constraintStart_toEndOf="@id/player1_arrow"
-        app:layout_constraintTop_toTopOf="@+id/player1_box" />
-
-    <ImageView
-        android:id="@+id/player2_pic"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:scaleX="0.85"
-        android:scaleY="0.85"
-        android:src="#0000FF"
-        app:layout_constraintBottom_toBottomOf="@id/player2_pic_box"
-        app:layout_constraintEnd_toEndOf="@id/player2_pic_box"
-        app:layout_constraintStart_toStartOf="@id/player2_pic_box"
-        app:layout_constraintTop_toTopOf="@id/player2_pic_box" />
-
-    <ImageView
-        android:id="@+id/player2_pic_box"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/pic_box"
-        app:layout_constraintBottom_toBottomOf="@id/player1_pic_box"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/player2_box"
-        app:layout_constraintTop_toTopOf="@id/player1_pic" />
-
-    <!--<ImageView-->
-    <!--android:id="@+id/player3_dice_gif"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:adjustViewBounds="true"-->
-    <!--android:src="@drawable/dice_roll1"-->
-    <!--android:visibility="invisible"-->
-    <!--app:layout_constraintHeight_percent="0.07"-->
-    <!--app:layout_constraintBottom_toBottomOf="@id/player3_box"-->
-    <!--app:layout_constraintEnd_toEndOf="@id/player3_box"-->
-    <!--app:layout_constraintStart_toStartOf="@id/player3_box"-->
-    <!--app:layout_constraintTop_toTopOf="@id/player3_box" />-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/player4_dice_gif"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="0dp"-->
-    <!--app:layout_constraintHeight_percent="0.07"-->
-    <!--android:adjustViewBounds="true"-->
-    <!--android:src="@drawable/dice_roll1"-->
-    <!--android:visibility="invisible"-->
-    <!--app:layout_constraintBottom_toBottomOf="@id/player4_box"-->
-    <!--app:layout_constraintEnd_toEndOf="@id/player4_box"-->
-    <!--app:layout_constraintStart_toStartOf="@id/player4_box"-->
-    <!--app:layout_constraintTop_toTopOf="@id/player4_box" />-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/player1_dice_gif"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:adjustViewBounds="true"-->
-    <!--android:src="@drawable/dice_roll1"-->
-    <!--android:visibility="invisible"-->
-    <!--app:layout_constraintHeight_percent="0.07"-->
-    <!--app:layout_constraintBottom_toBottomOf="@id/player1_box"-->
-    <!--app:layout_constraintEnd_toEndOf="@id/player1_box"-->
-    <!--app:layout_constraintStart_toStartOf="@id/player1_box"-->
-    <!--app:layout_constraintTop_toTopOf="@id/player1_box" />-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/player2_dice_gif"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:adjustViewBounds="true"-->
-    <!--android:src="@drawable/dice_roll1"-->
-    <!--android:visibility="invisible"-->
-    <!--app:layout_constraintHeight_percent="0.07"-->
-    <!--app:layout_constraintBottom_toBottomOf="@id/player2_box"-->
-    <!--app:layout_constraintEnd_toEndOf="@id/player2_box"-->
-    <!--app:layout_constraintStart_toStartOf="@id/player2_box"-->
-    <!--app:layout_constraintTop_toTopOf="@id/player2_box" />-->
-
-    <ImageView
-        android:id="@+id/player3_dice"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/dice_1"
-        app:layout_constraintBottom_toBottomOf="@id/player3_box"
-        app:layout_constraintEnd_toEndOf="@id/player3_box"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintStart_toStartOf="@id/player3_box"
-        app:layout_constraintTop_toTopOf="@id/player3_box" />
-
-    <ImageView
-        android:id="@+id/player4_dice"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/dice_1"
-        app:layout_constraintBottom_toBottomOf="@id/player4_box"
-        app:layout_constraintEnd_toEndOf="@id/player4_box"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintStart_toStartOf="@id/player4_box"
-        app:layout_constraintTop_toTopOf="@id/player4_box" />
-
-    <ImageView
-        android:id="@+id/player1_dice"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/dice_1"
-        app:layout_constraintBottom_toBottomOf="@id/player1_box"
-        app:layout_constraintEnd_toEndOf="@id/player1_box"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintStart_toStartOf="@id/player1_box"
-        app:layout_constraintTop_toTopOf="@id/player1_box" />
-
-    <ImageView
-        android:id="@+id/player2_dice"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/dice_1"
-        app:layout_constraintBottom_toBottomOf="@id/player2_box"
-        app:layout_constraintEnd_toEndOf="@id/player2_box"
-        app:layout_constraintHeight_percent="0.07"
-        app:layout_constraintStart_toStartOf="@id/player2_box"
-        app:layout_constraintTop_toTopOf="@id/player2_box" />
-
-    <TextView
-        android:id="@+id/player4_name"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:autoSizeTextType="uniform"
-        android:background="@drawable/player_names_border"
-        android:fontFamily="cursive"
-        android:gravity="center"
-        android:maxLength="30"
-        android:maxLines="1"
-        android:text="Muhammad Awais Haroon"
-        android:textAllCaps="true"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/ludoBoard"
-        app:layout_constraintEnd_toEndOf="@id/player4_pic_box"
-        app:layout_constraintHeight_percent="0.045"
-        app:layout_constraintStart_toStartOf="@id/player4_box"
-        app:layout_constraintTop_toBottomOf="@id/player4_box" />
-
-    <TextView
-        android:id="@+id/player3_name"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:autoSizeTextType="uniform"
-        android:background="@drawable/player_names_border"
-        android:fontFamily="cursive"
-        android:gravity="center"
-        android:maxLines="1"
-        android:text="Muhammad Awais Haroon Bhatti"
-        android:textAllCaps="true"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/player4_name"
-        app:layout_constraintEnd_toEndOf="@id/player3_box"
-        app:layout_constraintStart_toStartOf="@id/player3_pic_box"
-        app:layout_constraintTop_toTopOf="@id/player4_name" />
-
-    <TextView
-        android:id="@+id/player2_name"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:autoSizeTextType="uniform"
-        android:background="@drawable/player_names_border"
-        android:fontFamily="cursive"
-        android:gravity="center"
-        android:maxLines="1"
-        android:text="Muhammad Awais Haroon Bhatti"
-        android:textAllCaps="true"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/player1_name"
-        app:layout_constraintEnd_toEndOf="@id/player2_pic_box"
-        app:layout_constraintStart_toStartOf="@id/player2_box"
-        app:layout_constraintTop_toTopOf="@id/player1_name" />
-
-    <TextView
-        android:id="@+id/player1_name"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:autoSizeTextType="uniform"
-        android:background="@drawable/player_names_border"
-        android:fontFamily="cursive"
-        android:gravity="center"
-        android:maxLength="10"
-        android:maxLines="1"
-        android:text="Taha Malik"
-        android:textAllCaps="true"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/player1_box"
-        app:layout_constraintEnd_toEndOf="@id/player1_box"
-        app:layout_constraintHeight_percent="0.045"
-        app:layout_constraintStart_toStartOf="@id/player1_pic_box"
-        app:layout_constraintTop_toBottomOf="@id/ludoBoard" />
-
-
-    <FrameLayout
-        android:id="@+id/boardContainer"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:weightSum="1">
 
-    </FrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.25"
+            android:orientation="horizontal"
+            android:weightSum="1.04"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.106"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:gravity="center">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.66"
+                android:scaleType="fitXY"
+                android:id="@id/player3_pic"
+                android:src="#0000ff" />
+            </LinearLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/dice_box"
+                android:id="@id/player3_box"
+                android:layout_weight="0.16"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:id="@id/player3_arrow"
+                android:src="@drawable/left_arrow_up"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:src="@drawable/right_arrow_up"
+                android:id="@id/player4_arrow"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/dice_box"
+                android:id="@id/player4_box"
+                android:layout_weight="0.16"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.106"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.66"
+                    android:id="@id/player4_pic"
+                    android:scaleType="fitXY"
+                    android:src="#0000ff" />
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ludoBoard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ludo_board_4x4" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.25"
+            android:orientation="horizontal"
+            android:weightSum="1.04"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.106"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.66"
+                    android:scaleType="fitXY"
+                    android:id="@id/player1_pic"
+                    android:src="#0000ff" />
+            </LinearLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/dice_box"
+                android:id="@id/player1_box"
+                android:layout_weight="0.16"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:id="@id/player1_arrow"
+                android:src="@drawable/left_arrow_up"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:id="@id/player2_arrow"
+                android:src="@drawable/right_arrow_up"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/dice_box"
+                android:id="@id/player2_box"
+                android:layout_weight="0.16"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.02"
+                />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.106"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.66"
+                    android:scaleType="fitXY"
+                    android:id="@id/player2_pic"
+                    android:src="#0000ff" />
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.25"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.29"
+                android:weightSum="1">
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.45"
+                android:rotation="180"
+                android:id="@+id/player3_pic_box"
+                android:src="@drawable/pic_box" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="0.55"
+                android:weightSum="1"
+                android:gravity="center">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.67"
+                android:id="@+id/player3_dice"
+                android:src="@drawable/dice_1" />
+            </LinearLayout>
+
+            </LinearLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.42"
+                android:visibility="invisible" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="0.16"
+                android:weightSum="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.67"
+                    android:rotation="180"
+                    android:id="@+id/player4_dice"
+                    android:src="@drawable/dice_1" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.13"
+                android:rotation="180"
+                android:id="@+id/player4_pic_box"
+                android:src="@drawable/pic_box" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ludo_board_4x4_bw"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.25"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.13"
+                android:src="@drawable/pic_box"
+                android:id="@+id/player1_pic_box"
+                />
+
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="0.16"
+                android:weightSum="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.67"
+                     android:rotation="180"
+                    android:id="@+id/player1_dice"
+                    android:src="@drawable/dice_1" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.42"
+                android:visibility="invisible" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="0.16"
+                android:weightSum="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.67"
+                    android:rotation="180"
+                    android:id="@+id/player2_dice"
+                    android:src="@drawable/dice_1" />
+            </LinearLayout>
+
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.13"
+                android:src="@drawable/pic_box"
+                android:id="@+id/player2_pic_box"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/addUnit">
+    </com.google.android.gms.ads.AdView>
 
     <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:id="@+id/you_won_dialogue"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:visibility="gone">
 
         <ImageView
-            android:id="@+id/you_won_dialogue_image"
-            android:layout_width="wrap_content"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000"
+            android:alpha="0.7"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.275"/>
+
+        <ImageView
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:adjustViewBounds="true"
             android:src="@drawable/you_won"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:scaleType="fitXY"
+            android:layout_weight="0.5"
+            android:adjustViewBounds="true"/>
 
-        <TextView
-            android:id="@+id/total_wins"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:autoSizeTextType="uniform"
-            android:gravity="center"
-            android:text="100000"
-            android:textColor="#000"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/you_won_dialogue_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.045"
-            app:layout_constraintHorizontal_bias="0.28"
-            app:layout_constraintStart_toStartOf="@id/you_won_dialogue_image"
-            app:layout_constraintTop_toTopOf="@id/you_won_dialogue_image"
-            app:layout_constraintVertical_bias="0.8"
-            app:layout_constraintWidth_percent="0.234" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:adjustViewBounds="true"
+                android:layout_weight="0.15"
+                android:src="@drawable/edit_profile_continue"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1">
 
-            android:id="@+id/total_losses"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:autoSizeTextType="uniform"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="1000"
-            android:textColor="#000"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/you_won_dialogue_image"
-            app:layout_constraintEnd_toEndOf="@id/you_won_dialogue_image"
-            app:layout_constraintHeight_percent="0.045"
-            app:layout_constraintHorizontal_bias="0.6472265"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/you_won_dialogue_image"
-            app:layout_constraintVertical_bias="0.812"
-            app:layout_constraintWidth_percent="0.24" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.495"
+                />
 
-        <TextView
 
-            android:id="@+id/coins_won"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:autoSizeTextType="uniform"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="1000"
-            android:textColor="#ff0"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/you_won_dialogue_image"
-            app:layout_constraintEnd_toEndOf="@id/you_won_dialogue_image"
-            app:layout_constraintHeight_percent="0.05"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/you_won_dialogue_image"
-            app:layout_constraintVertical_bias="0.5" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.05"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.45999"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.08"
+                    android:text="0"
+                    android:textColor="#FFDD00"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.09"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:layout_weight="0.059"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.21"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.25"
+                    android:text="0"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.28"
+                    android:text="0"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </FrameLayout>
+
 
     <FrameLayout
-        android:id="@+id/you_lost_dialogue"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:id="@+id/you_lost_dialogue">
 
         <ImageView
-            android:id="@+id/you_lost_dialogue_image"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:adjustViewBounds="true"
-            android:src="@drawable/you_lost"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/total_lost_wins"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:autoSizeTextType="uniform"
-            android:gravity="center"
-            android:text="100000"
-            android:textColor="#000"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/you_lost_dialogue_image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.049"
-            app:layout_constraintHorizontal_bias="0.3"
-            app:layout_constraintStart_toStartOf="@id/you_lost_dialogue_image"
-            app:layout_constraintTop_toTopOf="@id/you_lost_dialogue_image"
-            app:layout_constraintVertical_bias="0.83"
-            app:layout_constraintWidth_percent="0.234" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000"
+            android:alpha="0.7"/>
 
-        <TextView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1">
 
-            android:id="@+id/total_lost_losses"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:autoSizeTextType="uniform"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="1000"
-            android:textColor="#000"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/you_lost_dialogue_image"
-            app:layout_constraintEnd_toEndOf="@id/you_lost_dialogue_image"
-            app:layout_constraintHeight_percent="0.05"
-            app:layout_constraintHorizontal_bias="0.65"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/you_lost_dialogue_image"
-            app:layout_constraintVertical_bias="0.839"
-            app:layout_constraintWidth_percent="0.256" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.275"/>
 
-        <TextView
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:src="@drawable/you_lost"
+                android:scaleType="fitXY"
+                android:layout_weight="0.5"
+                android:adjustViewBounds="true"/>
 
-            android:id="@+id/coins_lost"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:autoSizeTextType="uniform"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="1000"
-            android:textColor="#ff0"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/you_lost_dialogue_image"
-            app:layout_constraintEnd_toEndOf="@id/you_lost_dialogue_image"
-            app:layout_constraintHeight_percent="0.05"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/you_lost_dialogue_image"
-            app:layout_constraintVertical_bias="0.51" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:adjustViewBounds="true"
+                android:layout_weight="0.15"
+                android:src="@drawable/edit_profile_continue"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.495"
+                />
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.05"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.45999"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.08"
+                    android:text="0"
+                    android:textColor="#FFDD00"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.09"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:layout_weight="0.059"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.21"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.25"
+                    android:text="0"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.28"
+                    android:text="0"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </FrameLayout>
 
-    <!--<FrameLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:visibility="gone"-->
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--android:id="@+id/you_lost_dialogue">-->
-
-    <!--<ImageView-->
-
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="#000"-->
-    <!--android:alpha="0.7"/>-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:orientation="vertical"-->
-    <!--android:weightSum="1">-->
-
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:layout_weight="0.275"/>-->
-
-    <!--<ImageView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:src="@drawable/you_lost"-->
-    <!--android:scaleType="fitXY"-->
-    <!--android:layout_weight="0.5"-->
-    <!--android:adjustViewBounds="true"/>-->
-
-    <!--<ImageView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:adjustViewBounds="true"-->
-    <!--android:layout_weight="0.15"-->
-    <!--android:src="@drawable/edit_profile_continue"/>-->
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:orientation="vertical"-->
-    <!--android:weightSum="1">-->
-
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:layout_weight="0.495"-->
-    <!--/>-->
 
 
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:layout_weight="0.05"-->
-    <!--android:orientation="horizontal"-->
-    <!--android:weightSum="1">-->
 
-    <!--<TextView-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_weight="0.45999"/>-->
-    <!--<TextView-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_weight="0.08"-->
-    <!--android:text="0"-->
-    <!--android:textColor="#FFDD00"-->
-    <!--android:textSize="23sp"-->
-    <!--android:textStyle="bold"-->
-    <!--android:gravity="center"/>-->
-
-
-    <!--</LinearLayout>-->
-
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:layout_weight="0.09"/>-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:orientation="horizontal"-->
-    <!--android:layout_weight="0.059"-->
-    <!--android:weightSum="1">-->
-
-    <!--<TextView-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_weight="0.21"/>-->
-    <!--<TextView-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_weight="0.25"-->
-    <!--android:text="0"-->
-    <!--android:textSize="23sp"-->
-    <!--android:textStyle="bold"-->
-    <!--android:gravity="center"/>-->
-    <!--<TextView-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_weight="0.28"-->
-    <!--android:text="0"-->
-    <!--android:textSize="23sp"-->
-    <!--android:textStyle="bold"-->
-    <!--android:gravity="center"/>-->
-
-
-    <!--</LinearLayout>-->
-
-    <!--</LinearLayout>-->
-
-    <!--</FrameLayout>-->
-
-    <!--<TextView-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="0dp"-->
-    <!--app:layout_constraintHeight_percent="0."-->
-    <!--app:layout_constraintWidth_percent="0.15"-->
-    <!--android:rotation="-45"-->
-    <!--android:gravity="center"-->
-    <!--android:text="Taha"-->
-    <!--android:textSize="10sp"-->
-    <!--app:layout_constraintStart_toStartOf="@id/ludoBoard"-->
-    <!--app:layout_constraintTop_toTopOf="@id/ludoBoard" />-->
-
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>
