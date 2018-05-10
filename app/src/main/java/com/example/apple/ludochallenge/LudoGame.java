@@ -13,7 +13,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,7 +58,7 @@ public class LudoGame extends FrameLayout {
     int numberOfPlayers;
     int pieceIndex = -1;
     int num = 1;
-    Point[] dicePoints;
+    ImageView[] dicePoints;
     ImageView[] mArrows;
     ArrayList<LudoPlayer> players = new ArrayList<>();
     ArrayList<LudoPiece> pieces = new ArrayList<>();
@@ -68,7 +67,7 @@ public class LudoGame extends FrameLayout {
 
     public static TextView textView;
 
-    ImageView diceImage;
+//    ImageView diceImage;
     int width;
     LudoGame game = this;
     int boardStart;
@@ -77,7 +76,7 @@ public class LudoGame extends FrameLayout {
     public boolean done = false;
 
 
-    public LudoGame(@NonNull Context context, int width, int y, Color[] colors, int numberOfPlayers, Point[] dicePoints, ImageView[] arrows, PlayerType[] playerTypes) {
+    public LudoGame(@NonNull Context context, int width, int y, Color[] colors, int numberOfPlayers, ImageView[] dicePoints, ImageView[] arrows, PlayerType[] playerTypes) {
 
         super(context);
         mBoxWidth = width / 15;
@@ -93,16 +92,16 @@ public class LudoGame extends FrameLayout {
         setWillNotDraw(false);
         initializePieces(numberOfPlayers, colors, playerTypes);
 
-        diceImage = new ImageView(context);
-        diceImage.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));
+//        diceImage = new ImageView(context);
+//        diceImage.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));
 //        diceImage.setX(dicePoints[currentPlayer].x);
 //        diceImage.setY(dicePoints[currentPlayer].y);
         setVisibility(VISIBLE);
         setLayoutParams(new LayoutParams(width, width));
-        diceImage.setImageDrawable(getResources().getDrawable(R.drawable.dice_2));
-        diceImage.setOnClickListener(getDiceClickListener());
-        diceImage.setScaleType(ImageView.ScaleType.FIT_XY);
-        diceImage.setEnabled(false);
+//        diceImage.setImageDrawable(getResources().getDrawable(R.drawable.dice_2));
+//        diceImage.setOnClickListener(getDiceClickListener());
+//        diceImage.setScaleType(ImageView.ScaleType.FIT_XY);
+//        diceImage.setEnabled(false);
     }
 
     private OnClickListener pieceClickListener = new OnClickListener() {
@@ -134,6 +133,7 @@ public class LudoGame extends FrameLayout {
                         final OnCompleteListener<Void> onCompleteListener2 = new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
+
                                 if(!task.isSuccessful() || !task.isComplete())
                                 {
                                     gameRef.child("updateUI").setValue((++updateNum)%26).addOnCompleteListener(this);
@@ -142,6 +142,7 @@ public class LudoGame extends FrameLayout {
                                 {
                                     players.get(currentPlayer).move(finalNum, (LudoPiece) v);
                                 }
+
                             }
                         };
                         final OnCompleteListener<Void> onCompleteListener1 = new OnCompleteListener<Void>() {
@@ -194,7 +195,7 @@ public class LudoGame extends FrameLayout {
             @Override
             public void onClick(final View v) {
 
-                diceImage.setEnabled(false);
+                v.setEnabled(false);
                 mArrows[currentPlayer].setVisibility(INVISIBLE);
                 mArrows[currentPlayer].setAnimation(null);
 
@@ -263,8 +264,8 @@ public class LudoGame extends FrameLayout {
                                         animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                             @Override
                                             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                                if ((diceImage.getLayoutParams().width - value >= width / 10))
-                                                    diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width - value), (diceImage.getLayoutParams().height - value)));
+                                                if ((v.getLayoutParams().width - value >= width / 10))
+                                                    v.setLayoutParams(new LayoutParams((v.getLayoutParams().width - value), (v.getLayoutParams().height - value)));
                                             }
                                         });
 
@@ -285,7 +286,7 @@ public class LudoGame extends FrameLayout {
                                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                     @Override
                                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                        diceImage.setLayoutParams(new LayoutParams((diceImage.getLayoutParams().width + value), (diceImage.getLayoutParams().height + value)));
+                                        v.setLayoutParams(new LayoutParams((v.getLayoutParams().width + value), (v.getLayoutParams().height + value)));
                                     }
                                 });
                                 //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
@@ -358,13 +359,11 @@ public class LudoGame extends FrameLayout {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-
-
                 mArrows[currentPlayer].setVisibility(VISIBLE);
                 mArrows[currentPlayer].setAnimation(translateAnimation);
-                diceImage.setX(dicePoints[currentPlayer].x);
-                diceImage.setY(dicePoints[currentPlayer].y);
-                diceImage.setEnabled(true);
+//                diceImage.setX(dicePoints[currentPlayer].x);
+//                diceImage.setY(dicePoints[currentPlayer].y);
+                dicePoints[currentPlayer].setEnabled(true);
 
             }
         };
@@ -380,13 +379,16 @@ public class LudoGame extends FrameLayout {
 
                 mArrows[currentPlayer].setVisibility(VISIBLE);
                 mArrows[currentPlayer].setAnimation(translateAnimation);
-                diceImage.setX(dicePoints[currentPlayer].x);
-                diceImage.setY(dicePoints[currentPlayer].y);
+
+//                diceImage.setX(dicePoints[currentPlayer].x);
+//                diceImage.setY(dicePoints[currentPlayer].y);
+
                 if(currentPlayer == 0)
                 {
-                    diceImage.setEnabled(true);
+                    dicePoints[currentPlayer].setEnabled(true);
                 }
-                else diceImage.setEnabled(false);
+                else dicePoints[currentPlayer].setEnabled(false);
+
                 addOnDataChangeListener();
             }
         };
@@ -396,8 +398,6 @@ public class LudoGame extends FrameLayout {
     }
 
     public void addOnDataChangeListener() {
-
-
 
         final Query query = gameRef.child("updateUI");
         query.keepSynced(true);
@@ -411,6 +411,7 @@ public class LudoGame extends FrameLayout {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
 
+                                    updateNum = (++updateNum)%26;
                                     if(((Long) dataSnapshot.child("dice_value").getValue()) != null && ((Long) dataSnapshot.child("piece_number").getValue()) != null) {
                                         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                         assert user != null;
@@ -419,7 +420,7 @@ public class LudoGame extends FrameLayout {
                                             int pieceNum = ((Long) dataSnapshot.child("piece_number").getValue()).intValue();
                                             game.num = num;
                                             game.pieceIndex = pieceNum;
-                                            diceImage.performClick();
+                                            dicePoints[currentPlayer].performClick();
                                         }
 //                                        else {
 //                                            diceImage.setX(dicePoints[currentPlayer].x);
@@ -470,49 +471,36 @@ public class LudoGame extends FrameLayout {
                     @Override
                     public void onDataChange(final DataSnapshot dataSnapshot) {
 
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                boolean updated = true;
+                        if(currentPlayer == 0) {
 
-                                for (int i = 0; i < numberOfPlayers && updated; i++) {
-                                    updated = dataSnapshot.child(uids[i]).getValue(Boolean.class) != null && (boolean) dataSnapshot.child(uids[i]).getValue();
-                                }
+                            final Thread thread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    boolean updated = true;
 
-                                if (updated) {
-                                    final Runnable runnable = new Runnable() {
-                                        @Override
-                                        public void run() {
-
-                                            OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if(!task.isSuccessful() || !task.isComplete()) {
-                                                        gameRef.child("updated").setValue(true).addOnCompleteListener(this);
-                                                    }
-                                                }
-                                            };
-
-                                            gameRef.child("updated").setValue(true).addOnCompleteListener(onCompleteListener);
-                                            synchronized (this) {
-                                                this.notify();
-                                            }
-
-                                        }
-                                    };
-                                    synchronized (runnable) {
-                                        new Thread(runnable).start();
-                                        try {
-                                            runnable.wait();
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
+                                    for (int i = 0; i < numberOfPlayers && updated; i++) {
+                                        updated = dataSnapshot.child(uids[i]).getValue(Boolean.class) != null && (boolean) dataSnapshot.child(uids[i]).getValue();
                                     }
 
+                                    if (updated) {
+                                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (!task.isSuccessful() || !task.isComplete()) {
+                                                    gameRef.child("updated").setValue(true).addOnCompleteListener(this);
+                                                } else {
+                                                    Toast.makeText(context, "UPDATED EVERY PIECE", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        };
+
+                                        gameRef.child("updated").setValue(true).addOnCompleteListener(onCompleteListener);
+
+                                    }
                                 }
-                            }
-                        });
-                        thread.start();
+                            });
+                            thread.start();
+                        }
                     }
 
                     @Override
@@ -534,7 +522,6 @@ public class LudoGame extends FrameLayout {
             query1.addValueEventListener(valueEventListener);
             listeners.add(new TrackingListeners(query1,valueEventListener));
         }
-
         ValueEventListener updatedValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
@@ -544,45 +531,45 @@ public class LudoGame extends FrameLayout {
                     public void run() {
                         if (!firstupdate) {
                             if (!(boolean) dataSnapshot.getValue()) {
-                                if (uids[currentPlayer].equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                                    ValueEventListener valueEventListener1 = new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(final DataSnapshot dataSnapshot) {
-                                            Thread thread1 = new Thread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    for (int i = 0; i < numberOfPlayers; i++) {
-                                                        final int finalI = i;
-                                                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if (!task.isComplete() || !task.isSuccessful()) {
-                                                                    Query query1 = dataSnapshot.getRef().child(uids[finalI]);
-                                                                    query1.keepSynced(true);
-                                                                    query1.getRef().setValue(false).addOnCompleteListener(this);
-                                                                }
-                                                            }
-                                                        };
-                                                        Query query1 = dataSnapshot.getRef().child(uids[i]);
-                                                        query1.keepSynced(true);
-                                                        query1.getRef().setValue(false).addOnCompleteListener(onCompleteListener);
-                                                    }
-                                                    falsed = true;
-                                                }
-                                            });
-                                            thread1.start();
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    };
-                                    Query query1 = gameRef;
-                                    query1.keepSynced(true);
-                                    query1.addListenerForSingleValueEvent(valueEventListener1);
-                                }
-                            } else{
+//                                if (uids[currentPlayer].equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+//                                    ValueEventListener valueEventListener1 = new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(final DataSnapshot dataSnapshot) {
+//                                            Thread thread1 = new Thread(new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                    for (int i = 0; i < numberOfPlayers; i++) {
+//                                                        final int finalI = i;
+//                                                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
+//                                                            @Override
+//                                                            public void onComplete(@NonNull Task<Void> task) {
+//                                                                if (!task.isComplete() || !task.isSuccessful()) {
+//                                                                    Query query1 = dataSnapshot.getRef().child(uids[finalI]);
+//                                                                    query1.keepSynced(true);
+//                                                                    query1.getRef().setValue(false).addOnCompleteListener(this);
+//                                                                }
+//                                                            }
+//                                                        };
+//                                                        Query query1 = dataSnapshot.getRef().child(uids[i]);
+//                                                        query1.keepSynced(true);
+//                                                        query1.getRef().setValue(false).addOnCompleteListener(onCompleteListener);
+//                                                    }
+//                                                    falsed = true;
+//                                                }
+//                                            });
+//                                            thread1.start();
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(DatabaseError databaseError) {
+//
+//                                        }
+//                                    };
+//                                    Query query1 = gameRef;
+//                                    query1.keepSynced(true);
+//                                    query1.addListenerForSingleValueEvent(valueEventListener1);
+//                            }
+                            } else {
                                 final Query query1 = gameRef;
                                 query1.keepSynced(true);
                                 query1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -601,21 +588,59 @@ public class LudoGame extends FrameLayout {
                                                 public void onComplete(@NonNull Task<Void> task) {
 
                                                     if (task.isSuccessful() && task.isComplete()) {
-                                                        OnCompleteListener<Void> onCompleteListener1 = new OnCompleteListener<Void>() {
+
+                                                        final int[] i = {1};
+                                                        OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
-                                                                if (!task.isSuccessful() || !task.isComplete()) {
-                                                                    dataSnapshot.getRef().child("updated").setValue(false).addOnCompleteListener(this);
+                                                                if (!task.isSuccessful()) {
+                                                                    Query query1 = dataSnapshot.getRef().child(uids[i[0]]);
+                                                                    query1.getRef().setValue(false).addOnCompleteListener(this);
                                                                 } else {
-                                                                    mArrows[currentPlayer].setVisibility(VISIBLE);
-                                                                    mArrows[currentPlayer].setAnimation(translateAnimation);
-                                                                    diceImage.setEnabled(true);
+                                                                    i[0]++;
+                                                                    if(i[0] < numberOfPlayers) {
+                                                                        Query query1 = dataSnapshot.getRef().child(uids[i[0]]);
+                                                                        query1.getRef().setValue(false).addOnCompleteListener(this);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        OnCompleteListener<Void> onCompleteListener1 = new OnCompleteListener<Void>() {
+                                                                            @Override
+                                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                                if (!task.isComplete() || !task.isSuccessful()) {
+                                                                                    Query query1 = dataSnapshot.getRef().child(uids[0]);
+                                                                                    query1.getRef().setValue(false).addOnCompleteListener(this);
+                                                                                } else {
+                                                                                    OnCompleteListener<Void> onCompleteListener1 = new OnCompleteListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                            if (!task.isSuccessful() || !task.isComplete()) {
+                                                                                                dataSnapshot.getRef().child("updated").setValue(false).addOnCompleteListener(this);
+                                                                                            } else {
+                                                                                                mArrows[currentPlayer].setVisibility(VISIBLE);
+                                                                                                mArrows[currentPlayer].setAnimation(translateAnimation);
+                                                                                                dicePoints[currentPlayer].setEnabled(true);
+                                                                                            }
+                                                                                        }
+                                                                                    };
+                                                                                    Query query2 = dataSnapshot.getRef().child("updated");
+                                                                                    query2.keepSynced(true);
+                                                                                    query2.getRef().setValue(false).addOnCompleteListener(onCompleteListener1);
+                                                                                }
+                                                                            }
+                                                                        };
+
+                                                                        Query query2 = dataSnapshot.getRef().child(uids[0]);
+                                                                        query2.keepSynced(true);
+                                                                        query2.getRef().setValue(false).addOnCompleteListener(onCompleteListener1);
+
+                                                                    }
                                                                 }
                                                             }
                                                         };
-                                                        Query query2 = dataSnapshot.getRef().child("updated");
-                                                        query2.keepSynced(true);
-                                                        query2.getRef().setValue(false).addOnCompleteListener(onCompleteListener1);
+                                                        Query query1 = dataSnapshot.getRef().child(uids[i[0]]);
+                                                        query1.getRef().setValue(false).addOnCompleteListener(onCompleteListener);
+
                                                     } else {
                                                         Query query2 = dataSnapshot.getRef().child("turn");
                                                         query2.keepSynced(true);
@@ -727,10 +752,11 @@ public class LudoGame extends FrameLayout {
                                 postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
+                                        turnChange = true;
                                         currentPlayer++;
                                         currentPlayer %= numberOfPlayers;
-                                        getDiceImage().setX(dicePoints[currentPlayer].x);
-                                        getDiceImage().setY(dicePoints[currentPlayer].y);
+//                                        getDiceImage().setX(dicePoints[currentPlayer].x);
+//                                        getDiceImage().setY(dicePoints[currentPlayer].y);
                                         getDiceImage().setEnabled(true);
                                         getmArrows()[currentPlayer].setVisibility(VISIBLE);
                                         getmArrows()[currentPlayer].setAnimation(translateAnimation);
@@ -796,13 +822,16 @@ public class LudoGame extends FrameLayout {
                         postDelayed(new Runnable() {
                             @Override
                             public void run() {
+                                turnChange  = true;
                                 currentPlayer++;
                                 currentPlayer %= numberOfPlayers;
                                 ((Activity)context).runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        getDiceImage().setX(dicePoints[currentPlayer].x);
-                                        getDiceImage().setY(dicePoints[currentPlayer].y);
+
+//                                        getDiceImage().setX(dicePoints[currentPlayer].x);
+//                                        getDiceImage().setY(dicePoints[currentPlayer].y);
+
                                         getDiceImage().setEnabled(true);
                                         getmArrows()[currentPlayer].setVisibility(VISIBLE);
                                         getmArrows()[currentPlayer].setAnimation(translateAnimation);
@@ -840,7 +869,15 @@ public class LudoGame extends FrameLayout {
                     if(!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(uids[currentPlayer])) {
                         if (pieceIndex != -1) {
                             LudoPiece piece = players.get(currentPlayer).getmPiece()[pieceIndex];
-                            players.get(currentPlayer).move(num, piece);
+                            int sendNum = num;
+
+                            if(piece.open == false && num == 6)
+                            {
+                                sendNum -= 5;
+                            }
+
+                            players.get(currentPlayer).move(sendNum, piece);
+
                         } else {
                             postDelayed(new Runnable() {
                                 @Override
@@ -854,8 +891,8 @@ public class LudoGame extends FrameLayout {
 
                                                     currentPlayer++;
                                                     currentPlayer %= numberOfPlayers;
-                                                    diceImage.setX(dicePoints[currentPlayer].x);
-                                                    diceImage.setY(dicePoints[currentPlayer].y);
+//                                                    diceImage.setX(dicePoints[currentPlayer].x);
+//                                                    diceImage.setY(dicePoints[currentPlayer].y);
                                                     synchronized (this)
                                                     {
                                                         this.notify();
@@ -949,10 +986,18 @@ public class LudoGame extends FrameLayout {
                             }
                         }
                         if (foundNum[0] == 1 || (sameCoordinates[0] && temp[0] != null)) {
-                            temp[0].performClick();
+
+                            ((Activity)context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    temp[0].performClick();
+                                }
+                            });
                         }
                         else if(foundNum[0] == 0)
                         {
+
+                            turnChange = true;
 
                             final OnCompleteListener<Void> onCompleteListener3 = new OnCompleteListener<Void>() {
                                 @Override
@@ -971,6 +1016,7 @@ public class LudoGame extends FrameLayout {
                                         gameRef.child("updateUI").setValue((++updateNum)%26).addOnCompleteListener(this);
                                     }else
                                     {
+                                        Toast.makeText(context, "updated UI Success", Toast.LENGTH_SHORT).show();
                                         gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(onCompleteListener3);
                                     }
                                 }
@@ -1004,11 +1050,13 @@ public class LudoGame extends FrameLayout {
                             Runnable runnable = new Runnable() {
                                 @Override
                                 public void run() {
+
                                     done = false;
                                     currentPlayer++;
                                     currentPlayer %= numberOfPlayers;
-                                    diceImage.setX(dicePoints[currentPlayer].x);
-                                    diceImage.setY(dicePoints[currentPlayer].y);
+//                                    diceImage.setX(dicePoints[currentPlayer].x);
+//                                    diceImage.setY(dicePoints[currentPlayer].y);
+
                                     synchronized (this)
                                     {
                                         this.notify();
@@ -1036,7 +1084,7 @@ public class LudoGame extends FrameLayout {
     }
 
     public ImageView getDiceImage() {
-        return diceImage;
+        return dicePoints[currentPlayer];
     }
 
     public ArrayList<LudoPiece> getPieces() {

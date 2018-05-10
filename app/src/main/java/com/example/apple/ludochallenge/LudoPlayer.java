@@ -87,7 +87,19 @@ public class LudoPlayer {
                 currentBox.addPiece(piece);
 
                 if (currentBox.mPieceCount > 0) {
-                    if (!currentBox.stop) {
+
+                    if(currentBox.winBox && currentBox.mPieceCount == 4)
+                    {
+                        if(mGame.currentPlayer == 0) {
+                            player_won();
+                            return;
+                        }else
+                        {
+                            player_lost();
+                            return;
+                        }
+                    }
+                    else if (!currentBox.stop) {
                         int opponent = 0;
                         int mine = 0;
                         final LudoPiece[] ludoPieces = {null, null, null, null};
@@ -99,6 +111,8 @@ public class LudoPlayer {
                             }
                         }
                         if (mine == opponent) {
+
+                            LudoGame.turnChange = false;
                             for (int i = 0; i < opponent; i++) {
                                 killPieces(ludoPieces);
                             }
@@ -113,6 +127,7 @@ public class LudoPlayer {
                         if (mGame.players.get(mGame.currentPlayer).type != PlayerType.ONLINE) {
                             mGame.getmArrows()[mGame.currentPlayer].setVisibility(View.INVISIBLE);
                             mGame.getmArrows()[mGame.currentPlayer].setAnimation(null);
+
                             if (LudoGame.turnChange) {
                                 mGame.currentPlayer++;
                                 mGame.currentPlayer %= mGame.numberOfPlayers;
@@ -120,8 +135,8 @@ public class LudoPlayer {
 
                             mGame.getmArrows()[mGame.currentPlayer].setVisibility(VISIBLE);
                             mGame.getmArrows()[mGame.currentPlayer].setAnimation(translateAnimation);
-                            mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
-                            mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
+//                            mGame.getDiceImage().setY(mGame.dicePoints[mGame.currentPlayer].y);
+//                            mGame.getDiceImage().setX(mGame.dicePoints[mGame.currentPlayer].x);
                             mGame.getDiceImage().setEnabled(true);
                             if (mGame.players.get(mGame.currentPlayer).type == PlayerType.CPU) {
                                 mGame.getDiceImage().performClick();
@@ -132,11 +147,12 @@ public class LudoPlayer {
                                 mGame.currentPlayer++;
                                 mGame.currentPlayer %= mGame.numberOfPlayers;
                             }
-                            mGame.diceImage.setX(mGame.dicePoints[mGame.currentPlayer].x);
-                            mGame.diceImage.setY(mGame.dicePoints[mGame.currentPlayer].y);
+                            else LudoGame.turnChange = true;
 
+//                            mGame.diceImage.setX(mGame.dicePoints[mGame.currentPlayer].x);
+//                            mGame.diceImage.setY(mGame.dicePoints[mGame.currentPlayer].y);
 
-                            Runnable runnable1 = new Runnable() {
+                            new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     OnCompleteListener<Void> onCompleteListener = new OnCompleteListener<Void>() {
@@ -147,26 +163,14 @@ public class LudoPlayer {
                                             }
                                             else{
                                                 mGame.done = false;
-                                                synchronized (this){
-                                                    this.notify();
-                                                }
                                             }
                                         }
                                     };
                                     mGame.gameRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true).addOnCompleteListener(onCompleteListener);
                                 }
-                            };
-                            synchronized (runnable1)
-                            {
-                                new Thread(runnable1).start();
-                                try {
-                                    runnable1.wait();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
+                            }).start();
                         }
+
                         synchronized (this) {
                             this.notify();
                         }
@@ -197,11 +201,27 @@ public class LudoPlayer {
             @Override
             public void run() {
                 Toast.makeText(mGame.context, "You WON", Toast.LENGTH_SHORT).show();
+                ((LudoActivity)mGame.context).findViewById(R.id.you_won_dialogue).setVisibility(VISIBLE);
+                mGame.getDiceImage().setVisibility(View.GONE);
             }
         };
 //        Handler handler = new Handler(mGame.context.getMainLooper());
         ((Activity)mGame.context).runOnUiThread(runnable);
     }
+
+    private void player_lost() {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mGame.context, "You LOST", Toast.LENGTH_SHORT).show();
+                ((LudoActivity)mGame.context).findViewById(R.id.you_lost_dialogue).setVisibility(VISIBLE);
+                mGame.getDiceImage().setVisibility(View.GONE);
+            }
+        };
+//        Handler handler = new Handler(mGame.context.getMainLooper());
+        ((Activity)mGame.context).runOnUiThread(runnable);
+    }
+
 
     private void animatePiece(final LudoPiece piece, final Point from, final Point to) {
 

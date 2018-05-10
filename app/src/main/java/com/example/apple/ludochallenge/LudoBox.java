@@ -176,7 +176,6 @@ public class LudoBox {
         return defaultWidth;
     }
 
-
     public enum TransitionPlayer
     {
         ONE, TWO, THREE, FOUR, NULL
