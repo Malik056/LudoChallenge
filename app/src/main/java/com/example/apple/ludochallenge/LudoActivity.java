@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -236,6 +237,8 @@ public class LudoActivity extends AppCompatActivity {
                                 diceImages[1] = findViewById(R.id.player2_dice);
                                 diceImages[2] = findViewById(R.id.player4_dice);
                                 diceImages[3] = findViewById(R.id.player3_dice);
+
+
 //                                pNames[0] = findViewById(R.id.player1_name);
 //                                pNames[1] = findViewById(R.id.player2_name);
 //                                pNames[2] = findViewById(R.id.player4_name);
@@ -389,10 +392,13 @@ public class LudoActivity extends AppCompatActivity {
                             :new ImageView[]{
                                     findViewById(R.id.player1_pic)
                             };
-
-
-                            byte[] player1Pic = (byte[]) MySQLDatabase.getInstance(getApplicationContext()).getData(mCurrentUser.getUid(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
-                            Bitmap player1Bitmap = player1Pic != null ? BitmapFactory.decodeByteArray(player1Pic, 0, player1Pic.length) : null;//((BitmapDrawable)imageViews[0].getDrawable()).getBitmap();
+                            MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+                            String LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedInStatus();
+                            byte[] player1Pic  = null;
+                            if(!LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST)) {
+                                player1Pic = (byte[]) MySQLDatabase.getInstance(getApplicationContext()).getData(mCurrentUser.getUid(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+                            }
+                            Bitmap player1Bitmap = player1Pic != null ? BitmapFactory.decodeByteArray(player1Pic, 0, player1Pic.length) : ((BitmapDrawable)imageViews[0].getDrawable()).getBitmap();
                             for (int i = 0; i < players; i++) {
                                 if (i == 0) {
                                     if(player1Bitmap != null)

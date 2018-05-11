@@ -207,6 +207,7 @@ public class LudoPlayer {
         };
 //        Handler handler = new Handler(mGame.context.getMainLooper());
         ((Activity)mGame.context).runOnUiThread(runnable);
+
     }
 
     private void player_lost() {
