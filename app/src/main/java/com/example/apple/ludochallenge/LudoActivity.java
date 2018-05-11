@@ -505,13 +505,13 @@ public class LudoActivity extends AppCompatActivity {
                                     textView.setText("0");
                                 }
                             });
-                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView);
-                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView1);
-                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView2);
-                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(imageView);
-                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(imageView1);
-                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(imageView2);
-                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(imageView3);
+//                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView);
+//                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView1);
+//                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(textView2);
+//                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(imageView);
+//                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(imageView1);
+//                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(imageView2);
+//                            ((FrameLayout) findViewById(R.id.boardContainer)).addView(imageView3);
 
                             LudoGame.textView = textView;
                             synchronized (this) {
