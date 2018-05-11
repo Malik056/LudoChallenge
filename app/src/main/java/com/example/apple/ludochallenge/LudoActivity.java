@@ -15,6 +15,7 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
@@ -148,6 +149,7 @@ public class LudoActivity extends AppCompatActivity {
                                     new LinearInterpolator()
                             );
                             LudoGame.alphaAnimation = alphaAnimation;
+
 //                            TranslateAnimation translateAnimation = new TranslateAnimation(
 //                                    TranslateAnimation.RELATIVE_TO_SELF, 0.1f,
 //                                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
@@ -279,9 +281,9 @@ public class LudoActivity extends AppCompatActivity {
 //                                pNames[2] = findViewById(R.id.player4_name);
 //                                pNames[3] = findViewById(R.id.player3_name);
                             }
-                            for (int i = 0; i < players; i++) {
-                                pNames[i].setText(names[i]);
-                            }
+//                            for (int i = 0; i < players; i++) {
+//                                pNames[i].setText(names[i]);
+//                            }
 //                            getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 //                                @Override
 //                                public void onGlobalLayout() {
@@ -390,9 +392,12 @@ public class LudoActivity extends AppCompatActivity {
                             :new ImageView[]{
                                     view[0].findViewById(R.id.player1_pic)
                             };
-
-
-                            byte[] player1Pic = (byte[]) MySQLDatabase.getInstance(getApplicationContext()).getData(mCurrentUser.getUid(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+                            MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+                            String LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedInStatus();
+                            byte[] player1Pic  = null;
+                            if(!LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_PLAY_AS_GUEST)) {
+                                player1Pic = (byte[]) MySQLDatabase.getInstance(getApplicationContext()).getData(mCurrentUser.getUid(), MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+                            }
                             Bitmap player1Bitmap = player1Pic != null ? BitmapFactory.decodeByteArray(player1Pic, 0, player1Pic.length) : ((BitmapDrawable)imageViews[0].getDrawable()).getBitmap();
                             for (int i = 0; i < players; i++) {
                                 if (i == 0) {
