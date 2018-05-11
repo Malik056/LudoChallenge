@@ -13,6 +13,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -120,6 +121,8 @@ public class LudoGame extends FrameLayout {
 
                 l.setEnabled(false);
                 l.setAnimation(null);
+                l.clearAnimation();
+                l.invalidate();
                 ((ImageView) l.getTag()).setVisibility(INVISIBLE);
                 ((ImageView) l.getTag()).setAnimation(null);
             }
@@ -198,6 +201,8 @@ public class LudoGame extends FrameLayout {
                 v.setEnabled(false);
                 mArrows[currentPlayer].setVisibility(INVISIBLE);
                 mArrows[currentPlayer].setAnimation(null);
+                final int fwidth = v.getWidth();
+                final int fheight = v.getHeight();
 
                 Thread thread = new Thread(new Runnable() {
                     @Override
@@ -252,12 +257,11 @@ public class LudoGame extends FrameLayout {
                                 valueAnimator.addListener(new Animator.AnimatorListener() {
                                     @Override
                                     public void onAnimationStart(Animator animator) {
-//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width + boxSize), (int)(dice1.getLayoutParams().height + boxSize)));
+
                                     }
 
                                     @Override
                                     public void onAnimationEnd(Animator animator) {
-//                dice1.setLayoutParams(new LinearLayout.LayoutParams((int)(dice1.getLayoutParams().width - boxSize), (int)(dice1.getLayoutParams().height - boxSize)));
 
 
                                         ValueAnimator animator1 = ValueAnimator.ofFloat(0f, 1f);
@@ -265,7 +269,29 @@ public class LudoGame extends FrameLayout {
                                             @Override
                                             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                                                 if ((v.getLayoutParams().width - value >= width / 10))
-                                                    v.setLayoutParams(new LayoutParams((v.getLayoutParams().width - value), (v.getLayoutParams().height - value)));
+                                                    v.setLayoutParams(new LinearLayout.LayoutParams((v.getLayoutParams().width - value), (v.getLayoutParams().height - value)));
+                                            }
+                                        });
+
+                                        animator1.addListener(new Animator.AnimatorListener() {
+                                            @Override
+                                            public void onAnimationStart(Animator animation) {
+
+                                            }
+
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                v.setLayoutParams(new LinearLayout.LayoutParams(fwidth, fheight));
+                                            }
+
+                                            @Override
+                                            public void onAnimationCancel(Animator animation) {
+                                                v.setLayoutParams(new LinearLayout.LayoutParams(fwidth, fheight));
+                                            }
+
+                                            @Override
+                                            public void onAnimationRepeat(Animator animation) {
+
                                             }
                                         });
 
@@ -275,6 +301,19 @@ public class LudoGame extends FrameLayout {
 
                                     @Override
                                     public void onAnimationCancel(Animator animator) {
+
+                                        ValueAnimator animator1 = ValueAnimator.ofFloat(0f, 1f);
+
+                                        animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                            @Override
+                                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                                if ((v.getLayoutParams().width - value >= width / 10))
+                                                    v.setLayoutParams(new LinearLayout.LayoutParams((v.getLayoutParams().width - value), (v.getLayoutParams().height - value)));
+                                            }
+                                        });
+
+                                        animator1.setDuration(150);
+                                        animator1.start();
 
                                     }
 
@@ -286,7 +325,7 @@ public class LudoGame extends FrameLayout {
                                 valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                     @Override
                                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                        v.setLayoutParams(new LayoutParams((v.getLayoutParams().width + value), (v.getLayoutParams().height + value)));
+                                        v.setLayoutParams(new LinearLayout.LayoutParams((v.getLayoutParams().width + value), (v.getLayoutParams().height + value)));
                                     }
                                 });
                                 //DICE ANIMATED///////////////DICE ANIMATED////////////////DICE ANIMATED////////////////////
@@ -363,8 +402,11 @@ public class LudoGame extends FrameLayout {
                 mArrows[currentPlayer].setAnimation(translateAnimation);
 //                diceImage.setX(dicePoints[currentPlayer].x);
 //                diceImage.setY(dicePoints[currentPlayer].y);
+                for(ImageView view : dicePoints)
+                {
+                    view.setOnClickListener(getDiceClickListener());
+                }
                 dicePoints[currentPlayer].setEnabled(true);
-
             }
         };
         ((Activity)context).runOnUiThread(runnable);
@@ -822,7 +864,7 @@ public class LudoGame extends FrameLayout {
                         postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                turnChange  = true;
+                                turnChange = true;
                                 currentPlayer++;
                                 currentPlayer %= numberOfPlayers;
                                 ((Activity)context).runOnUiThread(new Runnable() {

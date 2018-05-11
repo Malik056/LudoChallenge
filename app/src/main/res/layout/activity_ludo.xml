@@ -58,12 +58,14 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.2"
+                android:visibility="invisible"
                 android:id="@id/player3_arrow"
                 android:src="@drawable/left_arrow_up"/>
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.2"
+                android:visibility="invisible"
                 android:src="@drawable/right_arrow_up"
                 android:id="@id/player4_arrow"/>
             <View
@@ -153,12 +155,14 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.2"
+                android:visibility="invisible"
                 android:id="@id/player1_arrow"
                 android:src="@drawable/left_arrow_up"/>
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.2"
+                android:visibility="invisible"
                 android:id="@id/player2_arrow"
                 android:src="@drawable/right_arrow_up"/>
             <View
