@@ -84,6 +84,8 @@
         <activity android:name=".WaitingForOpponent3Players" />
         <activity android:name=".WaitingForOpponent2Players"></activity>
         <activity android:name=".networking.UsersActivityThreePlayers"/>
+        <activity android:name=".networking.MainMenuSAL"/>
+        <activity android:name=".networking.PlayActivitySAL"/>
     </application>
 
 </manifest>

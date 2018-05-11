@@ -784,7 +784,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0.10"
-                        android:src="@drawable/select_your_color_yellow_pawn"/>
+                        android:src="@drawable/select_your_color_blue_pawn"/>
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -817,7 +817,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="0.10"
-                        android:src="@drawable/select_your_color_blue_pawn"/>
+                        android:src="@drawable/select_your_color_yellow_pawn"/>
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -1108,7 +1108,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="0.10"
                         android:id="@+id/three_players_pawn2"
-                        android:src="@drawable/select_your_color_blue_pawn"/>
+                        android:src="@drawable/select_your_color_red_pawn"/>
                     <ImageView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -1151,7 +1151,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="0.10"
                         android:id="@+id/three_players_pawn3"
-                        android:src="@drawable/select_your_color_yellow_pawn"/>
+                        android:src="@drawable/select_your_color_blue_pawn"/>
                     <ImageView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"

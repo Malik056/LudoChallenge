@@ -149,6 +149,8 @@ public class PlayActivity extends AppCompatActivity {
     private ImageView online_multiplayer_coins_4players_btn7;
     private ImageView online_multiplayer_coins_4players_btn8;
     private ImageView online_multiplayer_coins_4players_btn9;
+    private boolean check_3player_localClick  = false;
+    private boolean check_2player_computerClick  = false;
 
 
     String LudoChallenge_vsComputer_WIN;
@@ -1156,6 +1158,8 @@ public class PlayActivity extends AppCompatActivity {
         four_players_playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                colors_array = new int[]{Color.getInt(Color.RED), Color.getInt(Color.BLUE), Color.getInt(Color.YELLOW), Color.getInt(Color.GREEN)};
                 noOfPlayers = 4;
                 color = 0;
                 String player1_name = four_players_player1_name.getText().toString();
@@ -1169,12 +1173,23 @@ public class PlayActivity extends AppCompatActivity {
                 else{
                     four_player_frameLayout.setVisibility(View.GONE);
                     Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
-                    intent.putExtra("noOfPlayers",noOfPlayers);
-                    intent.putExtra("color",color);
-                    intent.putExtra("vsComputer",vsComputer);
+                    String[] player_names = new String[4];
+                    player_names[0] = player1_name;
+                    player_names[1] = player2_name;
+                    player_names[2] = player3_name;
+                    player_names[3] = player4_name;
+                    int[] player_types = new int[]{PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.HUMAN)};
+                    intent.putExtra(PLAYERS_KEY,noOfPlayers);
+                    intent.putExtra(COLORS_KEY,colors_array);
+                    intent.putExtra(PLAYERS_TYPE_KEY, player_types);
+                    intent.putExtra(NAMES_KEY,player_names);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     overridePendingTransition(R.anim.goup, R.anim.godown);
+                    four_players_player1_name.setText("");
+                    four_players_player2_name.setText("");
+                    four_players_player3_name.setText("");
+                    four_players_player4_name.setText("");
                     finish();
                 }
             }
@@ -1183,6 +1198,9 @@ public class PlayActivity extends AppCompatActivity {
         three_players_playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!check_3player_localClick){
+                    colors_array = new int[]{Color.getInt(Color.GREEN), Color.getInt(Color.RED), Color.getInt(Color.BLUE)};
+                }
                 noOfPlayers = 3;
                 String player1_name = three_players_player1_name.getText().toString();
                 String player2_name = three_players_player2_name.getText().toString();
@@ -1194,9 +1212,15 @@ public class PlayActivity extends AppCompatActivity {
                 else{
                     three_player_frameLayout.setVisibility(View.GONE);
                     Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
-                    intent.putExtra("noOfPlayers",noOfPlayers);
-                    intent.putExtra("color",color_3players);
-                    intent.putExtra("vsComputer",vsComputer);
+                    String[] player_names = new String[3];
+                    player_names[0] = player1_name;
+                    player_names[1] = player2_name;
+                    player_names[2] = player3_name;
+                    int[] player_types = new int[]{PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.HUMAN)};
+                    intent.putExtra(PLAYERS_KEY,noOfPlayers);
+                    intent.putExtra(COLORS_KEY,colors_array);
+                    intent.putExtra(PLAYERS_TYPE_KEY, player_types);
+                    intent.putExtra(NAMES_KEY,player_names);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     overridePendingTransition(R.anim.goup, R.anim.godown);
@@ -1244,11 +1268,21 @@ public class PlayActivity extends AppCompatActivity {
             public void onClick(View view) {
                     noOfPlayers = 2;
                     vsComputer = 1;
+                    if(!check_2player_computerClick) {
+                        colors_array = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
+                    }
+                    String[] player_names = new String[2];
+                    String player1_name = null;
+                    String player2_name = null;
+                    player_names[0] = player1_name;
+                    player_names[1] = player2_name;
+                    int[] player_types = new int[]{PlayerType.getInt(PlayerType.HUMAN), PlayerType.getInt(PlayerType.CPU)};
                     vsComputer_frameLayout.setVisibility(View.GONE);
                     Intent intent = new Intent(getApplicationContext(), LudoActivity.class);
-                    intent.putExtra("noOfPlayers",noOfPlayers);
-                    intent.putExtra("color",vsComputer_color);
-                    intent.putExtra("vsComputer",vsComputer);
+                    intent.putExtra(PLAYERS_KEY,noOfPlayers);
+                    intent.putExtra(COLORS_KEY,colors_array);
+                    intent.putExtra(NAMES_KEY,player_names);
+                    intent.putExtra(PLAYERS_TYPE_KEY, player_types);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 overridePendingTransition(R.anim.goup, R.anim.godown);
@@ -1336,19 +1370,21 @@ public class PlayActivity extends AppCompatActivity {
         three_players_leftPress1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                check_3player_localClick = true;
                 if(checkPawn_3players == 0){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_yellow_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_red_pawn);
                     checkPawn_3players = 1;
-                    color_3players = 4;
+                    colors_array = new int[]{Color.getInt(Color.YELLOW), Color.getInt(Color.GREEN), Color.getInt(Color.RED)};
                 }
                 else if(checkPawn_3players == 1){
-                    three_players_pawn1.setImageResource(R.drawable.select_your_color_green_pawn);
+                    three_players_pawn1.setImageResource(R.drawable.select_your_color_red_pawn);
                     three_players_pawn2.setImageResource(R.drawable.select_your_color_blue_pawn);
                     three_players_pawn3.setImageResource(R.drawable.select_your_color_yellow_pawn);
                     checkPawn_3players = 0;
                     color_3players = 2;
+                    colors_array = new int[]{Color.getInt(Color.GREEN), Color.getInt(Color.RED), Color.getInt(Color.BLUE)};
                 }
 
             }
@@ -1356,95 +1392,110 @@ public class PlayActivity extends AppCompatActivity {
         three_players_leftPress2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                check_3player_localClick = true;
                 if(checkPawn_3players == 0){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_yellow_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_red_pawn);
                     checkPawn_3players = 1;
                     color_3players = 4;
+                    colors_array = new int[]{Color.getInt(Color.YELLOW), Color.getInt(Color.GREEN), Color.getInt(Color.RED)};
                 }
                 else if(checkPawn_3players == 1){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_green_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_blue_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_yellow_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
                     checkPawn_3players = 0;
                     color_3players = 2;
+                    colors_array = new int[]{Color.getInt(Color.GREEN), Color.getInt(Color.RED), Color.getInt(Color.BLUE)};
                 }
             }
         });
         three_players_leftPress3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                check_3player_localClick = true;
                 if(checkPawn_3players == 0){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_yellow_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_red_pawn);
                     checkPawn_3players = 1;
                     color_3players = 4;
+                    colors_array = new int[]{Color.getInt(Color.YELLOW), Color.getInt(Color.GREEN), Color.getInt(Color.RED)};
                 }
                 else if(checkPawn_3players == 1){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_green_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_blue_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_yellow_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
                     checkPawn_3players = 0;
                     color_3players = 2;
+                    colors_array = new int[]{Color.getInt(Color.GREEN), Color.getInt(Color.RED), Color.getInt(Color.BLUE)};
                 }
             }
         });
         three_players_rightPress1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                check_3player_localClick = true;
                 if(checkPawn_3players == 0){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_yellow_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_red_pawn);
                     checkPawn_3players = 1;
                     color_3players = 4;
+                    colors_array = new int[]{Color.getInt(Color.YELLOW), Color.getInt(Color.GREEN), Color.getInt(Color.RED)};
                 }
                 else if(checkPawn_3players == 1){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_green_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_blue_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_yellow_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
                     checkPawn_3players = 0;
                     color_3players = 2;
+                    colors_array = new int[]{Color.getInt(Color.GREEN), Color.getInt(Color.RED), Color.getInt(Color.BLUE)};
                 }
             }
         });
         three_players_rightPress2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                check_3player_localClick = true;
                 if(checkPawn_3players == 0){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_yellow_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_red_pawn);
                     checkPawn_3players = 1;
                     color_3players = 4;
+                    colors_array = new int[]{Color.getInt(Color.YELLOW), Color.getInt(Color.GREEN), Color.getInt(Color.RED)};
                 }
                 else if(checkPawn_3players == 1){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_green_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_blue_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_yellow_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
                     checkPawn_3players = 0;
                     color_3players = 2;
+                    colors_array = new int[]{Color.getInt(Color.GREEN), Color.getInt(Color.RED), Color.getInt(Color.BLUE)};
                 }
             }
         });
         three_players_rightPress3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                check_3player_localClick = true;
                 if(checkPawn_3players == 0){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_yellow_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_green_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_red_pawn);
                     checkPawn_3players = 1;
                     color_3players = 4;
+                    colors_array = new int[]{Color.getInt(Color.YELLOW), Color.getInt(Color.GREEN), Color.getInt(Color.RED)};
                 }
                 else if(checkPawn_3players == 1){
                     three_players_pawn1.setImageResource(R.drawable.select_your_color_green_pawn);
-                    three_players_pawn2.setImageResource(R.drawable.select_your_color_blue_pawn);
-                    three_players_pawn3.setImageResource(R.drawable.select_your_color_yellow_pawn);
+                    three_players_pawn2.setImageResource(R.drawable.select_your_color_red_pawn);
+                    three_players_pawn3.setImageResource(R.drawable.select_your_color_blue_pawn);
                     checkPawn_3players = 0;
                     color_3players = 2;
+                    colors_array = new int[]{Color.getInt(Color.GREEN), Color.getInt(Color.RED), Color.getInt(Color.BLUE)};
                 }
             }
         });
@@ -1458,7 +1509,8 @@ public class PlayActivity extends AppCompatActivity {
                 vsComputer_check2.setImageResource(R.drawable.dull_circle);
                 vsComputer_check3.setImageResource(R.drawable.dull_circle);
                 vsComputer_check4.setImageResource(R.drawable.dull_circle);
-                vsComputer_color = 1;
+                colors_array = new int[]{Color.getInt(Color.RED), Color.getInt(Color.YELLOW)};
+                check_2player_computerClick = true;
             }
         });
         vsComputer_check2.setOnClickListener(new View.OnClickListener() {
@@ -1469,6 +1521,8 @@ public class PlayActivity extends AppCompatActivity {
                 vsComputer_check3.setImageResource(R.drawable.dull_circle);
                 vsComputer_check4.setImageResource(R.drawable.dull_circle);
                 vsComputer_color = 3;
+                colors_array = new int[]{Color.getInt(Color.BLUE), Color.getInt(Color.GREEN)};
+                check_2player_computerClick = true;
             }
         });
         vsComputer_check3.setOnClickListener(new View.OnClickListener() {
@@ -1479,6 +1533,8 @@ public class PlayActivity extends AppCompatActivity {
                 vsComputer_check3.setImageResource(R.drawable.circle_tick);
                 vsComputer_check4.setImageResource(R.drawable.dull_circle);
                 vsComputer_color = 2;
+                colors_array = new int[]{Color.getInt(Color.GREEN), Color.getInt(Color.BLUE)};
+                check_2player_computerClick = true;
             }
         });
         vsComputer_check4.setOnClickListener(new View.OnClickListener() {
@@ -1489,6 +1545,8 @@ public class PlayActivity extends AppCompatActivity {
                 vsComputer_check3.setImageResource(R.drawable.dull_circle);
                 vsComputer_check4.setImageResource(R.drawable.circle_tick);
                 vsComputer_color = 0;
+                colors_array = new int[]{Color.getInt(Color.YELLOW), Color.getInt(Color.RED)};
+                check_2player_computerClick = true;
             }
         });
     }
