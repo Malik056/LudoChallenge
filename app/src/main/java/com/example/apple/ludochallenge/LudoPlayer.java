@@ -226,207 +226,171 @@ public class LudoPlayer {
 
     private void animatePiece(final LudoPiece piece, final Point from, final Point to) {
 
-        ValueAnimator animator = null;
-        ValueAnimator animator1 = null;
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                final Runnable finalRunnable = this;
+                ValueAnimator animator = null;
+                ValueAnimator animator1 = null;
 
-        final int pieceWidth = piece.mBox.getPieceWidth();
-        final int pieceHeight = piece.mBox.getPieceHeight();
+                final int pieceWidth = piece.mBox.getPieceWidth();
+                final int pieceHeight = piece.mBox.getPieceHeight();
 
-        if (from.x != to.x && from.y != to.y) {
+                if (from.x != to.x && from.y != to.y) {
 
-            final Runnable runnable = new Runnable() {
-                final Runnable runnable1 = this;
-
-                @Override
-                public void run() {
                     piece.animate().translationX(to.x).setDuration(160);
-                    piece.animate().translationY(to.y).setDuration(160).setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
+                    piece.animate().translationY(to.y).setDuration(160);
 
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            synchronized (runnable1) {
-                                runnable1.notify();
-                            }
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-
-                        }
-                    });
                 }
-            };
-            synchronized (runnable) {
-//                Handler handler = new Handler(mGame.context.getMainLooper());
-                ((Activity)mGame.context).runOnUiThread(runnable);
-                try {
-                    runnable.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else if (from.x != to.x) {
-            animator = ValueAnimator.ofFloat(from.x, to.x);
+                else if (from.x != to.x) {
+                    animator = ValueAnimator.ofFloat(from.x, to.x);
 
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    piece.setTranslationX(((Float) animation.getAnimatedValue()));
-                }
-            });
-
-            animator1 = ValueAnimator.ofFloat(from.y, from.y - piece.mBox.getPieceHeight() / 2);
-
-            animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    piece.setTranslationY(((Float) animation.getAnimatedValue()));
-                }
-            });
-
-            animator1.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    ValueAnimator animator2 = ValueAnimator.ofFloat(piece.getY(), from.y);
-                    animator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public void onAnimationUpdate(ValueAnimator animation) {
-                            piece.setTranslationY((Float) animation.getAnimatedValue());
+                            piece.setTranslationX(((Float) animation.getAnimatedValue()));
                         }
                     });
-                    animator2.addListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
 
-                        }
+                    animator1 = ValueAnimator.ofFloat(from.y, from.y - piece.mBox.getPieceHeight() / 2);
 
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            piece.setLayoutParams(new FrameLayout.LayoutParams(piece.mBox.getPieceWidth(), piece.mBox.getPieceHeight()));
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-                            piece.setLayoutParams(new FrameLayout.LayoutParams(piece.mBox.getPieceWidth(), piece.mBox.getPieceHeight()));
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-
-                        }
-                    });
-                    animator2.setDuration(75);
-                    animator2.start();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    piece.setLayoutParams(new FrameLayout.LayoutParams((piece.mBox.getPieceWidth() + piece.mBox.getPieceWidth() / 8), piece.mBox.getPieceHeight() + piece.mBox.getPieceHeight() / 8));
-                }
-            });
-
-        } else if (from.y != to.y) {
-
-            animator = ValueAnimator.ofFloat(from.y, to.y);
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    piece.setTranslationY(((Float) animation.getAnimatedValue()));
-                }
-            });
-
-            animator1 = ValueAnimator.ofFloat(from.x, from.x + piece.mBox.getPieceWidth());
-
-            animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    piece.setTranslationX(((Float) animation.getAnimatedValue()));
-                }
-            });
-
-            animator1.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    ValueAnimator animator2 = ValueAnimator.ofFloat(piece.getX(), from.x);
-                    animator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public void onAnimationUpdate(ValueAnimator animation) {
-                            piece.setTranslationX((Float) animation.getAnimatedValue());
+                            piece.setTranslationY(((Float) animation.getAnimatedValue()));
                         }
                     });
-                    animator2.addListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
 
-                        }
-
+                    animator1.addListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
-                            piece.setLayoutParams(new FrameLayout.LayoutParams(pieceWidth, pieceHeight));
+                            ValueAnimator animator2 = ValueAnimator.ofFloat(piece.getY(), from.y);
+                            animator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    piece.setTranslationY((Float) animation.getAnimatedValue());
+                                }
+                            });
+                            animator2.addListener(new Animator.AnimatorListener() {
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    piece.setLayoutParams(new FrameLayout.LayoutParams(piece.mBox.getPieceWidth(), piece.mBox.getPieceHeight()));
+                                }
+
+                                @Override
+                                public void onAnimationCancel(Animator animation) {
+                                    piece.setLayoutParams(new FrameLayout.LayoutParams(piece.mBox.getPieceWidth(), piece.mBox.getPieceHeight()));
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animator animation) {
+
+                                }
+                            });
+                            animator2.setDuration(75);
+                            animator2.start();
                         }
 
                         @Override
                         public void onAnimationCancel(Animator animation) {
-                            piece.setLayoutParams(new FrameLayout.LayoutParams(pieceWidth, pieceHeight));
+
                         }
 
                         @Override
                         public void onAnimationRepeat(Animator animation) {
 
                         }
+
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            piece.setLayoutParams(new FrameLayout.LayoutParams((piece.mBox.getPieceWidth() + piece.mBox.getPieceWidth() / 8), piece.mBox.getPieceHeight() + piece.mBox.getPieceHeight() / 8));
+                        }
                     });
-                    animator2.setDuration(75);
-                    animator2.start();
+
+                } else if (from.y != to.y) {
+
+                    animator = ValueAnimator.ofFloat(from.y, to.y);
+                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            piece.setTranslationY(((Float) animation.getAnimatedValue()));
+                        }
+                    });
+
+                    animator1 = ValueAnimator.ofFloat(from.x, from.x + piece.mBox.getPieceWidth());
+
+                    animator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            piece.setTranslationX(((Float) animation.getAnimatedValue()));
+                        }
+                    });
+
+                    animator1.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            ValueAnimator animator2 = ValueAnimator.ofFloat(piece.getX(), from.x);
+                            animator2.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    piece.setTranslationX((Float) animation.getAnimatedValue());
+                                }
+                            });
+                            animator2.addListener(new Animator.AnimatorListener() {
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+
+                                }
+
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    piece.setLayoutParams(new FrameLayout.LayoutParams(pieceWidth, pieceHeight));
+                                }
+
+                                @Override
+                                public void onAnimationCancel(Animator animation) {
+                                    piece.setLayoutParams(new FrameLayout.LayoutParams(pieceWidth, pieceHeight));
+                                }
+
+                                @Override
+                                public void onAnimationRepeat(Animator animation) {
+
+                                }
+                            });
+                            animator2.setDuration(75);
+                            animator2.start();
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            piece.setLayoutParams(new FrameLayout.LayoutParams(pieceWidth + pieceWidth / 8, pieceHeight + pieceHeight / 8));
+                        }
+                    });
+
                 }
+                if (animator != null) {
 
-                @Override
-                public void onAnimationCancel(Animator animation) {
+                    final ValueAnimator finalAnimator = animator1;
+                    final ValueAnimator finalAnimator1 = animator;
 
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-
-                }
-
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    piece.setLayoutParams(new FrameLayout.LayoutParams(pieceWidth + pieceWidth / 8, pieceHeight + pieceHeight / 8));
-                }
-            });
-
-        }
-        if (animator != null) {
-
-            final ValueAnimator finalAnimator = animator1;
-            final ValueAnimator finalAnimator1 = animator;
-
-            final Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
                     AnimatorSet animatorSet = new AnimatorSet();
                     finalAnimator1.setDuration(160);
                     finalAnimator.setDuration(75);
-                    final Runnable runnable1 = this;
                     animatorSet.addListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationStart(Animator animation) {
@@ -435,20 +399,18 @@ public class LudoPlayer {
 
                         @Override
                         public void onAnimationEnd(Animator animation) {
-
-                            synchronized (runnable1) {
-                                runnable1.notify();
+                            synchronized (finalRunnable)
+                            {
+                                finalRunnable.notify();
                             }
-
                         }
 
                         @Override
                         public void onAnimationCancel(Animator animation) {
-
-                            synchronized (runnable1) {
-                                runnable1.notify();
+                            synchronized (finalRunnable)
+                            {
+                                finalRunnable.notify();
                             }
-
                         }
 
                         @Override
@@ -460,16 +422,14 @@ public class LudoPlayer {
                     animatorSet.start();
 
                 }
-            };
-            synchronized (runnable) {
-//                Handler handler = new Handler(mGame.context.getMainLooper());
-                ((Activity)mGame.context).runOnUiThread(runnable);
-//                ((Activity) mGame.context).runOnUiThread(runnable);
-                try {
-                    runnable.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            }
+        };
+        synchronized (runnable) {
+            ((Activity) mGame.context).runOnUiThread(runnable);
+            try {
+                runnable.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
