@@ -53,35 +53,54 @@ public class WaitingForOpponent4Players extends AppCompatActivity {
     String player3_uid;
     String player4_uid;
     int count = 0;
+    private String myUid,player2_Uid, player3_Uid, player4_Uid;
+    boolean localMultiplayer = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waiting_for_opponent4_players);
 
-        waiting_for_opponent_gif = (ImageView) findViewById(R.id.waiting_for_opponent_gif);
-        player2_name = (TextView) findViewById(R.id.waitingForOpponent_player2_name);
-        player3_name = (TextView) findViewById(R.id.waitingForOpponent_player3_name);
-        player4_name = (TextView) findViewById(R.id.waitingForOpponent_player4_name);
-        yourPic = (ImageView) findViewById(R.id.waitingForOpponent_yourPic);
-        player2Pic = (ImageView) findViewById(R.id.waitingForOpponent_player2Pic);
-        player3Pic = (ImageView) findViewById(R.id.waitingForOpponent_player3Pic);
-        player4Pic = (ImageView) findViewById(R.id.waitingForOpponent_player4Pic);
-        yourName = (TextView) findViewById(R.id.yourName);
+         waiting_for_opponent_gif = (ImageView) findViewById(R.id.waiting_for_opponent_gif);
+         player2_name = (TextView) findViewById(R.id.waitingForOpponent_player2_name);
+         player3_name = (TextView) findViewById(R.id.waitingForOpponent_player3_name);
+         player4_name = (TextView) findViewById(R.id.waitingForOpponent_player4_name);
+         yourPic = (ImageView) findViewById(R.id.waitingForOpponent_yourPic);
+         player2Pic = (ImageView) findViewById(R.id.waitingForOpponent_player2Pic);
+         player3Pic = (ImageView) findViewById(R.id.waitingForOpponent_player3Pic);
+         player4Pic = (ImageView) findViewById(R.id.waitingForOpponent_player4Pic);
+         yourName = (TextView) findViewById(R.id.yourName);
 
-        Glide.with(getApplicationContext()).load(R.raw.random_playergif).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(waiting_for_opponent_gif);
+         Glide.with(getApplicationContext()).load(R.raw.random_playergif).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(waiting_for_opponent_gif);
 
-        mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
-        final MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
-        current_uid = mySQLDatabase.fetchCurrentLoggedInID();
-        LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedInStatus();
-        if (LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)) {
+        Intent getIntent = getIntent();
+        String[] names = getIntent.getStringArrayExtra("names");
+        myUid = getIntent.getStringArrayExtra("UIDS")[0];
+        player2_Uid = getIntent.getStringArrayExtra("UIDS")[1];
+        player3_Uid = getIntent.getStringArrayExtra("UIDS")[2];
+        player4_Uid = getIntent.getStringArrayExtra("UIDS")[3];
+        localMultiplayer = getIntent.getBooleanExtra("checkActivity", true);
+
+        if(localMultiplayer) {
+            MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+            final byte[] myPic = (byte[]) mySQLDatabase.getData(myUid, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+
+            Bitmap yourPic = BitmapFactory.decodeByteArray(myPic, 0, myPic.length);
+            this.yourPic.setImageBitmap(yourPic);
+        }
+
+         mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+         final MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+         current_uid = mySQLDatabase.fetchCurrentLoggedInID();
+         LOGIN_STATUS = mySQLDatabase.fetchCurrentLoggedInStatus();
+         if (LOGIN_STATUS.equals(MySQLDatabase.LOGIN_STATUS_FACEBOOK)) {
             Intent intent = getIntent();
             facebook_uid = intent.getStringExtra("facebook_uid");
             mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(facebook_uid).child("Online_Multiplayer");
-        } else {
+         }
+         else{
             mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid).child("Online_Multiplayer");
-        }
+         }
 
 
         Intent onlineMultiplayer_intent = getIntent();
@@ -89,137 +108,78 @@ public class WaitingForOpponent4Players extends AppCompatActivity {
         entry_coins = onlineMultiplayer_intent.getStringExtra("entry_coins");
         check_online_multiplayer = onlineMultiplayer_intent.getBooleanExtra("online_multiplayer", true);
 
-        final DatabaseReference[] loopThrough = {FirebaseDatabase.getInstance().getReference().child("Users")};
+        final DatabaseReference loopThrough = FirebaseDatabase.getInstance().getReference().child("Users");
         final ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final ValueEventListener listener1 = this;
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     final String key = (String) ds.getKey();
-                    final DatabaseReference[] keyReference = {FirebaseDatabase.getInstance().getReference().child("Users").child(key).child("Online_Multiplayer")};
-                    keyReference[0].addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    DatabaseReference keyReference = FirebaseDatabase.getInstance().getReference().child("Users").child(key).child("Online_Multiplayer");
+                    keyReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onDataChange(final DataSnapshot dataSnapshot) {
+                        public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot.hasChild("still_searching")) {
                                 String code = dataSnapshot.child("still_searching").getValue(String.class);
-                                String NO_OF_PLAYERS = "" + dataSnapshot.child("noOfPlayers").getValue();
-                                String ENTRY_COINS = "" + dataSnapshot.child("entry_coins").getValue();
-                                if (code.equals("true") && !key.equals(current_uid) && noOfPlayers_online_multiplayer.equals(NO_OF_PLAYERS) && entry_coins.equals(ENTRY_COINS)) {
+                                String NO_OF_PLAYERS = ""+dataSnapshot.child("noOfPlayers").getValue();
+                                String ENTRY_COINS = ""+dataSnapshot.child("entry_coins").getValue();
+                                if (code.equals("true") && !key.equals(current_uid) && noOfPlayers_online_multiplayer.equals(NO_OF_PLAYERS)  && entry_coins.equals(ENTRY_COINS)) {
                                     Toast.makeText(getApplicationContext(), code + "  " + key, Toast.LENGTH_LONG).show();
-                                    String check_player2_value = dataSnapshot.child("player2_uid").getValue().toString();
-                                    if (check_player2_value.equals("0")) {
-                                        dataSnapshot.child("player2_uid").getRef().setValue(current_uid).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                dataSnapshot.child("still_searching").getRef().setValue("false").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        //////////////////////
-                                                                loopThrough[0].child(current_uid).child("Online_Multiplayer").child("player2_uid").setValue(key).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                        if (dataSnapshot.child(key).hasChild("name")) {
-                                                                            if (dataSnapshot.child(key).hasChild("thumb_image")) {
-                                                                                String opponent_name = dataSnapshot.child(key).child("name").getValue().toString();
-                                                                                player2_name.setText(opponent_name);
-                                                                                String opponent_pic = dataSnapshot.child(key).child("thumb_image").getValue().toString();
-                                                                                Picasso.get().load(opponent_pic).into(player2Pic);
-                                                                                dataSnapshot.child("waiting_for_Other_2Players").getRef().setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onComplete(@NonNull Task<Void> task) {
-//                                                                                        loopThrough[0].removeEventListener(listener1);
-                                                                                        final ValueEventListener listener = new ValueEventListener() {
-                                                                                            @Override
-                                                                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                                                final ValueEventListener listener1 = this;
-                                                                                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                                                                                    final String key1 = (String) ds.getKey();
-                                                                                                    if (key1 != current_uid) {
-                                                                                                        FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid)
-                                                                                                                .child("Online_Multiplayer").addValueEventListener(new ValueEventListener() {
-                                                                                                            @Override
-                                                                                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                                                                String player2_uid_value = dataSnapshot.child("player2_uid").getValue().toString();
-                                                                                                                if (key1 != player2_uid_value) {
-                                                                                                                    FirebaseDatabase.getInstance().getReference().child("Users").child(key).child("Online_multiplayer")
-                                                                                                                            .addValueEventListener(new ValueEventListener() {
-                                                                                                                                @Override
-                                                                                                                                public void onDataChange(final DataSnapshot dataSnapshot) {
-                                                                                                                                    String search_mode = dataSnapshot.child("waiting_for_Other_2Players").getValue().toString();
-                                                                                                                                    if (search_mode.equals("true")) {
-                                                                                                                                        dataSnapshot.child("player3_uid").getRef().setValue(current_uid).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                                            @Override
-                                                                                                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                                                dataSnapshot.child("player4_uid").getRef().setValue(key).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                                                    @Override
-                                                                                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                                                        dataSnapshot.child("still_searching").getRef().setValue("false").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                                                            @Override
-                                                                                                                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                                                                dataSnapshot.child("waiting_for_Other_2Players").getRef().setValue("false").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                                                                                                    @Override
-                                                                                                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                                                                                                        String player4_uid = dataSnapshot.child("player4_uid").getValue().toString();
-                                                                                                                                                                        FirebaseDatabase.getInstance().getReference().child("Users").child(player4_uid).child("Online_Multiplayer").addValueEventListener(new ValueEventListener() {
-                                                                                                                                                                            @Override
-                                                                                                                                                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                                                                                                                                dataSnapshot.child("player3_uid").getRef().setValue("");
-                                                                                                                                                                            }
-
-                                                                                                                                                                            @Override
-                                                                                                                                                                            public void onCancelled(DatabaseError databaseError) {
-
-                                                                                                                                                                            }
-                                                                                                                                                                        });
-                                                                                                                                                                    }
-                                                                                                                                                                });
-                                                                                                                                                            }
-                                                                                                                                                        });
-                                                                                                                                                    }
-                                                                                                                                                });
-                                                                                                                                            }
-                                                                                                                                        });
-                                                                                                                                    }
-                                                                                                                                }
-
-                                                                                                                                @Override
-                                                                                                                                public void onCancelled(DatabaseError databaseError) {
-
-                                                                                                                                }
-                                                                                                                            });
-                                                                                                                }
-                                                                                                            }
-
-                                                                                                            @Override
-                                                                                                            public void onCancelled(DatabaseError databaseError) {
-
-                                                                                                            }
-                                                                                                        });
-                                                                                                    }
-
-                                                                                                }
-                                                                                            }
-
-                                                                                            @Override
-                                                                                            public void onCancelled(DatabaseError databaseError) {
-
-                                                                                            }
-                                                                                        };
-                                                                                    }
-                                                                                });
-//
-                                                                            }
-                                                                        }
-                                                                    }
-
-
-                                                        });
-                                                    }
-                                                });
+                                    DatabaseReference firebaseDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(key);
+                                    firebaseDatabase.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(final DataSnapshot dataSnapshot) {
+                                            final String opponent_name = dataSnapshot.child("name").getValue().toString();
+                                            if (dataSnapshot.hasChild("thumb_image")) {
+                                                if(count == 0) {
+                                                    Handler handler = new Handler();
+                                                    handler.postDelayed(new Runnable() {
+                                                        public void run() {
+                                                            String opponent_pic = dataSnapshot.child("thumb_image").getValue().toString();
+                                                            Picasso.get().load(opponent_pic).into(player2Pic);
+                                                            player2_name.setText(opponent_name);
+                                                            player2_uid = key;
+                                                            count++;
+                                                        }
+                                                    }, 5000);
+                                                }
+                                                else if(count == 1) {
+                                                    Handler handler = new Handler();
+                                                    handler.postDelayed(new Runnable() {
+                                                        public void run() {
+                                                            String opponent_pic = dataSnapshot.child("thumb_image").getValue().toString();
+                                                            Picasso.get().load(opponent_pic).into(player3Pic);
+                                                            player3_name.setText(opponent_name);
+                                                            player3_uid = key;
+                                                            count++;
+                                                        }
+                                                    }, 5000);
+                                                }
+                                                else if(count == 2) {
+                                                    Handler handler = new Handler();
+                                                    handler.postDelayed(new Runnable() {
+                                                        public void run() {
+                                                            String opponent_pic = dataSnapshot.child("thumb_image").getValue().toString();
+                                                            Picasso.get().load(opponent_pic).into(player4Pic);
+                                                            player4_name.setText(opponent_name);
+                                                            player4_uid = key;
+                                                            count++;
+                                                        }
+                                                    }, 5000);
+                                                }
                                             }
-                                        });
-                                    }
+                                            if(count >= 3) {
+                                                loopThrough.removeEventListener(listener1);
+                                            }
 
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
                                 }
                             }
                         }
@@ -238,7 +198,7 @@ public class WaitingForOpponent4Players extends AppCompatActivity {
 
             }
         };
-        loopThrough[0].addValueEventListener(listener);
+        loopThrough.addValueEventListener(listener);
 
 
 
@@ -251,33 +211,12 @@ public class WaitingForOpponent4Players extends AppCompatActivity {
                         mDatabase.child("entry_coins").setValue(entry_coins).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                mDatabase.child("player3_uid").setValue("0").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        mDatabase.child("player4_uid").setValue("0").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                mDatabase.child("player1_uid").setValue(current_uid).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        mDatabase.child("waiting_for_Other_2Players").setValue("false").addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                String player_name = (String ) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_USER, mySQLDatabase.TABLE_NAME);
-                                                                byte[] pic = (byte[]) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.IMAGE_PROFILE_COL, mySQLDatabase.TABLE_NAME);
-                                                                ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(pic);
-                                                                Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
-                                                                yourPic.setImageBitmap(bitmap);
-                                                                yourName.setText(player_name);
-                                                            }
-                                                        });
-                                                    }
-                                                });
-
-                                            }
-                                        });
-                                    }
-                                });
+                                String player_name = (String ) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.NAME_USER, mySQLDatabase.TABLE_NAME);
+                                byte[] pic = (byte[]) mySQLDatabase.getData(mySQLDatabase.fetchCurrentLoggedInID(), MySQLDatabase.IMAGE_PROFILE_COL, mySQLDatabase.TABLE_NAME);
+                                ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(pic);
+                                Bitmap bitmap = BitmapFactory.decodeStream(arrayInputStream);
+                                yourPic.setImageBitmap(bitmap);
+                                yourName.setText(player_name);
                             }
                         });
                     }

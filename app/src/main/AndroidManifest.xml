@@ -23,6 +23,7 @@
             </intent-filter>
         </service>
 
+
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

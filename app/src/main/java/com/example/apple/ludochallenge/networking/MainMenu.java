@@ -3,6 +3,8 @@ package com.example.apple.ludochallenge.networking;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +31,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.apple.ludochallenge.Constants;
 import com.example.apple.ludochallenge.R;
 import com.example.apple.ludochallenge.SpinWheelActivity;
 import com.example.apple.ludochallenge.UserProgressData;
@@ -538,13 +541,25 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.putExtra("facebook_uid", facebook_uid);
-                startActivity(intent);
-                overridePendingTransition(R.anim.goup, R.anim.godown);
+
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainMenu.this);
+                    Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+                    intent.putExtra(Constants.KEY_ANIM_TYPE, Constants.TransitionType.Explode);
+                    startActivity(intent, options.toBundle());
+                }
+
+
+
+//                Intent intent = new Intent(getApplicationContext(), PlayActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                intent.putExtra("facebook_uid", facebook_uid);
+//                startActivity(intent);
+//                overridePendingTransition(R.anim.goup, R.anim.godown);
             }
         });
+
 
 
         profile_pic_box.setOnClickListener(new View.OnClickListener() {

@@ -448,7 +448,19 @@
                               databaseReference.child("Online_Multiplayer").setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                   @Override
                                   public void onComplete(@NonNull Task<Void> task) {
-                                      updateUI();
+                                      mDatabase = FirebaseDatabase.getInstance().getReference();
+                                      HashMap<String, String> userMap = new HashMap<>();
+                                      userMap.put("noOfPlayers", "null");
+                                      userMap.put("challenge", "false");
+                                      userMap.put("from", "null");
+                                      userMap.put("player3", "null");
+                                      userMap.put("player4","null");
+                                      mDatabase.child("notifications").child(facebook_uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                          @Override
+                                          public void onComplete(@NonNull Task<Void> task) {
+                                              updateUI();
+                                          }
+                                      });
                                   }});
                               facebookLogin.setEnabled(true);
                          } else {
@@ -512,23 +524,37 @@
                                     mTokenDatabase.child(current_userId).child("device_token").setValue(deviceToken).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            storeFlag_into_Storage();
-                                            Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
-                                            intent.putExtra("country_name", countryName.getText().toString());
-                                            intent.putExtra("userName_register",name.toString());
-                                            intent.putExtra("check",1);
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            mDatabase = FirebaseDatabase.getInstance().getReference();
+                                            HashMap<String, String> userMap = new HashMap<>();
+                                            userMap.put("noOfPlayers", "null");
+                                            userMap.put("challenge", "false");
+                                            userMap.put("from", "null");
+                                            userMap.put("player3", "null");
+                                            userMap.put("player4","null");
+                                            mDatabase.child("notifications").child(current_userId).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()){
+                                                        storeFlag_into_Storage();
+                                                        Intent intent = new Intent(getApplicationContext(),SettingsActivity.class);
+                                                        intent.putExtra("country_name", countryName.getText().toString());
+                                                        intent.putExtra("userName_register",name.toString());
+                                                        intent.putExtra("check",1);
+                                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                                            MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
-                                            mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_COMPUTER, "0","0", "500");
-                                            mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
-                                            mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_COMPUTER, "0","0", "500");
-                                            mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
+                                                        MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+                                                        mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_COMPUTER, "0","0", "500");
+                                                        mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.LUDO_CHALLENGE, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
+                                                        mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_COMPUTER, "0","0", "500");
+                                                        mySQLDatabase.insertGameProgressData(current_userId,MySQLDatabase.SNAKES_AND_LADDERS, MySQLDatabase.VS_MULTIPLAYTER, "0","0", "500");
 
 
-                                            startActivity(intent);
-                                            overridePendingTransition(R.anim.goup, R.anim.godown);
-                                            finish();
+                                                        startActivity(intent);
+                                                        overridePendingTransition(R.anim.goup, R.anim.godown);
+                                                        finish();
+                                                    }
+                                                }
+                                            });
                                         }
                                     });
                                     loadingBar.dismiss();

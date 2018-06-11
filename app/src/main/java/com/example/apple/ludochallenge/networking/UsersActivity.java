@@ -189,9 +189,9 @@ public class UsersActivity extends AppCompatActivity {
                         @Override
                         public void onClick(final View view) {
                             view.setEnabled(false);
-
+                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                             if (view.getTag().equals("challenged")) {
-                                mChallenge_database.child(user_id).child(mCurrent_user.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                mChallenge_database.child(mCurrent_user.getUid()).child(user_id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
@@ -201,31 +201,50 @@ public class UsersActivity extends AppCompatActivity {
                                     }
                                 });
                             } else if (view.getTag().equals("challenge")) {
-                                mChallenge_database.child(user_id).child(mCurrent_user.getUid()).child("challenge").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
+                                HashMap<String, String> userMap = new HashMap<>();
+                                userMap.put("noOfPlayers", "2");
+                                userMap.put("challenge", "true");
+                                userMap.put("from", mCurrent_user.getUid());
+                                userMap.put("player3", "null");
+                                userMap.put("player4","null");
+                                mDatabase.child("notifications").child(user_id).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            HashMap<String, String> notificationData = new HashMap<>();
-                                            notificationData.put("from", mCurrent_user.getUid());
-                                            notificationData.put("type", "challenged");
-                                            mNotification_database.child(user_id).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    ((ImageView) view).setImageResource(R.drawable.recycle_view_challenged);
-                                                    view.setTag("challenged");
-                                                    FirebaseDatabase.getInstance().getReference().child("started_games");
-                                                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
-                                                    intent.putExtra("UIDS", new String[]{user_id, mCurrent_user.getUid()});
-                                                    intent.putExtra("names", new String[]{model.name, myName});
-                                                    startActivity(intent);
-                                                }
-                                            });
-                                        } else {
-                                            Toast.makeText(UsersActivity.this, "Failed sending challenge!", Toast.LENGTH_SHORT).show();
+                                        if(task.isSuccessful()){
+                                            view.setTag("challenged");
+                                            ((ImageView) view).setImageResource(R.drawable.recycle_view_challenged);
+                                            FirebaseDatabase.getInstance().getReference().child("started_games");
+                                            Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                                            intent.putExtra("UIDS", new String[]{user_id, mCurrent_user.getUid()});
+                                            intent.putExtra("names", new String[]{model.name, myName});
+                                            startActivity(intent);
                                         }
                                     }
-
                                 });
+//                                mChallenge_database.child(mCurrent_user.getUid()).child(user_id).child("challenge").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                    @Override
+//                                    public void onComplete(@NonNull Task<Void> task) {
+//                                        if (task.isSuccessful()) {
+//                                            HashMap<String, String> notificationData = new HashMap<>();
+//                                            notificationData.put("from", mCurrent_user.getUid().toString());
+//                                            notificationData.put("type", "challenged");
+//                                            mNotification_database.child(user_id).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                                @Override
+//                                                public void onSuccess(Void aVoid) {
+//                                                    ((ImageView) view).setImageResource(R.drawable.recycle_view_challenged);
+//                                                    FirebaseDatabase.getInstance().getReference().child("started_games");
+//                                                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+//                                                    intent.putExtra("UIDS", new String[]{user_id, mCurrent_user.getUid()});
+//                                                    intent.putExtra("names", new String[]{model.name, myName});
+//                                                    startActivity(intent);
+//                                                }
+//                                            });
+//                                        } else {
+//                                            Toast.makeText(UsersActivity.this, "Failed sending challenge!", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    }
+//
+//                                });
                             } else if (view.getTag().equals("accept_challenge")) {
                                 gameStarted.child("started_games").child(mCurrent_user.getUid()).child(user_id).child("players").setValue("2").addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
