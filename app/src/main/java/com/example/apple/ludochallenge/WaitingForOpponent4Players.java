@@ -53,6 +53,8 @@ public class WaitingForOpponent4Players extends AppCompatActivity {
     String player3_uid;
     String player4_uid;
     int count = 0;
+    private String myUid,player2_Uid, player3_Uid, player4_Uid;
+    boolean localMultiplayer = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +69,25 @@ public class WaitingForOpponent4Players extends AppCompatActivity {
          player2Pic = (ImageView) findViewById(R.id.waitingForOpponent_player2Pic);
          player3Pic = (ImageView) findViewById(R.id.waitingForOpponent_player3Pic);
          player4Pic = (ImageView) findViewById(R.id.waitingForOpponent_player4Pic);
-        yourName = (TextView) findViewById(R.id.yourName);
+         yourName = (TextView) findViewById(R.id.yourName);
 
          Glide.with(getApplicationContext()).load(R.raw.random_playergif).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(waiting_for_opponent_gif);
+
+        Intent getIntent = getIntent();
+        String[] names = getIntent.getStringArrayExtra("names");
+        myUid = getIntent.getStringArrayExtra("UIDS")[0];
+        player2_Uid = getIntent.getStringArrayExtra("UIDS")[1];
+        player3_Uid = getIntent.getStringArrayExtra("UIDS")[2];
+        player4_Uid = getIntent.getStringArrayExtra("UIDS")[3];
+        localMultiplayer = getIntent.getBooleanExtra("checkActivity", true);
+
+        if(localMultiplayer) {
+            MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
+            final byte[] myPic = (byte[]) mySQLDatabase.getData(myUid, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
+
+            Bitmap yourPic = BitmapFactory.decodeByteArray(myPic, 0, myPic.length);
+            this.yourPic.setImageBitmap(yourPic);
+        }
 
          mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
          final MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());

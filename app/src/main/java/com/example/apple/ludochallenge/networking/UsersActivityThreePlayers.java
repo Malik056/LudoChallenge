@@ -19,8 +19,14 @@ import android.widget.TextView;
 
 import com.example.apple.ludochallenge.FacebookFriendAdapter;
 import com.example.apple.ludochallenge.R;
+import com.example.apple.ludochallenge.WaitingForOpponent2Players;
+import com.example.apple.ludochallenge.WaitingForOpponent3Players;
+import com.example.apple.ludochallenge.WaitingForOpponent4Players;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,6 +39,7 @@ import com.sdsmdg.tastytoast.TastyToast;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -48,6 +55,7 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
     String LOGIN_STATUS;
     FirebaseRecyclerAdapter<Users, UsersViewHolder> adapter;
     String myName;
+    String player2_Uid, player3_Uid, player4_Uid;
 
 
     private DatabaseReference mChallenge_database;
@@ -69,6 +77,8 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
     private TextView player4_name;
     private int checkCount = 0;
     private int checkCountTemp = 0;
+    private ImageView challenge_btn;
+    View player2_view, player3_view, player4_view;
 
 
 
@@ -96,6 +106,8 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
         ll_player2 = (LinearLayout) findViewById(R.id.ll_player2);
         ll_player3 = (LinearLayout) findViewById(R.id.ll_player3);
         ll_player4 = (LinearLayout) findViewById(R.id.ll_player4);
+
+        challenge_btn = (ImageView) findViewById(R.id.challenge_btn);
 
         ll_player2.setVisibility(View.GONE);
         ll_player3.setVisibility(View.GONE);
@@ -168,47 +180,6 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
 
                     final String user_id = getRef(position).getKey();
 
-                    DatabaseReference myChallenges = mChallenge_database != null ? mChallenge_database.child(mCurrent_user.getUid()) : null;
-                    DatabaseReference hisChallenges = mChallenge_database != null ? mChallenge_database.child(user_id) : null;
-
-                    if (myChallenges != null && myChallenges.child(user_id) != null) {
-
-                        myChallenges.child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                if (dataSnapshot.hasChild("challenge")) {
-
-                                    ImageView imageView = holder.mView.findViewById(R.id.users_three_layout_checkbox);
-                                    imageView.setImageResource(R.drawable.recyler_view_accept_challenge);
-                                    imageView.setTag("accept_challenge");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    } else if (hisChallenges != null && hisChallenges.child(mCurrent_user.getUid()) != null) {
-                        myChallenges.child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (dataSnapshot.hasChild("challenge")) {
-                                    ImageView challenge_btn = holder.mView.findViewById(R.id.users_three_layout_checkbox);
-
-                                    challenge_btn.setImageResource(R.drawable.recycle_view_challenged);
-                                    challenge_btn.setTag("challenged");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
                     holder.mView.findViewById(R.id.users_three_layout_checkbox).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(final View view) {
@@ -234,28 +205,53 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
                                     ll_player2.setVisibility(View.VISIBLE);
                                     second_player.setImageDrawable(holder.getUserImage());
                                     player2_name.setText(holder.getUserName());
+                                    player2_Uid = user_id;
+                                    player2_view = view;
                                 } else if (checkCount == 2 && checkCountTemp == 1) {
                                     if (ll_player2.getVisibility() == View.VISIBLE) {
                                         ll_player3.setVisibility(View.VISIBLE);
                                         third_player.setImageDrawable(holder.getUserImage());
                                         player3_name.setText(holder.getUserName());
+                                        player3_Uid = user_id;
+                                        player3_view = view;
                                     } else if (ll_player3.getVisibility() == View.VISIBLE) {
                                         ll_player2.setVisibility(View.VISIBLE);
                                         second_player.setImageDrawable(holder.getUserImage());
                                         player2_name.setText(holder.getUserName());
+                                        player2_Uid = user_id;
+                                        player2_view = view;
                                     }
                                 } else if (checkCount == 1 && checkCountTemp == 2) {
                                     if (holder.getUserImage() == second_player.getDrawable() && holder.getUserName() == player2_name.getText().toString()) {
                                         ll_player2.setVisibility(View.GONE);
                                         player2_name.setText("Player 2");
+                                        if (view.getTag().equals("checked")) {
+                                            view.setTag("check");
+                                        }
+                                        else if (view.getTag().equals("check")) {
+                                            view.setTag("checked");
+                                        }
                                     } else if (holder.getUserImage() == third_player.getDrawable() && holder.getUserName() == player3_name.getText().toString()) {
                                         ll_player3.setVisibility(View.GONE);
                                         player3_name.setText("Player 3");
+                                        if (view.getTag().equals("checked")) {
+                                            view.setTag("check");
+                                        }
+                                        else if (view.getTag().equals("check")) {
+                                            view.setTag("checked");
+                                        }
                                     }
                                 } else {
                                     TastyToast.makeText(getApplicationContext(), "You've selected maximum no of players", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                                 }
                                 checkCountTemp = checkCount;
+
+                                if (view.getTag().equals("checked")) {
+                                    view.setTag("check");
+                                }
+                                else if (view.getTag().equals("check")) {
+                                    view.setTag("checked");
+                                }
                             }
                             else if(noOfPlayers == 4){
                                 if (((ImageView) view).getTag().equals("checked")) {
@@ -278,44 +274,63 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
                                     ll_player2.setVisibility(View.VISIBLE);
                                     second_player.setImageDrawable(holder.getUserImage());
                                     player2_name.setText(holder.getUserName());
+                                    player2_Uid = user_id;
+                                    player2_view = view;
                                 } else if (checkCount == 2 && checkCountTemp == 1) {
-//                                    if (ll_player2.getVisibility() == View.VISIBLE) {
-                                        ll_player3.setVisibility(View.VISIBLE);
-                                        third_player.setImageDrawable(holder.getUserImage());
-                                        player3_name.setText(holder.getUserName());
-//                                    } else if (ll_player3.getVisibility() == View.VISIBLE) {
-//                                        ll_player2.setVisibility(View.VISIBLE);
-//                                        second_player.setImageDrawable(holder.getUserImage());
-//                                        player2_name.setText(holder.getUserName());
-//                                    }
+                                    ll_player3.setVisibility(View.VISIBLE);
+                                    third_player.setImageDrawable(holder.getUserImage());
+                                    player3_name.setText(holder.getUserName());
+                                    player3_Uid = user_id;
+                                    player3_view = view;
                                 } else if (checkCount == 3 && checkCountTemp == 2) {
-//                                    if (ll_player3.getVisibility() == View.VISIBLE) {
-                                        ll_player4.setVisibility(View.VISIBLE);
-                                        fourth_player.setImageDrawable(holder.getUserImage());
-                                        player4_name.setText(holder.getUserName());
-//                                    } else if (ll_player4.getVisibility() == View.VISIBLE) {
-//                                        ll_player3.setVisibility(View.VISIBLE);
-//                                        third_player.setImageDrawable(holder.getUserImage());
-//                                        player3_name.setText(holder.getUserName());
-//                                    }
+                                    ll_player4.setVisibility(View.VISIBLE);
+                                    fourth_player.setImageDrawable(holder.getUserImage());
+                                    player4_name.setText(holder.getUserName());
+                                    player4_Uid = user_id;
+                                    player4_view = view;
                                 }
                                  else if ((checkCount == 2 && checkCountTemp == 3) || (checkCount == 1 && checkCountTemp == 2)) {
                                     if (holder.getUserImage() == second_player.getDrawable() && holder.getUserName() == player2_name.getText().toString()) {
                                         ll_player2.setVisibility(View.GONE);
                                         player2_name.setText("Player 2");
+                                        if (view.getTag().equals("checked")) {
+                                            view.setTag("check");
+                                        }
+                                        else if (view.getTag().equals("check")) {
+                                            view.setTag("checked");
+                                        }
                                     } else if (holder.getUserImage() == third_player.getDrawable() && holder.getUserName() == player3_name.getText().toString()) {
                                         ll_player3.setVisibility(View.GONE);
                                         player3_name.setText("Player 3");
+                                        if (view.getTag().equals("checked")) {
+                                            view.setTag("check");
+                                        }
+                                        else if (view.getTag().equals("check")) {
+                                            view.setTag("checked");
+                                        }
                                     }
                                     else if (holder.getUserImage() == fourth_player.getDrawable() && holder.getUserName() == player4_name.getText().toString()) {
                                         ll_player4.setVisibility(View.GONE);
                                         player4_name.setText("Player 4");
+                                        if (view.getTag().equals("checked")) {
+                                            view.setTag("check");
+                                        }
+                                        else if (view.getTag().equals("check")) {
+                                            view.setTag("checked");
+                                        }
                                     }
                                 } else {
                                     TastyToast.makeText(getApplicationContext(), "You've selected maximum no of players", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
                                 }
-                                checkCountTemp = checkCount;
+                                    checkCountTemp = checkCount;
+                                    if (view.getTag().equals("checked")) {
+                                        view.setTag("check");
+                                    }
+                                    else if (view.getTag().equals("check")) {
+                                        view.setTag("checked");
+                                    }
                             }
+
                         }
                     });
                 }
@@ -335,7 +350,187 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
 
         }
 
+        challenge_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                if (noOfPlayers == 3) {
+                    if (player2_view.getTag().equals("checked") && player3_view.getTag().equals("checked")) {
+                        mChallenge_database.child(mCurrent_user.getUid()).child(player2_Uid).child(player3_Uid).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    player2_view.setTag("check");
+                                    player3_name.setTag("check");
+                                }
+                            }
+                        });
+                    } else if (player2_view.getTag().equals("check") && player3_view.getTag().equals("check")) {
+                        final HashMap<String, String> userMap = new HashMap<>();
+                        userMap.put("noOfPlayers", "3");
+                        userMap.put("challenge", "true");
+                        userMap.put("from", mCurrent_user.getUid());
+                        userMap.put("player3", player3_Uid);
+                        userMap.put("player4","null");
+                        mDatabase.child("notifications").child(player2_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()) {
+                                    player2_view.setTag("checked");
+                                    HashMap<String, String> userMap = new HashMap<>();
+                                    userMap.put("noOfPlayers", "3");
+                                    userMap.put("challenge", "true");
+                                    userMap.put("from", mCurrent_user.getUid());
+                                    userMap.put("player3", player2_Uid);
+                                    userMap.put("player4", "null");
+                                    mDatabase.child("notifications").child(player3_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                player3_view.setTag("checked");
+                                                Intent intent = new Intent(getApplicationContext(), WaitingForOpponent3Players.class);
+                                                intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid});
+                                                intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString()});
+                                                startActivity(intent);
+                                            }
+
+                                        }
+                                    });
+                                }
+
+                            }
+                        });
+//                        mChallenge_database.child(mCurrent_user.getUid()).child(player2_Uid).child(player3_Uid).child("challenge").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Void> task) {
+//                                if (task.isSuccessful()) {
+//                                    HashMap<String, String> notificationData = new HashMap<>();
+//                                    notificationData.put("from", mCurrent_user.getUid());
+//                                    notificationData.put("type", "challenged");
+//                                    mNotification_database.child(player2_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//                                            player2_view.setTag("checked");
+//                                        }
+//                                    });
+//                                    mNotification_database.child(player3_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//                                            player3_view.setTag("checked");
+//                                        }
+//                                    });
+//                                    FirebaseDatabase.getInstance().getReference().child("started_games");
+//                                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent3Players.class);
+//                                    intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid});
+//                                    intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString()});
+//                                    startActivity(intent);
+//                                }
+//                            }
+//                        });
+                    }
+                }
+                else if(noOfPlayers == 4){
+                    if (player2_view.getTag().equals("checked") && player3_view.getTag().equals("checked") && player4_view.getTag().equals("checked")) {
+                        mChallenge_database.child(mCurrent_user.getUid()).child(player2_Uid).child(player3_Uid).child(player4_Uid).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    player2_view.setTag("check");
+                                    player3_name.setTag("check");
+                                    player4_name.setTag("check");
+                                }
+                            }
+                        });
+                    } else if (player2_view.getTag().equals("check") && player3_view.getTag().equals("check") && player4_view.getTag().equals("check")) {
+                        HashMap<String, String> userMap = new HashMap<>();
+                        userMap.put("noOfPlayers", "4");
+                        userMap.put("challenge", "true");
+                        userMap.put("from", mCurrent_user.getUid());
+                        userMap.put("player3", player3_Uid);
+                        userMap.put("player4",player4_Uid);
+                        mDatabase.child("notifications").child(player2_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    player2_view.setTag("checked");
+                                    HashMap<String, String> userMap = new HashMap<>();
+                                    userMap.put("noOfPlayers", "4");
+                                    userMap.put("challenge", "true");
+                                    userMap.put("from", mCurrent_user.getUid());
+                                    userMap.put("player3", player2_Uid);
+                                    userMap.put("player4",player4_Uid);
+                                    mDatabase.child("notifications").child(player3_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                player3_view.setTag("checked");
+                                                HashMap<String, String> userMap = new HashMap<>();
+                                                userMap.put("noOfPlayers", "4");
+                                                userMap.put("challenge", "true");
+                                                userMap.put("from", mCurrent_user.getUid());
+                                                userMap.put("player3", player2_Uid);
+                                                userMap.put("player4",player3_Uid);
+                                                mDatabase.child("notifications").child(player4_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if(task.isSuccessful()){
+                                                            player4_view.setTag("checked");
+                                                            Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                                                            intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid, player4_Uid});
+                                                            intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString(), player4_name.getText().toString()});
+                                                            intent.putExtra("checkActivity", true);
+                                                            startActivity(intent);
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+
+                            }
+                        });
+//                        mChallenge_database.child(mCurrent_user.getUid()).child(player2_Uid).child(player3_Uid).child(player4_Uid).child("challenge").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Void> task) {
+//                                if (task.isSuccessful()) {
+//                                    HashMap<String, String> notificationData = new HashMap<>();
+//                                    notificationData.put("from", mCurrent_user.getUid());
+//                                    notificationData.put("type", "challenged");
+//                                    mNotification_database.child(player2_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//                                            player2_view.setTag("checked");
+//                                        }
+//                                    });
+//                                    mNotification_database.child(player3_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//                                            player3_view.setTag("checked");
+//                                        }
+//                                    });
+//                                    mNotification_database.child(player4_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+//                                            player4_view.setTag("checked");
+//                                        }
+//                                    });
+//                                    FirebaseDatabase.getInstance().getReference().child("started_games");
+//                                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+//                                    intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid, player4_Uid});
+//                                    intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString(), player4_name.getText().toString()});
+//                                    intent.putExtra("checkActivity", true);
+//                                    startActivity(intent);
+//                                }
+//                            }
+//                        });
+                    }
+                }
+            }
+        });
+
     }
+
 
     public static class UsersViewHolder extends RecyclerView.ViewHolder{
 
@@ -364,6 +559,7 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
         public String getUserName(){
             return ((TextView) mView.findViewById(R.id.users_name)).getText().toString();
         }
+
     }
 
     private void getDataFromParentActivity(){

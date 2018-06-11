@@ -3,11 +3,14 @@ package com.example.apple.ludochallenge.networking;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.transition.Explode;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.apple.ludochallenge.Color;
+import com.example.apple.ludochallenge.Constants;
 import com.example.apple.ludochallenge.LudoActivity;
 import com.example.apple.ludochallenge.PlayerType;
 import com.example.apple.ludochallenge.R;
@@ -168,10 +172,19 @@ public class PlayActivity extends AppCompatActivity {
     PlayerType[] playerType;
     int numberOfPlayers;
 
+
+
+    Constants.TransitionType type;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
+
+        initPage();
+        initAnimation();
 
 //        FirebaseAuth.getInstance().signOut();
 
@@ -942,16 +955,16 @@ public class PlayActivity extends AppCompatActivity {
 
 
 
-        play_backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                overridePendingTransition(R.anim.goup, R.anim.godown);
-                finish();
-            }
-        });
+//        play_backBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(intent);
+//                overridePendingTransition(R.anim.goup, R.anim.godown);
+//                finish();
+//            }
+//        });
 
         playWithFriends_backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1294,6 +1307,35 @@ public class PlayActivity extends AppCompatActivity {
         vsComputer();
     }
 
+    private void initPage(){
+        type = (Constants.TransitionType) getIntent().getSerializableExtra(Constants.KEY_ANIM_TYPE);
+        play_backBtn = (ImageView) findViewById(R.id.play_backBtn);
+        play_backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    finishAfterTransition();
+                }
+            }
+        });
+
+
+    }
+    private void initAnimation(){
+        switch (type){
+            case Explode: {
+                Explode enterTransition = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    enterTransition = new Explode();
+                    enterTransition.setDuration(10);
+                    getWindow().setEnterTransition(enterTransition);
+                    break;
+                }
+
+            }
+        }
+    }
+
 
     void setColor(){
         two_players_leftPress1.setOnClickListener(new View.OnClickListener() {
@@ -1567,11 +1609,14 @@ public class PlayActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), MainMenu.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        overridePendingTransition(R.anim.goup, R.anim.godown);
-        finish();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            finishAfterTransition();
+        }
+//        Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(intent);
+//        overridePendingTransition(R.anim.goup, R.anim.godown);
+//        finish();
     }
 
     @Override
