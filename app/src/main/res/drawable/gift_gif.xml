@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list android:id="@+id/gift_gif"
+    android:oneshot="false"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/gift_gif_1" android:duration="@integer/gift_gif_duration"/>
+    <item android:drawable="@drawable/gift_gif_2" android:duration="@integer/gift_gif_duration"/>
+    <item android:drawable="@drawable/gift_gif_3" android:duration="@integer/gift_gif_duration"/>
+</animation-list>

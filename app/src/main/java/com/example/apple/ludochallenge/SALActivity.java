@@ -385,7 +385,7 @@ public class SALActivity extends AppCompatActivity {
         arrow2.setTag(R.id.player2_arrow);
         arrow2.setLayoutParams(new LinearLayout.LayoutParams(width / 5, width / 10));
         arrow2.setVisibility(View.INVISIBLE);
-        arrow2.setImageDrawable(getResources().getDrawable(R.drawable.right_arrown_down));
+        arrow2.setImageDrawable(getResources().getDrawable(R.drawable.right_arrow_down));
 
         TextView textView = new TextView(this);
         textView.setLayoutParams(new LinearLayout.LayoutParams(width / 10, width / 10));

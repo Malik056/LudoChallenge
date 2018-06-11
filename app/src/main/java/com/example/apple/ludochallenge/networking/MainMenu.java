@@ -1,16 +1,15 @@
 package com.example.apple.ludochallenge.networking;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,15 +17,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -41,8 +37,6 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -54,7 +48,6 @@ import com.sdsmdg.tastytoast.TastyToast;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MainMenu extends AppCompatActivity implements RewardedVideoAdListener {
 
@@ -135,6 +128,8 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
     String coins;
     String textResult = null;
     private  ArrayList<UserProgressData> userProgressData;
+    private AnimationDrawable logoDrawable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,6 +150,9 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         logo = (ImageView) findViewById(R.id.register_logo);
         spin = (ImageView) findViewById(R.id.spin);
         Glide.with(getApplicationContext()).load(R.raw.logo).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(logo);
+//        logo.setImageResource(R.drawable.logo_anim);
+//        logoDrawable = (AnimationDrawable) logo.getDrawable();
+//        logoDrawable.start();
         Glide.with(getApplicationContext()).load(R.raw.spin).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(spin);
         Glide.with(getApplicationContext()).load(R.raw.add).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(watchAd);
         mAuth = FirebaseAuth.getInstance();
@@ -677,13 +675,30 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
 
     @Override
     protected void onDestroy() {
-        rewardedVideoAd.destroy(this);
+        rewardedVideoAd.destroy(getApplicationContext());
+//        logoDrawable.stop();
+////        logoDrawable.setCallback(null);
+//        freeLogo(logoDrawable);
+//        logoDrawable = null;
         super.onDestroy();
         unbindDrawables(findViewById(R.id.mainMenuActivityRoot));
         Runtime.getRuntime().gc();
         System.gc();
     }
 
+    private void freeLogo(AnimationDrawable drawable)
+    {
+        drawable.mutate();
+        drawable.stop();
+        for(int i = 0; i < drawable.getNumberOfFrames(); i++)
+        {
+            BitmapDrawable drawable1 = (BitmapDrawable) drawable.getFrame(i);
+            drawable1.mutate();
+            drawable1.getBitmap().recycle();
+            drawable1.setCallback(null);
+        }
+        drawable.setCallback(null);
+    }
 
     private void disableButtons(){
         profile_pic_box.setEnabled(false);
@@ -725,6 +740,8 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
         if (view instanceof ImageView) {
             ImageView imageView = (ImageView) view;
             imageView.setImageBitmap(null);
+            imageView.setImageDrawable(null);
+            imageView.setBackground(null);
         } else if (view instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) view;
             for (int i = 0; i < viewGroup.getChildCount(); i++)

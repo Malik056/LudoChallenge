@@ -1,17 +1,13 @@
  package com.example.apple.ludochallenge.networking;
 
- import android.app.Activity;
  import android.app.ProgressDialog;
- import android.content.ContentResolver;
  import android.content.Intent;
  import android.graphics.Bitmap;
  import android.graphics.BitmapFactory;
+ import android.graphics.drawable.AnimationDrawable;
  import android.graphics.drawable.BitmapDrawable;
- import android.graphics.drawable.Drawable;
- import android.media.MediaCas;
  import android.net.Uri;
  import android.os.Bundle;
- import android.service.textservice.SpellCheckerService;
  import android.support.annotation.NonNull;
  import android.support.v7.app.AppCompatActivity;
  import android.text.TextUtils;
@@ -24,7 +20,6 @@
  import android.widget.ImageView;
  import android.widget.Spinner;
  import android.widget.TextView;
- import android.widget.Toast;
 
  import com.bumptech.glide.Glide;
  import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -63,12 +58,8 @@
 
  import java.io.ByteArrayOutputStream;
  import java.io.File;
- import java.io.FileNotFoundException;
  import java.io.IOException;
- import java.io.InputStream;
  import java.lang.reflect.Field;
- import java.net.MalformedURLException;
- import java.net.URL;
  import java.util.ArrayList;
  import java.util.Arrays;
  import java.util.HashMap;
@@ -112,9 +103,10 @@
     Uri photoUrl;
 
     ArrayList<Bitmap> bitmapArrayList;
+     private AnimationDrawable logoDrawable;
 
 
-    @Override
+     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
@@ -137,12 +129,15 @@
         countryFlag = (ImageView) findViewById(R.id.country_flag);
         logo = (ImageView) findViewById(R.id.register_logo);
         Glide.with(getApplicationContext()).load(R.raw.logo).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(logo);
-
+//        logo.setImageResource(R.drawable.logo_anim);
+//
+//        logoDrawable = (AnimationDrawable) logo.getDrawable();
+//        logoDrawable.start();
         register_name = (CustomEditText) findViewById(R.id.register_name);
         register_email = (CustomEditText) findViewById(R.id.register_email);
         register_password = (CustomEditText) findViewById(R.id.register_password);
         registerBtn = (Button) findViewById(R.id.register_register_button);
-        loadingBar = new ProgressDialog(this);
+        loadingBar = new ProgressDialog(getApplicationContext());
         alreadyHaveAnAccount = (ImageView) findViewById(R.id.register_already_have_an_account_login);
         playAsGuest = (ImageView) findViewById(R.id.registerActivity_playAsGuest);
         facebookLogin = (ImageView) findViewById(R.id.registerActivity_loginWithFacebook);
@@ -291,11 +286,6 @@
                 String clickedCountryName = clickedItem.getCountryName();
                 countryName.setText(clickedCountryName);
                 countryFlag.setImageDrawable(getResources().getDrawable(clickedItem.getFlagImage()));
-
-
-
-
-
 //                Toast.makeText(getApplicationContext(),clickedCountryName,Toast.LENGTH_SHORT).show();
             }
 
@@ -870,8 +860,27 @@
      public void onDestroy() {
          super.onDestroy();
          unbindDrawables(findViewById(R.id.registerActivityRoot));
+//         logoDrawable.mutate();
+//         logoDrawable = new AnimationDrawable();
+//         logoDrawable.stop();
+//         logoDrawable.setCallback(null);
+//         logoDrawable.setOneShot(true);
+//         freeLogo(logoDrawable);
+         logoDrawable = null;
          Runtime.getRuntime().gc();
          System.gc();
+     }
+
+     private void freeLogo(AnimationDrawable drawable)
+     {
+         drawable.stop();
+         for(int i = 0; i < drawable.getNumberOfFrames(); i++)
+         {
+             BitmapDrawable drawable1 = (BitmapDrawable) drawable.getFrame(i);
+             drawable1.mutate();
+             drawable1.setCallback(null);
+         }
+         drawable.setCallback(null);
      }
 
      private void unbindDrawables(View view) {
@@ -881,6 +890,8 @@
          if (view instanceof ImageView) {
              ImageView imageView = (ImageView) view;
              imageView.setImageBitmap(null);
+             imageView.setImageDrawable(null);
+             imageView.setBackground(null);
          } else if (view instanceof ViewGroup) {
              ViewGroup viewGroup = (ViewGroup) view;
              for (int i = 0; i < viewGroup.getChildCount(); i++)

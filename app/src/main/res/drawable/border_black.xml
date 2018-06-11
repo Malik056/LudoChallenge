@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#000" />
+    <stroke android:width="@dimen/ludoboard_border" android:color="#000000" />
+    <padding android:left="@dimen/ludoboard_border" android:top="@dimen/ludoboard_border" android:right="@dimen/ludoboard_border"
+        android:bottom="@dimen/ludoboard_border" />
+</shape>

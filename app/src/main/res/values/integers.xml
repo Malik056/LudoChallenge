@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="dice_gif_duration">10</integer>
+    <integer name="logo_gif_duration">20</integer>
+    <integer name="border_gif_duration">50</integer>
+    <integer name="gift_gif_duration">150</integer>
+</resources>

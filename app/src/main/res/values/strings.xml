@@ -3,6 +3,8 @@
     <string name="facebook_app_id">142901193223884</string>
     <string name="fb_login_protocol_scheme">fb142901193223884</string>
     <string name="addUnit">ca-app-pub-3940256099942544/6300978111</string>
-
+    <string name="CHANNEL_ID">1</string>
+    <string name="channel_name">ludo_challenge</string>
+    <string name="channel_description">notifications of Challenges</string>
 
 </resources>

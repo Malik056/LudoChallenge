@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list android:id="@+id/selected"
+    android:oneshot="true"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/dice_gif0" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif1" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif2" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif3" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif4" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif5" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif6" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif7" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif8" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif9" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif10" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif11" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif12" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif13" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif14" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif15" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif16" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif17" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif18" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif19" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif20" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif21" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif22" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif23" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif0" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif1" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif2" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif3" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif4" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif5" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif6" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif7" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif8" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif9" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif10" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif11" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif12" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif13" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif14" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif15" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif16" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif17" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif18" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif19" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif20" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif21" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif22" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_gif23" android:duration="@integer/dice_gif_duration" />
+    <item android:drawable="@drawable/dice_2" android:duration="@integer/dice_gif_duration" />
+</animation-list>

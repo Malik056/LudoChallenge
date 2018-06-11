@@ -135,6 +135,7 @@ public class UsersActivity extends AppCompatActivity {
                     } else {
                         holder.mView.setBackgroundColor(android.graphics.Color.BLACK);
                     }
+
                     holder.setName(model.getName());
                     holder.setUserImage(model.getThumb_image(), getApplicationContext());
                     holder.setUserFlag(model.getFlag_image(), getApplicationContext());
@@ -170,12 +171,8 @@ public class UsersActivity extends AppCompatActivity {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 if (dataSnapshot.hasChild("challenge")) {
                                     ImageView challenge_btn = holder.mView.findViewById(R.id.challenge_btn);
-
                                     challenge_btn.setImageResource(R.drawable.recycle_view_challenged);
                                     challenge_btn.setTag("challenged");
-
-
-
                                 }
                             }
 
