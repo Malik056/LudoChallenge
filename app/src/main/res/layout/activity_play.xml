@@ -11,7 +11,6 @@
 
 
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -307,6 +306,7 @@
 
                 <TextView
                     android:layout_width="0dp"
+                    android:id="@+id/gift_gap"
                     android:layout_height="match_parent"
                     android:layout_weight="0.36"
                     android:textStyle="bold"
@@ -323,16 +323,17 @@
                     android:scaleType="fitXY"
                     android:src="@drawable/coin"
                     />
+
                 <TextView
+                    android:id="@+id/play_coins"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.55"
                     android:maxLength="17"
+                    android:text="1,000,000,000,000"
                     android:textColor="#481676"
                     android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:id="@+id/play_coins"
-                    android:text="1,000,000,000,000"/>
+                    android:textStyle="bold" />
             </LinearLayout>
 
 
@@ -346,6 +347,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
+
+
 
         <ImageView
             android:layout_width="match_parent"
@@ -679,7 +682,6 @@
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
-
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -2988,8 +2990,50 @@
 
     </FrameLayout>
 
+    <LinearLayout
+        android:id="@+id/gift_gif"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:visibility="visible"
+        android:scaleY="0"
+        android:scaleX="0"
+        android:layout_marginEnd="10dp"
+        android:orientation="vertical">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#000"
+            android:id="@+id/gift_text1"
+            android:text="A Gift From"/>
 
+        <ImageView
+            android:id="@+id/gift_gif_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/gift_gif"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="#000"
+            android:textSize="15dp"
+            android:id="@+id/gift_text2"
+            android:text="Xaara Meher"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="#FFFF00"
+            android:textSize="17dp"
+            android:text="100 Coins"/>
+
+    </LinearLayout>
 
 
 </FrameLayout>

@@ -33,6 +33,6 @@ public class CustomEditText extends android.support.v7.widget.AppCompatEditText 
         paint.setStrokeWidth(15);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setColor(Color.WHITE);
-        canvas.drawLine(0,(getBaseline()+getBottom())/2,0+getWidth(),(getBaseline()+getBottom())/2,paint);
+        canvas.drawLine(0,(getBaseline()+getBottom())/2, getWidth(),(getBaseline()+getBottom())/2,paint);
     }
 }

@@ -131,6 +131,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
             String data = cursor.getString(0);
             return data;
         }
+        cursor.close();
         return null;
     }
 
@@ -149,6 +150,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
             String data = cursor.getString(0);
             return data;
         }
+        cursor.close();
         return null;
     }
     @Override
@@ -245,7 +247,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
         {
             return cursor.getString(1);
         }
-
+        cursor.close();
         return null;
     }
 
@@ -498,7 +500,6 @@ public class MySQLDatabase extends SQLiteOpenHelper {
                         null,
                         null, null, null, null, null
                 );
-
         while(cursor.moveToNext())
         {
 
@@ -512,7 +513,7 @@ public class MySQLDatabase extends SQLiteOpenHelper {
 
             users.add(user);
         }
-
+        cursor.close();
         return users;
 
     }

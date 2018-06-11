@@ -11,10 +11,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Iterator;
-
-import static com.example.apple.ludochallenge.LudoActivity.REFERENCE;
-
 public class CheckChallegeAcceptedService extends Service {
     public CheckChallegeAcceptedService() {
     }
@@ -39,13 +35,9 @@ public class CheckChallegeAcceptedService extends Service {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = children.iterator();
 
-                while (iterator.hasNext())
-                {
-                    DataSnapshot snapshot = iterator.next();
-                    if(snapshot.hasChild(intent.getStringExtra("UID")))
-                    {
+                for (DataSnapshot snapshot : children) {
+                    if (snapshot.hasChild(intent.getStringExtra("UID"))) {
                         int players = (int) snapshot.child("UID").child("players").getValue();
 
                     }

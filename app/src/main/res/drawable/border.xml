@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list android:oneshot="true"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/border_black" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_pink" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_black" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_pink" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_black" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_pink" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_black" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_pink" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_black" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_pink" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_black" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_pink" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_black" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_pink" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_black" android:duration="@integer/border_gif_duration"/>
+    <item android:drawable="@drawable/border_pink" android:duration="@integer/border_gif_duration"/>
+</animation-list>

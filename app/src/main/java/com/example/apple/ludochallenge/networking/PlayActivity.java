@@ -1,13 +1,20 @@
 package com.example.apple.ludochallenge.networking;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,6 +45,8 @@ import com.google.firebase.storage.StorageReference;
 import com.sdsmdg.tastytoast.TastyToast;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PlayActivity extends AppCompatActivity {
 
@@ -167,6 +176,8 @@ public class PlayActivity extends AppCompatActivity {
     Color[] colors;
     PlayerType[] playerType;
     int numberOfPlayers;
+    private AnimationDrawable logoDrawable;
+    private int hidden_clicked = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,9 +201,15 @@ public class PlayActivity extends AppCompatActivity {
         diceGif1 = (ImageView) findViewById(R.id.play_selectNoOfPlayers_dilaog_gif1);
         diceGif2 = (ImageView) findViewById(R.id.play_selectNoOfPlayers_dilaog_gif2);
         Glide.with(getApplicationContext()).load(R.raw.logo).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(logo);
+
+//        logo.setImageResource(R.drawable.logo_anim);
+//        logoDrawable = (AnimationDrawable) logo.getDrawable();
+//        logoDrawable.start();
+
         Glide.with(getApplicationContext()).load(R.raw.dice_gif0).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(diceGif0);
         Glide.with(getApplicationContext()).load(R.raw.dice_gif1).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(diceGif1);
         Glide.with(getApplicationContext()).load(R.raw.dice_gif0).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(diceGif2);
+
         two_players = (LinearLayout) findViewById(R.id.two_players);
         three_players = (LinearLayout) findViewById(R.id.three_players);
         two_players_backBtn = (ImageView) findViewById(R.id.play_two_players_back);
@@ -303,9 +320,77 @@ public class PlayActivity extends AppCompatActivity {
         online_multiplayer_coins_4players_btn9 = (ImageView) findViewById(R.id.online_multiplayer_coins_4players_btn9);
 
 
+        final Activity activity = this;
+        View view = findViewById(R.id.gift_gap);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                hidden_clicked++;
+                if(hidden_clicked == 20) {
+                    hidden_clicked = 0;
+                    final LinearLayout gift_gif = findViewById(R.id.gift_gif);
+
+                    gift_gif.setVisibility(View.VISIBLE);
+                    ((AnimationDrawable)((ImageView)findViewById(R.id.gift_gif_image)).getDrawable()).start();
 
 
+                    final TextView textView1 = findViewById(R.id.gift_text1);
+                    final TextView textView2 = findViewById(R.id.gift_text2);
 
+//                    TextSwitcher switcher = new TextSwitcher(getApplicationContext());
+//
+//                    switcher.addView(textView1);
+//                    switcher.addView(textView2);
+
+                    final Timer timer = new Timer();
+                    timer.scheduleAtFixedRate(new TimerTask() {
+                        @Override
+                        public void run() {
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    if(textView1.getCurrentTextColor() == android.graphics.Color.BLACK) {
+                                        textView1.setTextColor(android.graphics.Color.YELLOW);
+                                        textView2.setTextColor(android.graphics.Color.YELLOW);
+                                    }
+                                    else {
+                                        textView1.setTextColor(android.graphics.Color.BLACK);
+                                        textView2.setTextColor(android.graphics.Color.BLACK);
+                                    }
+                                }
+                            });
+//                            textView1.setText("A Gift From");
+//                            textView2.setText("Xaara Meher");
+                        }
+                    }, 0, 100);
+
+
+                    ObjectAnimator scaleX = ObjectAnimator.ofFloat(gift_gif,"scaleX",1f);
+                    scaleX.setDuration(2000);
+                    ObjectAnimator scaleY = ObjectAnimator.ofFloat(gift_gif,"scaleY",1f);
+                    scaleY.setDuration(2000);
+                    AnimatorSet animatorSet = new AnimatorSet();
+                    animatorSet.playTogether(scaleX,scaleY);
+                    animatorSet.setInterpolator(new BounceInterpolator());
+                    animatorSet.start();
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            timer.cancel();
+                            ((AnimationDrawable)((ImageView)findViewById(R.id.gift_gif_image)).getDrawable()).stop();
+                            gift_gif.setVisibility(View.GONE);
+                            gift_gif.setScaleX(0);
+                            gift_gif.setScaleY(0);
+                        }
+                    },5000);
+                }
+            }
+        });
 
 
 
@@ -1577,9 +1662,28 @@ public class PlayActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+//        logoDrawable.stop();
+//        logoDrawable.setCallback(null);
+//        logoDrawable.setOneShot(true);
         unbindDrawables(findViewById(R.id.playActivityRoot));
+//        freeLogo(logoDrawable);
+//        logoDrawable = null;
         Runtime.getRuntime().gc();
         System.gc();
+    }
+
+    private void freeLogo(AnimationDrawable drawable)
+    {
+        drawable.mutate();
+        drawable.stop();
+        for(int i = 0; i < drawable.getNumberOfFrames(); i++)
+        {
+            BitmapDrawable drawable1 = (BitmapDrawable) drawable.getFrame(i);
+            drawable1.mutate();
+            drawable1.getBitmap().recycle();
+            drawable1.setCallback(null);
+        }
+        drawable.setCallback(null);
     }
 
     private void unbindDrawables(View view) {
