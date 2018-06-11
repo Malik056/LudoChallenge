@@ -186,7 +186,7 @@ public class UsersActivity extends AppCompatActivity {
                         @Override
                         public void onClick(final View view) {
                             view.setEnabled(false);
-                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                            final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                             if (view.getTag().equals("challenged")) {
                                 mChallenge_database.child(mCurrent_user.getUid()).child(user_id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -199,8 +199,6 @@ public class UsersActivity extends AppCompatActivity {
                                 });
                             } else if (view.getTag().equals("challenge")) {
                                 HashMap<String, String> userMap = new HashMap<>();
-                                userMap.put("noOfPlayers", "2");
-                                userMap.put("challenge", "true");
                                 userMap.put("from", mCurrent_user.getUid());
                                 userMap.put("player3", "null");
                                 userMap.put("player4","null");
@@ -208,13 +206,27 @@ public class UsersActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if(task.isSuccessful()){
-                                            view.setTag("challenged");
-                                            ((ImageView) view).setImageResource(R.drawable.recycle_view_challenged);
-                                            FirebaseDatabase.getInstance().getReference().child("started_games");
-                                            Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
-                                            intent.putExtra("UIDS", new String[]{user_id, mCurrent_user.getUid()});
-                                            intent.putExtra("names", new String[]{model.name, myName});
-                                            startActivity(intent);
+                                            mDatabase.child("notifications").child(user_id).child("noOfPlayers").setValue(2).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()){
+                                                        mDatabase.child("notifications").child(user_id).child("challenge").setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if(task.isSuccessful()){
+                                                                    view.setTag("challenged");
+                                                                    ((ImageView) view).setImageResource(R.drawable.recycle_view_challenged);
+                                                                    FirebaseDatabase.getInstance().getReference().child("started_games");
+                                                                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent2Players.class);
+                                                                    intent.putExtra("UIDS", new String[]{user_id, mCurrent_user.getUid()});
+                                                                    intent.putExtra("names", new String[]{model.name, myName});
+                                                                    startActivity(intent);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            });
                                         }
                                     }
                                 });
