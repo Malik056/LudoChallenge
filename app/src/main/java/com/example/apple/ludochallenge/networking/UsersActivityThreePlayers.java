@@ -367,8 +367,6 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
                         });
                     } else if (player2_view.getTag().equals("check") && player3_view.getTag().equals("check")) {
                         final HashMap<String, String> userMap = new HashMap<>();
-                        userMap.put("noOfPlayers", "3");
-                        userMap.put("challenge", "true");
                         userMap.put("from", mCurrent_user.getUid());
                         userMap.put("player3", player3_Uid);
                         userMap.put("player4","null");
@@ -376,57 +374,44 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()) {
-                                    player2_view.setTag("checked");
-                                    HashMap<String, String> userMap = new HashMap<>();
-                                    userMap.put("noOfPlayers", "3");
-                                    userMap.put("challenge", "true");
-                                    userMap.put("from", mCurrent_user.getUid());
-                                    userMap.put("player3", player2_Uid);
-                                    userMap.put("player4", "null");
-                                    mDatabase.child("notifications").child(player3_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    mDatabase.child("notifications").child(player2_Uid).child("noOfPlayers").setValue(3).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
-                                                player3_view.setTag("checked");
-                                                Intent intent = new Intent(getApplicationContext(), WaitingForOpponent3Players.class);
-                                                intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid});
-                                                intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString()});
-                                                startActivity(intent);
-                                            }
+                                                mDatabase.child("notifications").child(player2_Uid).child("challenge").setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if(task.isSuccessful()){
+                                                            player2_view.setTag("checked");
+                                                            HashMap<String, String> userMap = new HashMap<>();
+                                                            userMap.put("noOfPlayers", "3");
+                                                            userMap.put("challenge", "true");
+                                                            userMap.put("from", mCurrent_user.getUid());
+                                                            userMap.put("player3", player2_Uid);
+                                                            userMap.put("player4", "null");
+                                                            mDatabase.child("notifications").child(player3_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                    if(task.isSuccessful()){
+                                                                        player3_view.setTag("checked");
+                                                                        Intent intent = new Intent(getApplicationContext(), WaitingForOpponent3Players.class);
+                                                                        intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid});
+                                                                        intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString()});
+                                                                        startActivity(intent);
+                                                                    }
 
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                });
+                                            }
                                         }
                                     });
                                 }
 
                             }
                         });
-//                        mChallenge_database.child(mCurrent_user.getUid()).child(player2_Uid).child(player3_Uid).child("challenge").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<Void> task) {
-//                                if (task.isSuccessful()) {
-//                                    HashMap<String, String> notificationData = new HashMap<>();
-//                                    notificationData.put("from", mCurrent_user.getUid());
-//                                    notificationData.put("type", "challenged");
-//                                    mNotification_database.child(player2_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                        @Override
-//                                        public void onSuccess(Void aVoid) {
-//                                            player2_view.setTag("checked");
-//                                        }
-//                                    });
-//                                    mNotification_database.child(player3_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                        @Override
-//                                        public void onSuccess(Void aVoid) {
-//                                            player3_view.setTag("checked");
-//                                        }
-//                                    });
-//                                    FirebaseDatabase.getInstance().getReference().child("started_games");
-//                                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent3Players.class);
-//                                    intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid});
-//                                    intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString()});
-//                                    startActivity(intent);
-//                                }
-//                            }
-//                        });
                     }
                 }
                 else if(noOfPlayers == 4){
@@ -454,8 +439,6 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
                                 if(task.isSuccessful()){
                                     player2_view.setTag("checked");
                                     HashMap<String, String> userMap = new HashMap<>();
-                                    userMap.put("noOfPlayers", "4");
-                                    userMap.put("challenge", "true");
                                     userMap.put("from", mCurrent_user.getUid());
                                     userMap.put("player3", player2_Uid);
                                     userMap.put("player4",player4_Uid);
@@ -463,23 +446,37 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
-                                                player3_view.setTag("checked");
-                                                HashMap<String, String> userMap = new HashMap<>();
-                                                userMap.put("noOfPlayers", "4");
-                                                userMap.put("challenge", "true");
-                                                userMap.put("from", mCurrent_user.getUid());
-                                                userMap.put("player3", player2_Uid);
-                                                userMap.put("player4",player3_Uid);
-                                                mDatabase.child("notifications").child(player4_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                mDatabase.child("notifications").child(player3_Uid).child("noOfPlayers").setValue(4).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if(task.isSuccessful()){
-                                                            player4_view.setTag("checked");
-                                                            Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
-                                                            intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid, player4_Uid});
-                                                            intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString(), player4_name.getText().toString()});
-                                                            intent.putExtra("checkActivity", true);
-                                                            startActivity(intent);
+                                                            mDatabase.child("notifications").child(player3_Uid).child("challenge").setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                    if(task.isSuccessful()){
+                                                                        player3_view.setTag("checked");
+                                                                        HashMap<String, String> userMap = new HashMap<>();
+                                                                        userMap.put("noOfPlayers", "4");
+                                                                        userMap.put("challenge", "true");
+                                                                        userMap.put("from", mCurrent_user.getUid());
+                                                                        userMap.put("player3", player2_Uid);
+                                                                        userMap.put("player4",player3_Uid);
+                                                                        mDatabase.child("notifications").child(player4_Uid).setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                            @Override
+                                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                                if(task.isSuccessful()){
+                                                                                    player4_view.setTag("checked");
+                                                                                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
+                                                                                    intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid, player4_Uid});
+                                                                                    intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString(), player4_name.getText().toString()});
+                                                                                    intent.putExtra("checkActivity", true);
+                                                                                    startActivity(intent);
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+                                                            });
                                                         }
                                                     }
                                                 });
@@ -490,40 +487,6 @@ public class UsersActivityThreePlayers extends AppCompatActivity {
 
                             }
                         });
-//                        mChallenge_database.child(mCurrent_user.getUid()).child(player2_Uid).child(player3_Uid).child(player4_Uid).child("challenge").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<Void> task) {
-//                                if (task.isSuccessful()) {
-//                                    HashMap<String, String> notificationData = new HashMap<>();
-//                                    notificationData.put("from", mCurrent_user.getUid());
-//                                    notificationData.put("type", "challenged");
-//                                    mNotification_database.child(player2_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                        @Override
-//                                        public void onSuccess(Void aVoid) {
-//                                            player2_view.setTag("checked");
-//                                        }
-//                                    });
-//                                    mNotification_database.child(player3_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                        @Override
-//                                        public void onSuccess(Void aVoid) {
-//                                            player3_view.setTag("checked");
-//                                        }
-//                                    });
-//                                    mNotification_database.child(player4_Uid).setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                        @Override
-//                                        public void onSuccess(Void aVoid) {
-//                                            player4_view.setTag("checked");
-//                                        }
-//                                    });
-//                                    FirebaseDatabase.getInstance().getReference().child("started_games");
-//                                    Intent intent = new Intent(getApplicationContext(), WaitingForOpponent4Players.class);
-//                                    intent.putExtra("UIDS", new String[]{mCurrent_user.getUid(), player2_Uid, player3_Uid, player4_Uid});
-//                                    intent.putExtra("names", new String[]{myName, player2_name.getText().toString(), player3_name.getText().toString(), player4_name.getText().toString()});
-//                                    intent.putExtra("checkActivity", true);
-//                                    startActivity(intent);
-//                                }
-//                            }
-//                        });
                     }
                 }
             }
