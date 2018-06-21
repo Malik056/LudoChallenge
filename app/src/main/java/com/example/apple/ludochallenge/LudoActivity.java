@@ -213,7 +213,7 @@ public class LudoActivity extends AppCompatActivity {
                                         .into(arrows[0]);
                                 Glide.with(getApplicationContext())
                                         .asGif()
-                                        .load(R.drawable.right_arrown_down)
+                                        .load(R.drawable.right_arrow_down)
                                         .into(arrows[1]);
                                 Glide.with(getApplicationContext())
                                         .asGif()
@@ -263,7 +263,7 @@ public class LudoActivity extends AppCompatActivity {
                                         .into(arrows[0]);
                                 Glide.with(getApplicationContext())
                                         .asGif()
-                                        .load(R.drawable.right_arrown_down)
+                                        .load(R.drawable.right_arrow_down)
                                         .into(arrows[1]);
                                 Glide.with(getApplicationContext())
                                         .asGif()

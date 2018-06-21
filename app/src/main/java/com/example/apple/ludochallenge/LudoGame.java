@@ -732,9 +732,9 @@ public class LudoGame extends FrameLayout {
             LudoPiece[] ludoPieces = new LudoPiece[4];
 
             for (int j = 0; j < 4; j++) {
-                final LudoPiece ludoPiece = new LudoPiece(context, player, game, colors[i], pieceSize, ludoBoxes[i][j], ludoBoxes[i][j]);
-                ludoPiece.pieceNum = j;
                 ImageView circle = new ImageView(context);
+                final LudoPiece ludoPiece = new LudoPiece(context, player, game, colors[i], pieceSize, ludoBoxes[i][j],circle);
+                ludoPiece.pieceNum = j;
                 circle.setImageResource(R.drawable.circle);
                 circle.setWillNotDraw(false);
                 circle.setVisibility(INVISIBLE);
