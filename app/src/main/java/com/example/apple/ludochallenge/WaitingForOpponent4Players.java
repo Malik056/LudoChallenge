@@ -84,7 +84,6 @@ public class WaitingForOpponent4Players extends AppCompatActivity {
         if(localMultiplayer) {
             MySQLDatabase mySQLDatabase = MySQLDatabase.getInstance(getApplicationContext());
             final byte[] myPic = (byte[]) mySQLDatabase.getData(myUid, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
-
             Bitmap yourPic = BitmapFactory.decodeByteArray(myPic, 0, myPic.length);
             this.yourPic.setImageBitmap(yourPic);
         }
@@ -199,8 +198,6 @@ public class WaitingForOpponent4Players extends AppCompatActivity {
             }
         };
         loopThrough.addValueEventListener(listener);
-
-
 
         mDatabase.child("still_searching").setValue("true").addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

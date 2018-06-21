@@ -56,7 +56,6 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waiting_for_opponent2_players);
 
-
         waiting_for_opponent_gif = (ImageView) findViewById(R.id.waiting_for_opponent_gif_2players);
         player2_name = (TextView) findViewById(R.id.waitingForOpponent_player2_name_2players);
         yourPic = (ImageView) findViewById(R.id.waitingForOpponent_yourPic_2players);
@@ -76,7 +75,6 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
         }
 
             Glide.with(getApplicationContext()).load(R.raw.random_playergif).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE)).into(waiting_for_opponent_gif);
-
             Intent onlineMultiplayer_intent = getIntent();
             noOfPlayers_online_multiplayer = onlineMultiplayer_intent.getStringExtra("noOfPlayers");
             entry_coins = onlineMultiplayer_intent.getStringExtra("entry_coins");
@@ -86,7 +84,6 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
             if (!check_online_multiplayer) {
                 final String hisUID = getIntent().getStringArrayExtra("UIDS")[0];
                 final String myUID = getIntent().getStringArrayExtra("UIDS")[1];
-
                 final byte[] myPic = (byte[]) mySQLDatabase.getData(myUID, MySQLDatabase.IMAGE_PROFILE_COL, MySQLDatabase.TABLE_NAME);
 
                 Bitmap yourPic = BitmapFactory.decodeByteArray(myPic, 0, myPic.length);

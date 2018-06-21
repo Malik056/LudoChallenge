@@ -574,14 +574,14 @@
                                             });
                                         }
                                     });
-                                    loadingBar.dismiss();
+//                                    loadingBar.dismiss();
                                 }
                             }
                         });
                     }
                     else{
                         TastyToast.makeText(getApplicationContext(),"Error Occured Try Again!", TastyToast.LENGTH_SHORT, TastyToast.ERROR).show();
-                        loadingBar.dismiss();
+//                        loadingBar.dismiss();
                     }
                 }
             });

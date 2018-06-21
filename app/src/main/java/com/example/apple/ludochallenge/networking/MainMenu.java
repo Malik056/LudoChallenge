@@ -1,7 +1,6 @@
 package com.example.apple.ludochallenge.networking;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -48,6 +47,8 @@ import com.sdsmdg.tastytoast.TastyToast;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import service.NotificationService;
 
 public class MainMenu extends AppCompatActivity implements RewardedVideoAdListener {
 
@@ -320,7 +321,12 @@ public class MainMenu extends AppCompatActivity implements RewardedVideoAdListen
 
 
     }
+    else
+    {
+        Intent service = new Intent(getApplicationContext(), NotificationService.class);
+        startService(service);
 
+    }
 
 
 
