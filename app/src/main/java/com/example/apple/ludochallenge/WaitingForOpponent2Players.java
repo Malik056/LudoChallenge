@@ -46,6 +46,7 @@ public class WaitingForOpponent2Players extends AppCompatActivity {
     private String entry_coins;
     private boolean check_online_multiplayer = false;
     private String current_uid;
+
     private DatabaseReference mDatabase;
     DatabaseReference reference;
     String LOGIN_STATUS;
