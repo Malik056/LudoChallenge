@@ -797,6 +797,7 @@ public class LudoGame extends FrameLayout {
                                         turnChange = true;
                                         currentPlayer++;
                                         currentPlayer %= numberOfPlayers;
+
 //                                        getDiceImage().setX(dicePoints[currentPlayer].x);
 //                                        getDiceImage().setY(dicePoints[currentPlayer].y);
                                         getDiceImage().setEnabled(true);
