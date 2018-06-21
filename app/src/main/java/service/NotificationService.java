@@ -52,7 +52,7 @@ public class NotificationService extends Service {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                if((Boolean) dataSnapshot.child("challenge").getValue())
+                if(dataSnapshot != null && dataSnapshot.child("challenge") != null && dataSnapshot.child("challenge").getValue() != null && (Boolean) dataSnapshot.child("challenge").getValue())
                 {
                     final String challenger = (String) dataSnapshot.child("from").getValue();
                     final int numberofPlayers =  ((Long)dataSnapshot.child("noOfPlayers").getValue()).intValue();
@@ -132,8 +132,9 @@ public class NotificationService extends Service {
                                         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, finalIntent, 0);
                                         final NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(),getResources().getString(R.string.CHANNEL_ID))
                                                 .setSmallIcon(R.mipmap.ic_launcher_round)
-                                                .setContentTitle(challenger + " challenged you")
-                                                .setContentText(challenger + " challenged you to play " + finalChallengeType)
+                                                .setLargeIcon(((BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))))
+                                                .setContentTitle(names[1] + " challenged you")
+                                                .setContentText(names[1] + " challenged you to play " + finalChallengeType)
                                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                                                 .setContentIntent(pendingIntent)
                                                 .setTimeoutAfter(20000)
